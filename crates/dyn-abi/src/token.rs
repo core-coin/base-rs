@@ -12,7 +12,7 @@ use alloy_sol_types::abi::token::{PackedSeqToken, TokenType, WordToken};
 pub enum DynToken<'a> {
     /// A single word.
     Word(Word),
-    /// A Fixed Sequence.
+    /// A fixed-length sequence.
     FixedSeq(Cow<'a, [DynToken<'a>]>, usize),
     /// A dynamic-length sequence.
     DynSeq {
@@ -133,12 +133,25 @@ impl<'a> DynToken<'a> {
         }
     }
 
+    pub(crate) fn is_zst(&self) -> bool {
+        match self {
+            Self::Word(_) | Self::PackedSeq(_) => false,
+            Self::FixedSeq(contents, _) | Self::DynSeq { contents, .. } => {
+                contents.is_empty() || contents.iter().all(Self::is_zst)
+            }
+        }
+    }
+
     /// Decodes from a decoder, populating the structure with the decoded data.
     #[inline]
     pub(crate) fn decode_populate(&mut self, dec: &mut Decoder<'a>) -> Result<()> {
         match self {
             Self::Word(w) => *w = WordToken::decode_from(dec)?.0,
             Self::FixedSeq(..) => {
+                if self.is_zst() {
+                    return Ok(())
+                }
+
                 let dynamic = self.is_dynamic();
                 let mut child = if dynamic {
                     dec.take_indirection()?
