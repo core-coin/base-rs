@@ -1,5 +1,5 @@
 use crate::{aliases::U160, utils::sha3, ChecksumAddress, FixedBytes};
-use core::{fmt, str};
+use core::{borrow::Borrow, fmt, str};
 use ruint::aliases::U256;
 
 const MAINNET: u64 = 203;
@@ -186,6 +186,26 @@ impl Address {
         s = (s % U256::from(10)) + (s / U256::from(10)) * U256::from(16);
         let result: U256 = value_new + (s << 160) + (network_prefix << 168);
         ChecksumAddress::from_word(result.into())
+    }
+
+    /// Computes the `CREATE2` address
+        #[must_use]
+    pub fn create2<S, H>(&self, salt: S, init_code_hash: H, network_id: u64) -> ChecksumAddress
+    where
+        // not `AsRef` because `[u8; N]` does not implement `AsRef<[u8; N]>`
+        S: Borrow<[u8; 32]>,
+        H: Borrow<[u8; 32]>,
+    {
+        self.to_ican(network_id).create2(salt, init_code_hash)
+    }
+
+
+    /// Computes the `CREATE` address
+    #[cfg(feature = "rlp")]
+    #[inline]
+    #[must_use]
+    pub fn create(&self, nonce: u64, network_id: u64) -> ChecksumAddress {
+        self.to_ican(network_id).create(nonce)
     }
 
     /// Instantiate by hashing public key bytes.

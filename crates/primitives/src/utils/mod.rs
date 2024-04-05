@@ -244,13 +244,13 @@ mod tests {
             eip191_msg,
             [EIP191_PREFIX.as_bytes(), msg.len().to_string().as_bytes(), msg.as_bytes()].concat()
         );
-        assert_eq!(hash, b256!("a1de988600a42c4b4ab089b619297c17d53cffae5d5120d82d8a92d0bb3b78f2"));
+        assert_eq!(hash, b256!("6e1062427a5c78e549a48e47260552bf9e35d44f747c640bad47bd48e8709f0f"));
         assert_eq!(eip191_hash_message(msg), hash);
     }
 
     #[test]
     fn sha3_hasher() {
-        let expected = b256!("47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad");
+        let expected = b256!("644bcc7e564373040999aac89e7622f3ca71fba1d972fd94a31c3bfbf24e3938");
         assert_eq!(sha3("hello world"), expected);
 
         let mut hasher = Sha3::new();

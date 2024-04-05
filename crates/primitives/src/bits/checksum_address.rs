@@ -115,9 +115,9 @@ impl ChecksumAddress {
         use crate::sha3;
 
         // max u64 encoded length is `1 + u64::BYTES`
-        const MAX_LEN: usize = 1 + (1 + 20) + 9;
+        const MAX_LEN: usize = 1 + (1 + 22) + 9;
 
-        let len = 22 + nonce.length();
+        let len = 24 + nonce.length();
         debug_assert!(len <= MAX_LEN);
 
         let mut out = [0u8; MAX_LEN];
@@ -127,11 +127,11 @@ impl ChecksumAddress {
         out[0] = EMPTY_LIST_CODE + len as u8 - 1;
 
         // address header + address
-        out[1] = EMPTY_STRING_CODE + 20;
-        out[2..22].copy_from_slice(self.as_slice());
+        out[1] = EMPTY_STRING_CODE + 22;
+        out[2..24].copy_from_slice(self.as_slice());
 
         // nonce
-        nonce.encode(&mut &mut out[22..]);
+        nonce.encode(&mut &mut out[24..]);
 
         let hash = sha3(&out[..len]);
         Self::from_word(hash)
@@ -203,11 +203,11 @@ impl ChecksumAddress {
     fn _create2(&self, salt: &[u8; 32], init_code_hash: &[u8; 32]) -> Self {
         // note: creating a temporary buffer and copying everything over performs
         // much better than calling `Keccak::update` multiple times
-        let mut bytes = [0; 85];
+        let mut bytes = [0; 87];
         bytes[0] = 0xff;
-        bytes[1..21].copy_from_slice(self.as_slice());
-        bytes[21..53].copy_from_slice(salt);
-        bytes[53..85].copy_from_slice(init_code_hash);
+        bytes[1..23].copy_from_slice(self.as_slice());
+        bytes[23..55].copy_from_slice(salt);
+        bytes[55..87].copy_from_slice(init_code_hash);
         let hash = sha3(bytes);
         Self::from_word(hash)
     }
@@ -244,28 +244,28 @@ impl ChecksumAddress {
 }
 #[cfg(test)]
 mod tests {
-    // use crate::Address;
-    // use super::*;
-    //
-    // // https://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
-    // #[test]
-    // #[cfg(feature = "rlp")]
-    // fn create() {
-    //
-    //     let from = "0x6ac7ea33f8831ea9dcc53393aaa88b25a785dbf0".parse::<Address>().unwrap();
-    //     for (nonce, expected) in [
-    //         "0xcd234a471b72ba2f1ccf0a70fcaba648a5eecd8d",
-    //         "0x343c43a37d37dff08ae8c4a11544c718abb4fcf8",
-    //         "0xf778b86fa74e846c4f0a1fbd1335fe81c00a0c91",
-    //         "0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c",
-    //     ]
-    //     .into_iter()
-    //     .enumerate()
-    //     {
-    //         let address = from.create(nonce as u64);
-    //         assert_eq!(address, expected.parse::<Address>().unwrap());
-    //     }
-    // }
+    use crate::Address;
+    use super::*;
+
+    // https://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
+    #[test]
+    #[cfg(feature = "rlp")]
+    fn create() {
+
+        let from = "0x6ac7ea33f8831ea9dcc53393aaa88b25a785dbf0".parse::<Address>().unwrap();
+        for (nonce, expected) in [
+            "0xcb12cd234a471b72ba2f1ccf0a70fcaba648a5eecd8d",
+            "0xcb12343c43a37d37dff08ae8c4a11544c718abb4fcf8",
+            "0xcb12f778b86fa74e846c4f0a1fbd1335fe81c00a0c91",
+            "0xcb12fffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let address = from.create(nonce as u64, 1);
+            assert_eq!(address, expected.parse::<ChecksumAddress>().unwrap());
+        }
+    }
     //
     // #[test]
     // #[cfg(all(feature = "rlp", feature = "arbitrary"))]
