@@ -3186,13 +3186,13 @@ function containsBytes32(bytes32[] memory a, bytes32 b) pure returns (bool resul
 
 /// @dev Checks if the `a` string array contains the `b` string.
 function contains(string[] memory a, string memory b) pure returns (bool result) {
-    bytes32 bHash = sha3(abi.encode(b));
+    bytes32 bHash = keccak256(abi.encode(b));
     string memory item;
     uint256 length = a.length;
 
     for (uint256 i = 0; i < length;) {
         item = a[i];
-        if (sha3(abi.encode(item)) == bHash) {
+        if (keccak256(abi.encode(item)) == bHash) {
             return true;
         }
         unchecked {
@@ -3276,7 +3276,7 @@ function delta(uint256 a, uint256 b) pure returns (uint256 result) {
 
 /// @dev Checks if the `a` address array equals the `b` address array.
 function eq(address[] memory a, address[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` address array equals the `b` address array.
@@ -3286,7 +3286,7 @@ function eqAddressArr(address[] memory a, address[] memory b) pure returns (bool
 
 /// @dev Checks if the `a` bool array equals the `b` bool array.
 function eq(bool[] memory a, bool[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` bool array equals the `b` bool array.
@@ -3296,7 +3296,7 @@ function eqBoolArr(bool[] memory a, bool[] memory b) pure returns (bool result) 
 
 /// @dev Checks if the `a` bytes equals the `b` bytes.
 function eq(bytes memory a, bytes memory b) pure returns (bool result) {
-    result = sha3(a) == sha3(b);
+    result = keccak256(a) == keccak256(b);
 }
 
 /// @dev Checks if the `a` bytes equals the `b` bytes.
@@ -3306,7 +3306,7 @@ function eqBytes(bytes memory a, bytes memory b) pure returns (bool result) {
 
 /// @dev Checks if the `a` bytes32 equals the `b` bytes32.
 function eq(bytes32 a, bytes32 b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` bytes32 equals the `b` bytes32.
@@ -3316,7 +3316,7 @@ function eqBytes32(bytes32 a, bytes32 b) pure returns (bool result) {
 
 /// @dev Checks if the `a` bytes32 array equals the `b` bytes32 array.
 function eq(bytes32[] memory a, bytes32[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` bytes32 array equals the `b` bytes32 array.
@@ -3326,7 +3326,7 @@ function eqBytes32Arr(bytes32[] memory a, bytes32[] memory b) pure returns (bool
 
 /// @dev Checks if the `a` string equals the `b` string.
 function eq(string memory a, string memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` string equals the `b` string.
@@ -3336,7 +3336,7 @@ function eqString(string memory a, string memory b) pure returns (bool result) {
 
 /// @dev Checks if the `a` string array equals the `b` string array.
 function eq(string[] memory a, string[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` string array equals the `b` string array.
@@ -3346,7 +3346,7 @@ function eqStringArr(string[] memory a, string[] memory b) pure returns (bool re
 
 /// @dev Checks if the `a` int256 array equals the `b` int256 array.
 function eq(int256[] memory a, int256[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` int256 array equals the `b` int256 array.
@@ -3356,7 +3356,7 @@ function eqInt256Arr(int256[] memory a, int256[] memory b) pure returns (bool re
 
 /// @dev Checks if the `a` uint256 array equals the `b` uint256 array.
 function eq(uint256[] memory a, uint256[] memory b) pure returns (bool result) {
-    result = sha3(abi.encode(a)) == sha3(abi.encode(b));
+    result = keccak256(abi.encode(a)) == keccak256(abi.encode(b));
 }
 
 /// @dev Checks if the `a` uint256 array equals the `b` uint256 array.
@@ -4188,7 +4188,7 @@ contract PRBTest {
     //////////////////////////////////////////////////////////////////////////*/
 
     /// @dev The virtual address of the Foundry VM.
-    address internal constant VM_ADDRESS = address(uint160(uint256(sha3("hevm cheat code"))));
+    address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
 
     /// @dev An instance of the Foundry VM, which contains cheatcodes for testing.
     Vm internal constant vm = Vm(VM_ADDRESS);
@@ -4212,7 +4212,7 @@ contract PRBTest {
         // If there is HEVM context, load the global variable "failed".
         if (VM_ADDRESS.code.length > 0) {
             (, bytes memory returndata) = VM_ADDRESS.call(
-                abi.encodePacked(bytes4(sha3("load(address,bytes32)")), abi.encode(VM_ADDRESS, bytes32("failed")))
+                abi.encodePacked(bytes4(keccak256("load(address,bytes32)")), abi.encode(VM_ADDRESS, bytes32("failed")))
             );
             bool globalFailed = abi.decode(returndata, (bool));
             return globalFailed;
@@ -4233,7 +4233,7 @@ contract PRBTest {
         // Store "0x01" at the "failed" storage slot on the HEVM contract.
         (bool status,) = VM_ADDRESS.call(
             abi.encodePacked(
-                bytes4(sha3("store(address,bytes32,bytes32)")),
+                bytes4(keccak256("store(address,bytes32,bytes32)")),
                 abi.encode(VM_ADDRESS, bytes32("failed"), bytes32(uint256(0x01)))
             )
         );
@@ -4304,9 +4304,9 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(address[] memory a, address[] memory b) internal virtual {
-        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
+        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
             emit Log("Error: a == b not satisfied [address[]]");
             emit LogNamedArray("   Left", a);
             emit LogNamedArray("  Right", b);
@@ -4315,9 +4315,9 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(address[] memory a, address[] memory b, string memory err) internal virtual {
-        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
+        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
             emit LogNamedString("Error", err);
             assertEq(a, b);
         }
@@ -4342,7 +4342,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bool[] memory a, bool[] memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [bool[]]");
@@ -4353,7 +4353,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bool[] memory a, bool[] memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4362,7 +4362,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bytes memory a, bytes memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [bytes]");
@@ -4373,7 +4373,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bytes memory a, bytes memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4400,7 +4400,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bytes32[] memory a, bytes32[] memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [bytes32[]]");
@@ -4411,7 +4411,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(bytes32[] memory a, bytes32[] memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4438,7 +4438,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(int256[] memory a, int256[] memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [int256[]]");
@@ -4449,7 +4449,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(int256[] memory a, int256[] memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4458,7 +4458,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the strings, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the strings, which is faster than iterating over the elements.
     function assertEq(string memory a, string memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [string]");
@@ -4469,7 +4469,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the strings, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the strings, which is faster than iterating over the elements.
     function assertEq(string memory a, string memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4478,7 +4478,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(string[] memory a, string[] memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [string[]]");
@@ -4489,7 +4489,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(string[] memory a, string[] memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4516,7 +4516,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(uint256[] memory a, uint256[] memory b) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit Log("Error: a == b not satisfied [uint256[]]");
@@ -4527,7 +4527,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertEq(uint256[] memory a, uint256[] memory b, string memory err) internal virtual {
         if (!Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4558,7 +4558,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(address[] memory a, address[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [address[]]");
@@ -4569,7 +4569,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(address[] memory a, address[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4596,7 +4596,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bool[] memory a, bool[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [bool[]]");
@@ -4607,7 +4607,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bool[] memory a, bool[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4616,7 +4616,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bytes memory a, bytes memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [bytes]");
@@ -4627,7 +4627,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are equal. If they are not, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bytes memory a, bytes memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4654,7 +4654,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bytes32[] memory a, bytes32[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [bytes32[]]");
@@ -4665,7 +4665,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(bytes32[] memory a, bytes32[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4692,7 +4692,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(int256[] memory a, int256[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [int256[]]");
@@ -4703,7 +4703,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(int256[] memory a, int256[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4712,7 +4712,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the strings, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the strings, which is faster than iterating over the elements.
     function assertNotEq(string memory a, string memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [string]");
@@ -4723,7 +4723,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the strings, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the strings, which is faster than iterating over the elements.
     function assertNotEq(string memory a, string memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4732,7 +4732,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(string[] memory a, string[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [string[]]");
@@ -4743,7 +4743,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(string[] memory a, string[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -4770,7 +4770,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(uint256[] memory a, uint256[] memory b) internal virtual {
         if (Helpers.eq(a, b)) {
             emit Log("Error: a != b not satisfied [uint256[]]");
@@ -4781,7 +4781,7 @@ contract PRBTest {
     }
 
     /// @dev Tests that `a` and `b` are not equal. If they are, the test fails with the error message `err`.
-    /// Works by comparing the `sha3` hashes of the arrays, which is faster than iterating over the elements.
+    /// Works by comparing the `keccak256` hashes of the arrays, which is faster than iterating over the elements.
     function assertNotEq(uint256[] memory a, uint256[] memory b, string memory err) internal virtual {
         if (Helpers.eq(a, b)) {
             emit LogNamedString("Error", err);
@@ -5995,7 +5995,7 @@ abstract contract StdUtils {
     //////////////////////////////////////////////////////////////////////////*/
 
     IMulticall3 private constant multicall = IMulticall3(0xcA11bde05977b3631167028862bE2a173976CA11);
-    VmSafe private constant vm = VmSafe(address(uint160(uint256(sha3("hevm cheat code")))));
+    VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
     address private constant CONSOLE2_ADDRESS = 0x000000000000000000636F6e736F6c652e6c6f67;
     uint256 private constant INT256_MIN_ABS =
         57896044618658097711785492504343953926634992332820282019728792003956564819968;
@@ -6083,13 +6083,13 @@ abstract contract StdUtils {
         // forgefmt: disable-start
         // The integer zero is treated as an empty byte string, and as a result it only has a length prefix, 0x80, computed via 0x80 + 0.
         // A one byte integer uses its own value as its length prefix, there is no additional "0x80 + length" prefix that comes before it.
-        if (nonce == 0x00)      return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, bytes1(0x80))));
-        if (nonce <= 0x7f)      return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, uint8(nonce))));
+        if (nonce == 0x00)      return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, bytes1(0x80))));
+        if (nonce <= 0x7f)      return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, uint8(nonce))));
 
         // Nonces greater than 1 byte all follow a consistent encoding scheme, where each value is preceded by a prefix of 0x80 + length.
-        if (nonce <= 2**8 - 1)  return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd7), bytes1(0x94), deployer, bytes1(0x81), uint8(nonce))));
-        if (nonce <= 2**16 - 1) return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd8), bytes1(0x94), deployer, bytes1(0x82), uint16(nonce))));
-        if (nonce <= 2**24 - 1) return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd9), bytes1(0x94), deployer, bytes1(0x83), uint24(nonce))));
+        if (nonce <= 2**8 - 1)  return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd7), bytes1(0x94), deployer, bytes1(0x81), uint8(nonce))));
+        if (nonce <= 2**16 - 1) return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd8), bytes1(0x94), deployer, bytes1(0x82), uint16(nonce))));
+        if (nonce <= 2**24 - 1) return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd9), bytes1(0x94), deployer, bytes1(0x83), uint24(nonce))));
         // forgefmt: disable-end
 
         // More details about RLP encoding can be found here: https://eth.wiki/fundamentals/rlp
@@ -6098,7 +6098,7 @@ abstract contract StdUtils {
         // 0x84 = 0x80 + 0x04 (0x04 = the bytes length of the nonce, 4 bytes, in hex)
         // We assume nobody can have a nonce large enough to require more than 32 bytes.
         return addressFromLast20Bytes(
-            sha3(abi.encodePacked(bytes1(0xda), bytes1(0x94), deployer, bytes1(0x84), uint32(nonce)))
+            keccak256(abi.encodePacked(bytes1(0xda), bytes1(0x94), deployer, bytes1(0x84), uint32(nonce)))
         );
     }
 
@@ -6108,7 +6108,7 @@ abstract contract StdUtils {
         virtual
         returns (address)
     {
-        return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xff), deployer, salt, initcodeHash)));
+        return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xff), deployer, salt, initcodeHash)));
     }
 
     /// @dev returns the address of a contract created with CREATE2 using the default CREATE2 deployer
@@ -6126,7 +6126,7 @@ abstract contract StdUtils {
     /// @param creationCode the creation code of a contract C, as returned by type(C).creationCode
     /// @param args the ABI-encoded arguments to the constructor of C
     function hashInitCode(bytes memory creationCode, bytes memory args) internal pure returns (bytes32) {
-        return sha3(abi.encodePacked(creationCode, args));
+        return keccak256(abi.encodePacked(creationCode, args));
     }
 
     // Performs a single call with Multicall3 to query the ERC-20 token balances of the given addresses.

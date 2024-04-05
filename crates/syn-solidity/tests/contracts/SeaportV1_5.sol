@@ -4,16 +4,12 @@ pragma solidity 0.8.17;
 enum OrderType {
     // 0: no partial fills, anyone can execute
     FULL_OPEN,
-
     // 1: partial fills supported, anyone can execute
     PARTIAL_OPEN,
-
     // 2: no partial fills, only offerer or zone can execute
     FULL_RESTRICTED,
-
     // 3: partial fills supported, only offerer or zone can execute
     PARTIAL_RESTRICTED,
-
     // 4: contract order type
     CONTRACT
 }
@@ -21,73 +17,50 @@ enum OrderType {
 enum BasicOrderType {
     // 0: no partial fills, anyone can execute
     ETH_TO_ERC721_FULL_OPEN,
-
     // 1: partial fills supported, anyone can execute
     ETH_TO_ERC721_PARTIAL_OPEN,
-
     // 2: no partial fills, only offerer or zone can execute
     ETH_TO_ERC721_FULL_RESTRICTED,
-
     // 3: partial fills supported, only offerer or zone can execute
     ETH_TO_ERC721_PARTIAL_RESTRICTED,
-
     // 4: no partial fills, anyone can execute
     ETH_TO_ERC1155_FULL_OPEN,
-
     // 5: partial fills supported, anyone can execute
     ETH_TO_ERC1155_PARTIAL_OPEN,
-
     // 6: no partial fills, only offerer or zone can execute
     ETH_TO_ERC1155_FULL_RESTRICTED,
-
     // 7: partial fills supported, only offerer or zone can execute
     ETH_TO_ERC1155_PARTIAL_RESTRICTED,
-
     // 8: no partial fills, anyone can execute
     ERC20_TO_ERC721_FULL_OPEN,
-
     // 9: partial fills supported, anyone can execute
     ERC20_TO_ERC721_PARTIAL_OPEN,
-
     // 10: no partial fills, only offerer or zone can execute
     ERC20_TO_ERC721_FULL_RESTRICTED,
-
     // 11: partial fills supported, only offerer or zone can execute
     ERC20_TO_ERC721_PARTIAL_RESTRICTED,
-
     // 12: no partial fills, anyone can execute
     ERC20_TO_ERC1155_FULL_OPEN,
-
     // 13: partial fills supported, anyone can execute
     ERC20_TO_ERC1155_PARTIAL_OPEN,
-
     // 14: no partial fills, only offerer or zone can execute
     ERC20_TO_ERC1155_FULL_RESTRICTED,
-
     // 15: partial fills supported, only offerer or zone can execute
     ERC20_TO_ERC1155_PARTIAL_RESTRICTED,
-
     // 16: no partial fills, anyone can execute
     ERC721_TO_ERC20_FULL_OPEN,
-
     // 17: partial fills supported, anyone can execute
     ERC721_TO_ERC20_PARTIAL_OPEN,
-
     // 18: no partial fills, only offerer or zone can execute
     ERC721_TO_ERC20_FULL_RESTRICTED,
-
     // 19: partial fills supported, only offerer or zone can execute
     ERC721_TO_ERC20_PARTIAL_RESTRICTED,
-
     // 20: no partial fills, anyone can execute
     ERC1155_TO_ERC20_FULL_OPEN,
-
     // 21: partial fills supported, anyone can execute
     ERC1155_TO_ERC20_PARTIAL_OPEN,
-
     // 22: no partial fills, only offerer or zone can execute
     ERC1155_TO_ERC20_FULL_RESTRICTED,
-
     // 23: partial fills supported, only offerer or zone can execute
     ERC1155_TO_ERC20_PARTIAL_RESTRICTED
 }
@@ -95,19 +68,14 @@ enum BasicOrderType {
 enum BasicOrderRouteType {
     // 0: provide Ether (or other native token) to receive offered ERC721 item.
     ETH_TO_ERC721,
-
     // 1: provide Ether (or other native token) to receive offered ERC1155 item.
     ETH_TO_ERC1155,
-
     // 2: provide ERC20 item to receive offered ERC721 item.
     ERC20_TO_ERC721,
-
     // 3: provide ERC20 item to receive offered ERC1155 item.
     ERC20_TO_ERC1155,
-
     // 4: provide ERC721 item to receive offered ERC20 item.
     ERC721_TO_ERC20,
-
     // 5: provide ERC1155 item to receive offered ERC20 item.
     ERC1155_TO_ERC20
 }
@@ -115,19 +83,14 @@ enum BasicOrderRouteType {
 enum ItemType {
     // 0: ETH on mainnet, MATIC on polygon, etc.
     NATIVE,
-
     // 1: ERC20 items (ERC777 and ERC20 analogues could also technically work)
     ERC20,
-
     // 2: ERC721 items
     ERC721,
-
     // 3: ERC1155 items
     ERC1155,
-
     // 4: ERC721 items where a number of tokenIds are supported
     ERC721_WITH_CRITERIA,
-
     // 5: ERC1155 items where a number of ids are supported
     ERC1155_WITH_CRITERIA
 }
@@ -135,7 +98,6 @@ enum ItemType {
 enum Side {
     // 0: Items that can be spent
     OFFER,
-
     // 1: Items that must be received
     CONSIDERATION
 }
@@ -418,7 +380,7 @@ library MemoryPointerLib {
         uint256 length
     ) internal pure returns (bytes32 _hash) {
         assembly {
-            _hash := sha3(ptr, length)
+            _hash := keccak256(ptr, length)
         }
     }
 
@@ -4981,6 +4943,7 @@ uint256 constant Panic_error_code_ptr = 0x20;
 uint256 constant Panic_error_length = 0x24;
 
 uint256 constant Panic_arithmetic = 0x11;
+
 // uint256 constant Panic_resource = 0x41;
 
 /**
@@ -6613,8 +6576,8 @@ uint256 constant BasicOrder_offerItem_endAmount_ptr = 0x120;
  *   - 0x80:   Order EIP-712 typehash (constant)
  *   - 0xa0:   orderParameters.offerer
  *   - 0xc0:   orderParameters.zone
- *   - 0xe0:   sha3(abi.encodePacked(offerHashes))
- *   - 0x100:  sha3(abi.encodePacked(considerationHashes))
+ *   - 0xe0:   keccak256(abi.encodePacked(offerHashes))
+ *   - 0x100:  keccak256(abi.encodePacked(considerationHashes))
  *   - 0x120:  orderType
  *   - 0x140:  startTime
  *   - 0x160:  endTime
@@ -6819,7 +6782,9 @@ contract ConsiderationDecoder {
      * @return mPtrLength A memory pointer to the start of the bytes array in
      *                    memory which contains the length of the array.
      */
-    function _decodeBytes(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeBytes(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         assembly {
             // Get the current free memory pointer.
             mPtrLength := mload(FreeMemoryPointerSlot)
@@ -6827,7 +6792,13 @@ contract ConsiderationDecoder {
             // Derive the size of the bytes array, rounding up to nearest word
             // and adding a word for the length field. Note: masking
             // `calldataload(cdPtrLength)` is redundant here.
-            let size := add(and(add(calldataload(cdPtrLength), ThirtyOneBytes), OnlyFullWordMask), OneWord)
+            let size := add(
+                and(
+                    add(calldataload(cdPtrLength), ThirtyOneBytes),
+                    OnlyFullWordMask
+                ),
+                OneWord
+            )
 
             // Copy bytes from calldata into memory based on pointers and size.
             calldatacopy(mPtrLength, cdPtrLength, size)
@@ -6835,7 +6806,10 @@ contract ConsiderationDecoder {
             // Store the masked value in memory. Note: the value of `size` is at
             // least 32, meaning the calldatacopy above will at least write to
             // `[mPtrLength, mPtrLength + 32)`.
-            mstore(mPtrLength, and(calldataload(cdPtrLength), OffsetOrLengthMask))
+            mstore(
+                mPtrLength,
+                and(calldataload(cdPtrLength), OffsetOrLengthMask)
+            )
 
             // Update free memory pointer based on the size of the bytes array.
             mstore(FreeMemoryPointerSlot, add(mPtrLength, size))
@@ -6851,7 +6825,9 @@ contract ConsiderationDecoder {
      * @return mPtrLength A memory pointer to the start of the offer array in
      *                    memory which contains the length of the array.
      */
-    function _decodeOffer(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeOffer(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         assembly {
             // Retrieve length of array, masking to prevent potential overflow.
             let arrLength := and(calldataload(cdPtrLength), OffsetOrLengthMask)
@@ -6873,13 +6849,21 @@ contract ConsiderationDecoder {
             let mPtrTailNext := mPtrTail
 
             // Copy all offer array data into memory at the tail pointer.
-            calldatacopy(mPtrTail, add(cdPtrLength, OneWord), mul(arrLength, OfferItem_size))
+            calldatacopy(
+                mPtrTail,
+                add(cdPtrLength, OneWord),
+                mul(arrLength, OfferItem_size)
+            )
 
             // Track the next head pointer, starting with initial head value.
             let mPtrHeadNext := mPtrHead
 
             // Iterate over each head pointer until it reaches the tail.
-            for {} lt(mPtrHeadNext, mPtrTail) {} {
+            for {
+
+            } lt(mPtrHeadNext, mPtrTail) {
+
+            } {
                 // Write the next tail pointer to next head pointer in memory.
                 mstore(mPtrHeadNext, mPtrTailNext)
 
@@ -6906,7 +6890,9 @@ contract ConsiderationDecoder {
      *                    array in memory which contains the length of the
      *                    array.
      */
-    function _decodeConsideration(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeConsideration(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         assembly {
             // Retrieve length of array, masking to prevent potential overflow.
             let arrLength := and(calldataload(cdPtrLength), OffsetOrLengthMask)
@@ -6928,13 +6914,21 @@ contract ConsiderationDecoder {
             let mPtrTailNext := mPtrTail
 
             // Copy all consideration array data into memory at tail pointer.
-            calldatacopy(mPtrTail, add(cdPtrLength, OneWord), mul(arrLength, ConsiderationItem_size))
+            calldatacopy(
+                mPtrTail,
+                add(cdPtrLength, OneWord),
+                mul(arrLength, ConsiderationItem_size)
+            )
 
             // Track the next head pointer, starting with initial head value.
             let mPtrHeadNext := mPtrHead
 
             // Iterate over each head pointer until it reaches the tail.
-            for {} lt(mPtrHeadNext, mPtrTail) {} {
+            for {
+
+            } lt(mPtrHeadNext, mPtrTail) {
+
+            } {
                 // Write the next tail pointer to next head pointer in memory.
                 mstore(mPtrHeadNext, mPtrTailNext)
 
@@ -6958,7 +6952,10 @@ contract ConsiderationDecoder {
      * @param cdPtr A calldata pointer for the OrderParameters struct.
      * @param mPtr A memory pointer to the OrderParameters struct head.
      */
-    function _decodeOrderParametersTo(CalldataPointer cdPtr, MemoryPointer mPtr) internal pure {
+    function _decodeOrderParametersTo(
+        CalldataPointer cdPtr,
+        MemoryPointer mPtr
+    ) internal pure {
         // Copy the full OrderParameters head from calldata to memory.
         cdPtr.copy(mPtr, OrderParameters_head_size);
 
@@ -6971,7 +6968,9 @@ contract ConsiderationDecoder {
         // Resolve consideration calldata offset, use that to copy consideration
         // from calldata, and write resultant memory offset to head in memory.
         mPtr.offset(OrderParameters_consideration_head_offset).write(
-            _decodeConsideration(cdPtr.pptr(OrderParameters_consideration_head_offset))
+            _decodeConsideration(
+                cdPtr.pptr(OrderParameters_consideration_head_offset)
+            )
         );
     }
 
@@ -6983,7 +6982,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the OrderParameters struct head.
      */
-    function _decodeOrderParameters(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeOrderParameters(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate required memory for the OrderParameters head (offer and
         // consideration are allocated independently).
         mPtr = malloc(OrderParameters_head_size);
@@ -7000,7 +7001,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the Order struct head.
      */
-    function _decodeOrder(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeOrder(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate required memory for the Order head (OrderParameters and
         // signature are allocated independently).
         mPtr = malloc(Order_head_size);
@@ -7011,7 +7014,9 @@ contract ConsiderationDecoder {
 
         // Resolve signature calldata offset, use that to decode and copy from
         // calldata, and write resultant memory offset to head in memory.
-        mPtr.offset(Order_signature_offset).write(_decodeBytes(cdPtr.pptr(Order_signature_offset)));
+        mPtr.offset(Order_signature_offset).write(
+            _decodeBytes(cdPtr.pptr(Order_signature_offset))
+        );
     }
 
     /**
@@ -7022,14 +7027,17 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the AdvancedOrder struct head.
      */
-    function _decodeAdvancedOrder(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeAdvancedOrder(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate memory for AdvancedOrder head and OrderParameters head.
         mPtr = malloc(AdvancedOrderPlusOrderParameters_head_size);
 
         // Use numerator + denominator calldata offset to decode and copy
         // from calldata and write resultant memory offset to head in memory.
         cdPtr.offset(AdvancedOrder_numerator_offset).copy(
-            mPtr.offset(AdvancedOrder_numerator_offset), AdvancedOrder_fixed_segment_0
+            mPtr.offset(AdvancedOrder_numerator_offset),
+            AdvancedOrder_fixed_segment_0
         );
 
         // Get pointer to memory immediately after advanced order.
@@ -7043,11 +7051,15 @@ contract ConsiderationDecoder {
 
         // Resolve signature calldata offset, use that to decode and copy from
         // calldata, and write resultant memory offset to head in memory.
-        mPtr.offset(AdvancedOrder_signature_offset).write(_decodeBytes(cdPtr.pptr(AdvancedOrder_signature_offset)));
+        mPtr.offset(AdvancedOrder_signature_offset).write(
+            _decodeBytes(cdPtr.pptr(AdvancedOrder_signature_offset))
+        );
 
         // Resolve extraData calldata offset, use that to decode and copy from
         // calldata, and write resultant memory offset to head in memory.
-        mPtr.offset(AdvancedOrder_extraData_offset).write(_decodeBytes(cdPtr.pptr(AdvancedOrder_extraData_offset)));
+        mPtr.offset(AdvancedOrder_extraData_offset).write(
+            _decodeBytes(cdPtr.pptr(AdvancedOrder_extraData_offset))
+        );
     }
 
     /**
@@ -7056,7 +7068,11 @@ contract ConsiderationDecoder {
      *
      * @return mPtr The memory pointer to the new empty word in memory.
      */
-    function _getEmptyBytesOrArray() internal pure returns (MemoryPointer mPtr) {
+    function _getEmptyBytesOrArray()
+        internal
+        pure
+        returns (MemoryPointer mPtr)
+    {
         mPtr = malloc(OneWord);
         mPtr.write(0);
     }
@@ -7069,7 +7085,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the AdvancedOrder struct head.
      */
-    function _decodeOrderAsAdvancedOrder(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeOrderAsAdvancedOrder(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate memory for AdvancedOrder head and OrderParameters head.
         mPtr = malloc(AdvancedOrderPlusOrderParameters_head_size);
 
@@ -7088,11 +7106,15 @@ contract ConsiderationDecoder {
 
         // Resolve signature calldata offset, use that to decode and copy from
         // calldata, and write resultant memory offset to head in memory.
-        mPtr.offset(AdvancedOrder_signature_offset).write(_decodeBytes(cdPtr.pptr(Order_signature_offset)));
+        mPtr.offset(AdvancedOrder_signature_offset).write(
+            _decodeBytes(cdPtr.pptr(Order_signature_offset))
+        );
 
         // Resolve extraData calldata offset, use that to decode and copy from
         // calldata, and write resultant memory offset to head in memory.
-        mPtr.offset(AdvancedOrder_extraData_offset).write(_getEmptyBytesOrArray());
+        mPtr.offset(AdvancedOrder_extraData_offset).write(
+            _getEmptyBytesOrArray()
+        );
     }
 
     /**
@@ -7105,11 +7127,9 @@ contract ConsiderationDecoder {
      * @return mPtrLength A memory pointer to the start of the array of advanced
      *                    orders in memory which contains length of the array.
      */
-    function _decodeOrdersAsAdvancedOrders(CalldataPointer cdPtrLength)
-        internal
-        pure
-        returns (MemoryPointer mPtrLength)
-    {
+    function _decodeOrdersAsAdvancedOrders(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7131,7 +7151,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve Order calldata offset, use it to decode and copy from
                 // calldata, and write resultant AdvancedOrder offset to memory.
-                mPtrHead.offset(offset).write(_decodeOrderAsAdvancedOrder(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeOrderAsAdvancedOrder(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7146,7 +7168,9 @@ contract ConsiderationDecoder {
      * @return mPtrLength A memory pointer to the start of the criteria proof
      *                    in memory which contains length of the array.
      */
-    function _decodeCriteriaProof(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeCriteriaProof(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7170,7 +7194,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the CriteriaResolver struct head.
      */
-    function _decodeCriteriaResolver(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeCriteriaResolver(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate required memory for the CriteriaResolver head (the criteria
         // proof bytes32 array is allocated independently).
         mPtr = malloc(CriteriaResolver_head_size);
@@ -7182,7 +7208,9 @@ contract ConsiderationDecoder {
         // Resolve criteria proof calldata offset, use it to decode and copy
         // from calldata, and write resultant memory offset to head in memory.
         mPtr.offset(CriteriaResolver_criteriaProof_offset).write(
-            _decodeCriteriaProof(cdPtr.pptr(CriteriaResolver_criteriaProof_offset))
+            _decodeCriteriaProof(
+                cdPtr.pptr(CriteriaResolver_criteriaProof_offset)
+            )
         );
     }
 
@@ -7198,7 +7226,9 @@ contract ConsiderationDecoder {
      *                    array in memory which contains the length of the
      *                    array.
      */
-    function _decodeCriteriaResolvers(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeCriteriaResolvers(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7220,7 +7250,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve CriteriaResolver calldata offset, use it to decode
                 // and copy from calldata, and write resultant memory offset.
-                mPtrHead.offset(offset).write(_decodeCriteriaResolver(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeCriteriaResolver(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7234,7 +7266,9 @@ contract ConsiderationDecoder {
      * @return mPtrLength A memory pointer to the start of the orders array
      *                    in memory which contains the length of the array.
      */
-    function _decodeOrders(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeOrders(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7256,7 +7290,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve Order calldata offset, use it to decode and copy
                 // from calldata, and write resultant memory offset.
-                mPtrHead.offset(offset).write(_decodeOrder(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeOrder(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7273,11 +7309,9 @@ contract ConsiderationDecoder {
      *                    components array in memory which contains the length
      *                    of the array.
      */
-    function _decodeFulfillmentComponents(CalldataPointer cdPtrLength)
-        internal
-        pure
-        returns (MemoryPointer mPtrLength)
-    {
+    function _decodeFulfillmentComponents(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         assembly {
             let arrLength := and(calldataload(cdPtrLength), OffsetOrLengthMask)
 
@@ -7288,12 +7322,23 @@ contract ConsiderationDecoder {
             let mPtrHead := add(mPtrLength, OneWord)
             let mPtrTail := add(mPtrHead, shl(OneWordShift, arrLength))
             let mPtrTailNext := mPtrTail
-            calldatacopy(mPtrTail, add(cdPtrLength, OneWord), shl(FulfillmentComponent_mem_tail_size_shift, arrLength))
+            calldatacopy(
+                mPtrTail,
+                add(cdPtrLength, OneWord),
+                shl(FulfillmentComponent_mem_tail_size_shift, arrLength)
+            )
             let mPtrHeadNext := mPtrHead
-            for {} lt(mPtrHeadNext, mPtrTail) {} {
+            for {
+
+            } lt(mPtrHeadNext, mPtrTail) {
+
+            } {
                 mstore(mPtrHeadNext, mPtrTailNext)
                 mPtrHeadNext := add(mPtrHeadNext, OneWord)
-                mPtrTailNext := add(mPtrTailNext, FulfillmentComponent_mem_tail_size)
+                mPtrTailNext := add(
+                    mPtrTailNext,
+                    FulfillmentComponent_mem_tail_size
+                )
             }
 
             // Update the free memory pointer.
@@ -7313,11 +7358,9 @@ contract ConsiderationDecoder {
      *                    fulfillment components array in memory which
      *                    contains the length of the array.
      */
-    function _decodeNestedFulfillmentComponents(CalldataPointer cdPtrLength)
-        internal
-        pure
-        returns (MemoryPointer mPtrLength)
-    {
+    function _decodeNestedFulfillmentComponents(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7339,7 +7382,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve FulfillmentComponents array calldata offset, use it
                 // to decode and copy from calldata, and write memory offset.
-                mPtrHead.offset(offset).write(_decodeFulfillmentComponents(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeFulfillmentComponents(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7356,7 +7401,9 @@ contract ConsiderationDecoder {
      *                    array in memory which contains the length of the
      *                    array.
      */
-    function _decodeAdvancedOrders(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeAdvancedOrders(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7378,7 +7425,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve AdvancedOrder calldata offset, use it to decode and
                 // copy from calldata, and write resultant memory offset.
-                mPtrHead.offset(offset).write(_decodeAdvancedOrder(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeAdvancedOrder(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7391,7 +7440,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the Fulfillment struct head.
      */
-    function _decodeFulfillment(CalldataPointer cdPtr) internal pure returns (MemoryPointer mPtr) {
+    function _decodeFulfillment(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate required memory for the Fulfillment head (the fulfillment
         // components arrays are allocated independently).
         mPtr = malloc(Fulfillment_head_size);
@@ -7403,7 +7454,9 @@ contract ConsiderationDecoder {
         // Resolve considerationComponents calldata offset, use it to decode and
         // copy from calldata, and write resultant memory offset to memory head.
         mPtr.offset(Fulfillment_considerationComponents_offset).write(
-            _decodeFulfillmentComponents(cdPtr.pptr(Fulfillment_considerationComponents_offset))
+            _decodeFulfillmentComponents(
+                cdPtr.pptr(Fulfillment_considerationComponents_offset)
+            )
         );
     }
 
@@ -7419,7 +7472,9 @@ contract ConsiderationDecoder {
      *                    array in memory which contains the length of the
      *                    array.
      */
-    function _decodeFulfillments(CalldataPointer cdPtrLength) internal pure returns (MemoryPointer mPtrLength) {
+    function _decodeFulfillments(
+        CalldataPointer cdPtrLength
+    ) internal pure returns (MemoryPointer mPtrLength) {
         // Retrieve length of array, masking to prevent potential overflow.
         uint256 arrLength = cdPtrLength.readMaskedUint256();
 
@@ -7441,7 +7496,9 @@ contract ConsiderationDecoder {
             for (uint256 offset = 0; offset < tailOffset; offset += OneWord) {
                 // Resolve Fulfillment calldata offset, use it to decode and
                 // copy from calldata, and write resultant memory offset.
-                mPtrHead.offset(offset).write(_decodeFulfillment(cdPtrHead.pptr(offset)));
+                mPtrHead.offset(offset).write(
+                    _decodeFulfillment(cdPtrHead.pptr(offset))
+                );
             }
         }
     }
@@ -7456,11 +7513,9 @@ contract ConsiderationDecoder {
      *
      * @return mPtr A memory pointer to the OrderParameters struct head.
      */
-    function _decodeOrderComponentsAsOrderParameters(CalldataPointer cdPtr)
-        internal
-        pure
-        returns (MemoryPointer mPtr)
-    {
+    function _decodeOrderComponentsAsOrderParameters(
+        CalldataPointer cdPtr
+    ) internal pure returns (MemoryPointer mPtr) {
         // Allocate memory for the OrderParameters head.
         mPtr = malloc(OrderParameters_head_size);
 
@@ -7475,11 +7530,17 @@ contract ConsiderationDecoder {
 
         // Resolve consideration calldata offset, use that to copy consideration
         // from calldata, and write resultant memory offset to head in memory.
-        MemoryPointer consideration = _decodeConsideration(cdPtr.pptr(OrderParameters_consideration_head_offset));
-        mPtr.offset(OrderParameters_consideration_head_offset).write(consideration);
+        MemoryPointer consideration = _decodeConsideration(
+            cdPtr.pptr(OrderParameters_consideration_head_offset)
+        );
+        mPtr.offset(OrderParameters_consideration_head_offset).write(
+            consideration
+        );
 
         // Write masked consideration length to totalOriginalConsiderationItems.
-        mPtr.offset(OrderParameters_totalOriginalConsiderationItems_offset).write(consideration.readUint256());
+        mPtr
+            .offset(OrderParameters_totalOriginalConsiderationItems_offset)
+            .write(consideration.readUint256());
     }
 
     /**
@@ -7495,7 +7556,11 @@ contract ConsiderationDecoder {
     function _decodeGenerateOrderReturndata()
         internal
         pure
-        returns (uint256 invalidEncoding, MemoryPointer offer, MemoryPointer consideration)
+        returns (
+            uint256 invalidEncoding,
+            MemoryPointer offer,
+            MemoryPointer consideration
+        )
     {
         assembly {
             // Check that returndatasize is at least four words: offerOffset,
@@ -7517,10 +7582,16 @@ contract ConsiderationDecoder {
 
                 // If valid length, check that offsets are within returndata.
                 let invalidOfferOffset := gt(offsetOffer, returndatasize())
-                let invalidConsiderationOffset := gt(offsetConsideration, returndatasize())
+                let invalidConsiderationOffset := gt(
+                    offsetConsideration,
+                    returndatasize()
+                )
 
                 // Only proceed if length (and thus encoding) is valid so far.
-                invalidEncoding := or(invalidOfferOffset, invalidConsiderationOffset)
+                invalidEncoding := or(
+                    invalidOfferOffset,
+                    invalidConsiderationOffset
+                )
                 if iszero(invalidEncoding) {
                     // Copy length of offer array to scratch space.
                     returndatacopy(0, offsetOffer, OneWord)
@@ -7532,19 +7603,30 @@ contract ConsiderationDecoder {
 
                     {
                         // Calculate total size of offer & consideration arrays.
-                        let totalOfferSize := shl(SpentItem_size_shift, offerLength)
-                        let totalConsiderationSize := mul(ReceivedItem_size, considerationLength)
+                        let totalOfferSize := shl(
+                            SpentItem_size_shift,
+                            offerLength
+                        )
+                        let totalConsiderationSize := mul(
+                            ReceivedItem_size,
+                            considerationLength
+                        )
 
                         // Add 4 words to total size to cover the offset and
                         // length fields of the two arrays.
-                        let totalSize := add(FourWords, add(totalOfferSize, totalConsiderationSize))
+                        let totalSize := add(
+                            FourWords,
+                            add(totalOfferSize, totalConsiderationSize)
+                        )
                         // Don't continue if returndatasize exceeds 65535 bytes
                         // or is greater than the calculated size.
-                        invalidEncoding :=
-                            or(
-                                gt(or(offerLength, considerationLength), generateOrder_maximum_returndatasize),
-                                gt(totalSize, returndatasize())
-                            )
+                        invalidEncoding := or(
+                            gt(
+                                or(offerLength, considerationLength),
+                                generateOrder_maximum_returndatasize
+                            ),
+                            gt(totalSize, returndatasize())
+                        )
 
                         // Set first word of scratch space to 0 so length of
                         // offer/consideration are set to 0 on invalid encoding.
@@ -7554,53 +7636,30 @@ contract ConsiderationDecoder {
             }
 
             if iszero(invalidEncoding) {
-                offer := copySpentItemsAsOfferItems(add(offsetOffer, OneWord), offerLength)
+                offer := copySpentItemsAsOfferItems(
+                    add(offsetOffer, OneWord),
+                    offerLength
+                )
 
-                consideration :=
-                    copyReceivedItemsAsConsiderationItems(add(offsetConsideration, OneWord), considerationLength)
+                consideration := copyReceivedItemsAsConsiderationItems(
+                    add(offsetConsideration, OneWord),
+                    considerationLength
+                )
             }
 
-            function copySpentItemsAsOfferItems(rdPtrHead, length) -> mPtrLength {
-                // Retrieve the current free memory pointer.
-                mPtrLength := mload(FreeMemoryPointerSlot)
-
-                // Allocate memory for the array.
-                mstore(FreeMemoryPointerSlot, add(mPtrLength, add(OneWord, mul(length, OfferItem_size_with_length))))
-
-                // Write the length of the array to the start of free memory.
-                mstore(mPtrLength, length)
-
-                // Use offset from length to minimize stack depth.
-                let headOffsetFromLength := OneWord
-                let headSizeWithLength := shl(OneWordShift, add(1, length))
-                let mPtrTailNext := add(mPtrLength, headSizeWithLength)
-
-                // Iterate over each element.
-                for {} lt(headOffsetFromLength, headSizeWithLength) {} {
-                    // Write the memory pointer to the accompanying head offset.
-                    mstore(add(mPtrLength, headOffsetFromLength), mPtrTailNext)
-
-                    // Copy itemType, token, identifier and amount.
-                    returndatacopy(mPtrTailNext, rdPtrHead, SpentItem_size)
-
-                    // Copy amount to endAmount.
-                    mstore(add(mPtrTailNext, Common_endAmount_offset), mload(add(mPtrTailNext, Common_amount_offset)))
-
-                    // Update read pointer, next tail pointer, and head offset.
-                    rdPtrHead := add(rdPtrHead, SpentItem_size)
-                    mPtrTailNext := add(mPtrTailNext, OfferItem_size)
-                    headOffsetFromLength := add(headOffsetFromLength, OneWord)
-                }
-            }
-
-            function copyReceivedItemsAsConsiderationItems(rdPtrHead, length) -> mPtrLength {
+            function copySpentItemsAsOfferItems(rdPtrHead, length)
+                -> mPtrLength
+            {
                 // Retrieve the current free memory pointer.
                 mPtrLength := mload(FreeMemoryPointerSlot)
 
                 // Allocate memory for the array.
                 mstore(
                     FreeMemoryPointerSlot,
-                    add(mPtrLength, add(OneWord, mul(length, ConsiderationItem_size_with_length)))
+                    add(
+                        mPtrLength,
+                        add(OneWord, mul(length, OfferItem_size_with_length))
+                    )
                 )
 
                 // Write the length of the array to the start of free memory.
@@ -7612,16 +7671,77 @@ contract ConsiderationDecoder {
                 let mPtrTailNext := add(mPtrLength, headSizeWithLength)
 
                 // Iterate over each element.
-                for {} lt(headOffsetFromLength, headSizeWithLength) {} {
+                for {
+
+                } lt(headOffsetFromLength, headSizeWithLength) {
+
+                } {
                     // Write the memory pointer to the accompanying head offset.
                     mstore(add(mPtrLength, headOffsetFromLength), mPtrTailNext)
 
                     // Copy itemType, token, identifier and amount.
-                    returndatacopy(mPtrTailNext, rdPtrHead, ReceivedItem_size_excluding_recipient)
+                    returndatacopy(mPtrTailNext, rdPtrHead, SpentItem_size)
+
+                    // Copy amount to endAmount.
+                    mstore(
+                        add(mPtrTailNext, Common_endAmount_offset),
+                        mload(add(mPtrTailNext, Common_amount_offset))
+                    )
+
+                    // Update read pointer, next tail pointer, and head offset.
+                    rdPtrHead := add(rdPtrHead, SpentItem_size)
+                    mPtrTailNext := add(mPtrTailNext, OfferItem_size)
+                    headOffsetFromLength := add(headOffsetFromLength, OneWord)
+                }
+            }
+
+            function copyReceivedItemsAsConsiderationItems(rdPtrHead, length)
+                -> mPtrLength
+            {
+                // Retrieve the current free memory pointer.
+                mPtrLength := mload(FreeMemoryPointerSlot)
+
+                // Allocate memory for the array.
+                mstore(
+                    FreeMemoryPointerSlot,
+                    add(
+                        mPtrLength,
+                        add(
+                            OneWord,
+                            mul(length, ConsiderationItem_size_with_length)
+                        )
+                    )
+                )
+
+                // Write the length of the array to the start of free memory.
+                mstore(mPtrLength, length)
+
+                // Use offset from length to minimize stack depth.
+                let headOffsetFromLength := OneWord
+                let headSizeWithLength := shl(OneWordShift, add(1, length))
+                let mPtrTailNext := add(mPtrLength, headSizeWithLength)
+
+                // Iterate over each element.
+                for {
+
+                } lt(headOffsetFromLength, headSizeWithLength) {
+
+                } {
+                    // Write the memory pointer to the accompanying head offset.
+                    mstore(add(mPtrLength, headOffsetFromLength), mPtrTailNext)
+
+                    // Copy itemType, token, identifier and amount.
+                    returndatacopy(
+                        mPtrTailNext,
+                        rdPtrHead,
+                        ReceivedItem_size_excluding_recipient
+                    )
 
                     // Copy amount and recipient.
                     returndatacopy(
-                        add(mPtrTailNext, Common_endAmount_offset), add(rdPtrHead, Common_amount_offset), TwoWords
+                        add(mPtrTailNext, Common_endAmount_offset),
+                        add(rdPtrHead, Common_amount_offset),
+                        TwoWords
                     )
 
                     // Update read pointer, next tail pointer, and head offset.
@@ -7653,13 +7773,13 @@ contract ConsiderationDecoder {
         pure
         returns (
             function()
-                                                internal
-                                                pure
-                                                returns (
-                                                    uint256,
-                                                    OfferItem[] memory,
-                                                    ConsiderationItem[] memory
-                                                ) outFn
+                internal
+                pure
+                returns (
+                    uint256,
+                    OfferItem[] memory,
+                    ConsiderationItem[] memory
+                ) outFn
         )
     {
         assembly {
@@ -7686,7 +7806,7 @@ contract ConsiderationDecoder {
         pure
         returns (
             function(OfferItem memory, address, bytes32, bytes memory)
-                                                internal outFn
+                internal outFn
         )
     {
         assembly {
@@ -7713,7 +7833,7 @@ contract ConsiderationDecoder {
         pure
         returns (
             function(ConsiderationItem memory, address, bytes32, bytes memory)
-                                                internal outFn
+                internal outFn
         )
     {
         assembly {
@@ -7732,14 +7852,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning an OrderParameters type.
      */
-    function _toOrderParametersReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toOrderParametersReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (OrderParameters memory) outFn
+                internal
+                pure
+                returns (OrderParameters memory) outFn
         )
     {
         assembly {
@@ -7758,14 +7880,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning an AdvancedOrder type.
      */
-    function _toAdvancedOrderReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toAdvancedOrderReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (AdvancedOrder memory) outFn
+                internal
+                pure
+                returns (AdvancedOrder memory) outFn
         )
     {
         assembly {
@@ -7784,14 +7908,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning a dynamic array of CriteriaResolver types.
      */
-    function _toCriteriaResolversReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toCriteriaResolversReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (CriteriaResolver[] memory) outFn
+                internal
+                pure
+                returns (CriteriaResolver[] memory) outFn
         )
     {
         assembly {
@@ -7810,14 +7936,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning a dynamic array of Order types.
      */
-    function _toOrdersReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toOrdersReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (Order[] memory) outFn
+                internal
+                pure
+                returns (Order[] memory) outFn
         )
     {
         assembly {
@@ -7845,9 +7973,9 @@ contract ConsiderationDecoder {
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (FulfillmentComponent[][] memory) outFn
+                internal
+                pure
+                returns (FulfillmentComponent[][] memory) outFn
         )
     {
         assembly {
@@ -7866,14 +7994,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning a dynamic array of AdvancedOrder types.
      */
-    function _toAdvancedOrdersReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toAdvancedOrdersReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (AdvancedOrder[] memory) outFn
+                internal
+                pure
+                returns (AdvancedOrder[] memory) outFn
         )
     {
         assembly {
@@ -7892,14 +8022,16 @@ contract ConsiderationDecoder {
      * @return outFn The output function, taking an arbitrary calldata pointer
      *               and returning a dynamic array of Fulfillment types.
      */
-    function _toFulfillmentsReturnType(function(CalldataPointer) internal pure returns (MemoryPointer) inFn)
+    function _toFulfillmentsReturnType(
+        function(CalldataPointer) internal pure returns (MemoryPointer) inFn
+    )
         internal
         pure
         returns (
             function(CalldataPointer)
-                                                internal
-                                                pure
-                                                returns (Fulfillment[] memory) outFn
+                internal
+                pure
+                returns (Fulfillment[] memory) outFn
         )
     {
         assembly {
@@ -7917,11 +8049,10 @@ contract ConsiderationDecoder {
      *
      * @return originalEndAmount The original end amount.
      */
-    function _replaceEndAmountWithRecipient(OfferItem memory offerItem, address recipient)
-        internal
-        pure
-        returns (uint256 originalEndAmount)
-    {
+    function _replaceEndAmountWithRecipient(
+        OfferItem memory offerItem,
+        address recipient
+    ) internal pure returns (uint256 originalEndAmount) {
         assembly {
             // Derive the pointer to the end amount on the offer item.
             let endAmountPtr := add(offerItem, ReceivedItem_recipient_offset)
@@ -7943,7 +8074,9 @@ contract ConsiderationEncoder {
      *
      * @return ptr A memory pointer to the start of the bytes array in memory.
      */
-    function toMemoryPointer(bytes memory obj) internal pure returns (MemoryPointer ptr) {
+    function toMemoryPointer(
+        bytes memory obj
+    ) internal pure returns (MemoryPointer ptr) {
         assembly {
             ptr := obj
         }
@@ -7957,7 +8090,9 @@ contract ConsiderationEncoder {
      * @return ptr A memory pointer to the start of the array of bytes32 types
      *             in memory.
      */
-    function toMemoryPointer(bytes32[] memory obj) internal pure returns (MemoryPointer ptr) {
+    function toMemoryPointer(
+        bytes32[] memory obj
+    ) internal pure returns (MemoryPointer ptr) {
         assembly {
             ptr := obj
         }
@@ -7975,7 +8110,10 @@ contract ConsiderationEncoder {
      *
      * @return size The size of the bytes array.
      */
-    function _encodeBytes(MemoryPointer src, MemoryPointer dst) internal view returns (uint256 size) {
+    function _encodeBytes(
+        MemoryPointer src,
+        MemoryPointer dst
+    ) internal view returns (uint256 size) {
         unchecked {
             // Mask the length of the bytes array to protect against overflow
             // and round up to the nearest word.
@@ -8000,11 +8138,10 @@ contract ConsiderationEncoder {
      *              calldata.
      * @return size The size of the bytes array.
      */
-    function _encodeGenerateOrder(OrderParameters memory orderParameters, bytes memory context)
-        internal
-        view
-        returns (MemoryPointer dst, uint256 size)
-    {
+    function _encodeGenerateOrder(
+        OrderParameters memory orderParameters,
+        bytes memory context
+    ) internal view returns (MemoryPointer dst, uint256 size) {
         // Get the memory pointer for the OrderParameters struct.
         MemoryPointer src = orderParameters.toMemoryPointer();
 
@@ -8025,13 +8162,20 @@ contract ConsiderationEncoder {
         uint256 tailOffset = generateOrder_base_tail_offset;
 
         // Write offset to minimumReceived.
-        dstHead.offset(generateOrder_minimumReceived_head_offset).write(tailOffset);
+        dstHead.offset(generateOrder_minimumReceived_head_offset).write(
+            tailOffset
+        );
 
         // Get memory pointer to `orderParameters.offer.length`.
-        MemoryPointer srcOfferPointer = src.offset(OrderParameters_offer_head_offset).readMemoryPointer();
+        MemoryPointer srcOfferPointer = src
+            .offset(OrderParameters_offer_head_offset)
+            .readMemoryPointer();
 
         // Encode the offer array as a `SpentItem[]`.
-        uint256 minimumReceivedSize = _encodeSpentItems(srcOfferPointer, dstHead.offset(tailOffset));
+        uint256 minimumReceivedSize = _encodeSpentItems(
+            srcOfferPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate maximumSpent array.
@@ -8039,14 +8183,20 @@ contract ConsiderationEncoder {
         }
 
         // Write offset to maximumSpent.
-        dstHead.offset(generateOrder_maximumSpent_head_offset).write(tailOffset);
+        dstHead.offset(generateOrder_maximumSpent_head_offset).write(
+            tailOffset
+        );
 
         // Get memory pointer to `orderParameters.consideration.length`.
-        MemoryPointer srcConsiderationPointer =
-            src.offset(OrderParameters_consideration_head_offset).readMemoryPointer();
+        MemoryPointer srcConsiderationPointer = src
+            .offset(OrderParameters_consideration_head_offset)
+            .readMemoryPointer();
 
         // Encode the consideration array as a `SpentItem[]`.
-        uint256 maximumSpentSize = _encodeSpentItems(srcConsiderationPointer, dstHead.offset(tailOffset));
+        uint256 maximumSpentSize = _encodeSpentItems(
+            srcConsiderationPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate context array.
@@ -8060,7 +8210,10 @@ contract ConsiderationEncoder {
         MemoryPointer srcContext = toMemoryPointer(context);
 
         // Encode context as a bytes array.
-        uint256 contextSize = _encodeBytes(srcContext, dstHead.offset(tailOffset));
+        uint256 contextSize = _encodeBytes(
+            srcContext,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment the tail offset, now used to determine final size.
@@ -8112,7 +8265,9 @@ contract ConsiderationEncoder {
         MemoryPointer dstHead = dst.offset(ratifyOrder_head_offset);
 
         // Write contractNonce to calldata via xor(orderHash, shiftedOfferer).
-        dstHead.offset(ratifyOrder_contractNonce_offset).write(uint256(orderHash) ^ shiftedOfferer);
+        dstHead.offset(ratifyOrder_contractNonce_offset).write(
+            uint256(orderHash) ^ shiftedOfferer
+        );
 
         // Initialize tail offset, used to populate the offer array.
         uint256 tailOffset = ratifyOrder_base_tail_offset;
@@ -8122,10 +8277,15 @@ contract ConsiderationEncoder {
         dstHead.write(tailOffset);
 
         // Get memory pointer to `orderParameters.offer.length`.
-        MemoryPointer srcOfferPointer = src.offset(OrderParameters_offer_head_offset).readMemoryPointer();
+        MemoryPointer srcOfferPointer = src
+            .offset(OrderParameters_offer_head_offset)
+            .readMemoryPointer();
 
         // Encode the offer array as a `SpentItem[]`.
-        uint256 offerSize = _encodeSpentItems(srcOfferPointer, dstHead.offset(tailOffset));
+        uint256 offerSize = _encodeSpentItems(
+            srcOfferPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate consideration array.
@@ -8136,12 +8296,15 @@ contract ConsiderationEncoder {
         dstHead.offset(ratifyOrder_consideration_head_offset).write(tailOffset);
 
         // Get pointer to `orderParameters.consideration.length`.
-        MemoryPointer srcConsiderationPointer =
-            src.offset(OrderParameters_consideration_head_offset).readMemoryPointer();
+        MemoryPointer srcConsiderationPointer = src
+            .offset(OrderParameters_consideration_head_offset)
+            .readMemoryPointer();
 
         // Encode the consideration array as a `ReceivedItem[]`.
-        uint256 considerationSize =
-            _encodeConsiderationAsReceivedItems(srcConsiderationPointer, dstHead.offset(tailOffset));
+        uint256 considerationSize = _encodeConsiderationAsReceivedItems(
+            srcConsiderationPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate context array.
@@ -8152,7 +8315,10 @@ contract ConsiderationEncoder {
         dstHead.offset(ratifyOrder_context_head_offset).write(tailOffset);
 
         // Encode context.
-        uint256 contextSize = _encodeBytes(toMemoryPointer(context), dstHead.offset(tailOffset));
+        uint256 contextSize = _encodeBytes(
+            toMemoryPointer(context),
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate orderHashes array.
@@ -8163,7 +8329,10 @@ contract ConsiderationEncoder {
         dstHead.offset(ratifyOrder_orderHashes_head_offset).write(tailOffset);
 
         // Encode orderHashes.
-        uint256 orderHashesSize = _encodeOrderHashes(toMemoryPointer(orderHashes), dstHead.offset(tailOffset));
+        uint256 orderHashesSize = _encodeOrderHashes(
+            toMemoryPointer(orderHashes),
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment the tail offset, now used to determine final size.
@@ -8233,8 +8402,12 @@ contract ConsiderationEncoder {
         dstHead.offset(ZoneParameters_startTime_offset).write(
             src.offset(OrderParameters_startTime_offset).readUint256()
         );
-        dstHead.offset(ZoneParameters_endTime_offset).write(src.offset(OrderParameters_endTime_offset).readUint256());
-        dstHead.offset(ZoneParameters_zoneHash_offset).write(src.offset(OrderParameters_zoneHash_offset).readUint256());
+        dstHead.offset(ZoneParameters_endTime_offset).write(
+            src.offset(OrderParameters_endTime_offset).readUint256()
+        );
+        dstHead.offset(ZoneParameters_zoneHash_offset).write(
+            src.offset(OrderParameters_zoneHash_offset).readUint256()
+        );
 
         // Initialize tail offset, used to populate the offer array.
         uint256 tailOffset = ZoneParameters_base_tail_offset;
@@ -8243,10 +8416,15 @@ contract ConsiderationEncoder {
         dstHead.offset(ZoneParameters_offer_head_offset).write(tailOffset);
 
         // Get pointer to `orderParameters.offer.length`.
-        MemoryPointer srcOfferPointer = src.offset(OrderParameters_offer_head_offset).readMemoryPointer();
+        MemoryPointer srcOfferPointer = src
+            .offset(OrderParameters_offer_head_offset)
+            .readMemoryPointer();
 
         // Encode the offer array as a `SpentItem[]`.
-        uint256 offerSize = _encodeSpentItems(srcOfferPointer, dstHead.offset(tailOffset));
+        uint256 offerSize = _encodeSpentItems(
+            srcOfferPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate consideration array.
@@ -8254,15 +8432,20 @@ contract ConsiderationEncoder {
         }
 
         // Write offset to consideration.
-        dstHead.offset(ZoneParameters_consideration_head_offset).write(tailOffset);
+        dstHead.offset(ZoneParameters_consideration_head_offset).write(
+            tailOffset
+        );
 
         // Get pointer to `orderParameters.consideration.length`.
-        MemoryPointer srcConsiderationPointer =
-            src.offset(OrderParameters_consideration_head_offset).readMemoryPointer();
+        MemoryPointer srcConsiderationPointer = src
+            .offset(OrderParameters_consideration_head_offset)
+            .readMemoryPointer();
 
         // Encode the consideration array as a `ReceivedItem[]`.
-        uint256 considerationSize =
-            _encodeConsiderationAsReceivedItems(srcConsiderationPointer, dstHead.offset(tailOffset));
+        uint256 considerationSize = _encodeConsiderationAsReceivedItems(
+            srcConsiderationPointer,
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate extraData array.
@@ -8272,7 +8455,10 @@ contract ConsiderationEncoder {
         // Write offset to extraData.
         dstHead.offset(ZoneParameters_extraData_head_offset).write(tailOffset);
         // Copy extraData.
-        uint256 extraDataSize = _encodeBytes(toMemoryPointer(extraData), dstHead.offset(tailOffset));
+        uint256 extraDataSize = _encodeBytes(
+            toMemoryPointer(extraData),
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment tail offset, now used to populate orderHashes array.
@@ -8280,10 +8466,15 @@ contract ConsiderationEncoder {
         }
 
         // Write offset to orderHashes.
-        dstHead.offset(ZoneParameters_orderHashes_head_offset).write(tailOffset);
+        dstHead.offset(ZoneParameters_orderHashes_head_offset).write(
+            tailOffset
+        );
 
         // Encode the order hashes array.
-        uint256 orderHashesSize = _encodeOrderHashes(toMemoryPointer(orderHashes), dstHead.offset(tailOffset));
+        uint256 orderHashesSize = _encodeOrderHashes(
+            toMemoryPointer(orderHashes),
+            dstHead.offset(tailOffset)
+        );
 
         unchecked {
             // Increment the tail offset, now used to determine final size.
@@ -8306,11 +8497,10 @@ contract ConsiderationEncoder {
      *              calldata.
      * @return size The size of the bytes array.
      */
-    function _encodeValidateBasicOrder(bytes32 orderHash, BasicOrderParameters calldata parameters)
-        internal
-        view
-        returns (MemoryPointer dst, uint256 size)
-    {
+    function _encodeValidateBasicOrder(
+        bytes32 orderHash,
+        BasicOrderParameters calldata parameters
+    ) internal view returns (MemoryPointer dst, uint256 size) {
         // Get free memory pointer to write calldata to. This isn't allocated as
         // it is only used for a single function call.
         dst = getFreeMemoryPointer();
@@ -8335,7 +8525,8 @@ contract ConsiderationEncoder {
 
         // Copy startTime, endTime and zoneHash to zoneParameters.
         CalldataPointer.wrap(BasicOrder_startTime_cdPtr).copy(
-            dstHead.offset(ZoneParameters_startTime_offset), BasicOrder_startTimeThroughZoneHash_size
+            dstHead.offset(ZoneParameters_startTime_offset),
+            BasicOrder_startTimeThroughZoneHash_size
         );
 
         // Initialize tail offset, used for the offer + consideration arrays.
@@ -8346,22 +8537,30 @@ contract ConsiderationEncoder {
 
         unchecked {
             // Write consideration offset next (located 5 words after offer).
-            dstHead.offset(ZoneParameters_consideration_head_offset).write(tailOffset + BasicOrder_common_params_size);
+            dstHead.offset(ZoneParameters_consideration_head_offset).write(
+                tailOffset + BasicOrder_common_params_size
+            );
 
             // Retrieve the offset to the length of additional recipients.
-            uint256 additionalRecipientsLength =
-                CalldataPointer.wrap(BasicOrder_additionalRecipients_length_cdPtr).readUint256();
+            uint256 additionalRecipientsLength = CalldataPointer
+                .wrap(BasicOrder_additionalRecipients_length_cdPtr)
+                .readUint256();
 
             // Derive offset to event data using base offset & total recipients.
-            uint256 offerDataOffset = OrderFulfilled_offer_length_baseOffset + additionalRecipientsLength * OneWord;
+            uint256 offerDataOffset = OrderFulfilled_offer_length_baseOffset +
+                additionalRecipientsLength *
+                OneWord;
 
             // Derive size of offer and consideration data.
             // 2 words (lengths) + 4 (offer data) + 5 (consideration 1) + 5 * ar
-            uint256 offerAndConsiderationSize =
-                OrderFulfilled_baseDataSize + (additionalRecipientsLength * ReceivedItem_size);
+            uint256 offerAndConsiderationSize = OrderFulfilled_baseDataSize +
+                (additionalRecipientsLength * ReceivedItem_size);
 
             // Copy offer and consideration data from event data to calldata.
-            MemoryPointer.wrap(offerDataOffset).copy(dstHead.offset(tailOffset), offerAndConsiderationSize);
+            MemoryPointer.wrap(offerDataOffset).copy(
+                dstHead.offset(tailOffset),
+                offerAndConsiderationSize
+            );
 
             // Increment tail offset, now used to populate extraData array.
             tailOffset += offerAndConsiderationSize;
@@ -8377,7 +8576,9 @@ contract ConsiderationEncoder {
         }
 
         // Write offset to orderHashes.
-        dstHead.offset(ZoneParameters_orderHashes_head_offset).write(tailOffset);
+        dstHead.offset(ZoneParameters_orderHashes_head_offset).write(
+            tailOffset
+        );
 
         // Write length = 1 to the orderHashes array.
         dstHead.offset(tailOffset).write(1);
@@ -8405,11 +8606,10 @@ contract ConsiderationEncoder {
      *
      * @return size The size of the order hashes array (including the length).
      */
-    function _encodeOrderHashes(MemoryPointer srcLength, MemoryPointer dstLength)
-        internal
-        view
-        returns (uint256 size)
-    {
+    function _encodeOrderHashes(
+        MemoryPointer srcLength,
+        MemoryPointer dstLength
+    ) internal view returns (uint256 size) {
         // Read length of the array from source and write to destination.
         uint256 length = srcLength.readUint256();
         dstLength.write(length);
@@ -8441,7 +8641,10 @@ contract ConsiderationEncoder {
      *
      * @return size The size of the SpentItem array (including the length).
      */
-    function _encodeSpentItems(MemoryPointer srcLength, MemoryPointer dstLength) internal pure returns (uint256 size) {
+    function _encodeSpentItems(
+        MemoryPointer srcLength,
+        MemoryPointer dstLength
+    ) internal pure returns (uint256 size) {
         assembly {
             // Read length of the array from source and write to destination.
             let length := mload(srcLength)
@@ -8462,15 +8665,28 @@ contract ConsiderationEncoder {
             // Pointer to end of array head in memory.
             let mPtrHeadEnd := add(mPtrHead, shl(OneWordShift, length))
 
-            for {} lt(mPtrHead, mPtrHeadEnd) {} {
+            for {
+
+            } lt(mPtrHead, mPtrHeadEnd) {
+
+            } {
                 // Read pointer to data for array element from head position.
                 let mPtrTail := mload(mPtrHead)
 
                 // Copy itemType, token, identifier, amount to calldata.
                 mstore(cdPtrData, mload(mPtrTail))
-                mstore(add(cdPtrData, Common_token_offset), mload(add(mPtrTail, Common_token_offset)))
-                mstore(add(cdPtrData, Common_identifier_offset), mload(add(mPtrTail, Common_identifier_offset)))
-                mstore(add(cdPtrData, Common_amount_offset), mload(add(mPtrTail, Common_amount_offset)))
+                mstore(
+                    add(cdPtrData, Common_token_offset),
+                    mload(add(mPtrTail, Common_token_offset))
+                )
+                mstore(
+                    add(cdPtrData, Common_identifier_offset),
+                    mload(add(mPtrTail, Common_identifier_offset))
+                )
+                mstore(
+                    add(cdPtrData, Common_amount_offset),
+                    mload(add(mPtrTail, Common_amount_offset))
+                )
 
                 mPtrHead := add(mPtrHead, OneWord)
                 cdPtrData := add(cdPtrData, SpentItem_size)
@@ -8494,11 +8710,10 @@ contract ConsiderationEncoder {
      *
      * @return size The size of the ReceivedItem array (including the length).
      */
-    function _encodeConsiderationAsReceivedItems(MemoryPointer srcLength, MemoryPointer dstLength)
-        internal
-        view
-        returns (uint256 size)
-    {
+    function _encodeConsiderationAsReceivedItems(
+        MemoryPointer srcLength,
+        MemoryPointer dstLength
+    ) internal view returns (uint256 size) {
         unchecked {
             // Read length of the array from source and write to destination.
             uint256 length = srcLength.readUint256();
@@ -8533,7 +8748,11 @@ contract ConsiderationEncoder {
  * @author 0age
  * @notice ConsiderationBase contains immutable constants and constructor logic.
  */
-contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, ConsiderationEventsAndErrors {
+contract ConsiderationBase is
+    ConsiderationDecoder,
+    ConsiderationEncoder,
+    ConsiderationEventsAndErrors
+{
     // Precompute hashes, original chainId, and domain separator on deployment.
     bytes32 internal immutable _NAME_HASH;
     bytes32 internal immutable _VERSION_HASH;
@@ -8577,7 +8796,9 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
         _CONDUIT_CONTROLLER = ConduitControllerInterface(conduitController);
 
         // Retrieve the conduit creation code hash from the supplied controller.
-        (_CONDUIT_CREATION_CODE_HASH,) = (_CONDUIT_CONTROLLER.getConduitCodeHashes());
+        (_CONDUIT_CREATION_CODE_HASH, ) = (
+            _CONDUIT_CONTROLLER.getConduitCodeHashes()
+        );
     }
 
     /**
@@ -8585,7 +8806,11 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
      *
      * @return domainSeparator The derived domain separator.
      */
-    function _deriveDomainSeparator() internal view returns (bytes32 domainSeparator) {
+    function _deriveDomainSeparator()
+        internal
+        view
+        returns (bytes32 domainSeparator)
+    {
         bytes32 typehash = _EIP_712_DOMAIN_TYPEHASH;
         bytes32 nameHash = _NAME_HASH;
         bytes32 versionHash = _VERSION_HASH;
@@ -8610,7 +8835,7 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
             mstore(EIP712_domainData_verifyingContract_offset, address())
 
             // Hash relevant region of memory to derive the domain separator.
-            domainSeparator := sha3(0, EIP712_domainData_size)
+            domainSeparator := keccak256(0, EIP712_domainData_size)
 
             // Restore the free memory pointer.
             mstore(FreeMemoryPointerSlot, freeMemoryPointer)
@@ -8687,46 +8912,77 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
         )
     {
         // Derive hash of the name of the contract.
-        nameHash = sha3(bytes(_nameString()));
+        nameHash = keccak256(bytes(_nameString()));
 
         // Derive hash of the version string of the contract.
-        versionHash = sha3(bytes("1.5"));
+        versionHash = keccak256(bytes("1.5"));
 
         // Construct the OfferItem type string.
         bytes memory offerItemTypeString = bytes(
-            "OfferItem(" "uint8 itemType," "address token," "uint256 identifierOrCriteria," "uint256 startAmount,"
-            "uint256 endAmount" ")"
+            "OfferItem("
+            "uint8 itemType,"
+            "address token,"
+            "uint256 identifierOrCriteria,"
+            "uint256 startAmount,"
+            "uint256 endAmount"
+            ")"
         );
 
         // Construct the ConsiderationItem type string.
         bytes memory considerationItemTypeString = bytes(
-            "ConsiderationItem(" "uint8 itemType," "address token," "uint256 identifierOrCriteria,"
-            "uint256 startAmount," "uint256 endAmount," "address recipient" ")"
+            "ConsiderationItem("
+            "uint8 itemType,"
+            "address token,"
+            "uint256 identifierOrCriteria,"
+            "uint256 startAmount,"
+            "uint256 endAmount,"
+            "address recipient"
+            ")"
         );
 
         // Construct the OrderComponents type string, not including the above.
         bytes memory orderComponentsPartialTypeString = bytes(
-            "OrderComponents(" "address offerer," "address zone," "OfferItem[] offer,"
-            "ConsiderationItem[] consideration," "uint8 orderType," "uint256 startTime," "uint256 endTime,"
-            "bytes32 zoneHash," "uint256 salt," "bytes32 conduitKey," "uint256 counter" ")"
+            "OrderComponents("
+            "address offerer,"
+            "address zone,"
+            "OfferItem[] offer,"
+            "ConsiderationItem[] consideration,"
+            "uint8 orderType,"
+            "uint256 startTime,"
+            "uint256 endTime,"
+            "bytes32 zoneHash,"
+            "uint256 salt,"
+            "bytes32 conduitKey,"
+            "uint256 counter"
+            ")"
         );
 
         // Construct the primary EIP-712 domain type string.
-        eip712DomainTypehash = sha3(
-            bytes("EIP712Domain(" "string name," "string version," "uint256 chainId," "address verifyingContract" ")")
+        eip712DomainTypehash = keccak256(
+            bytes(
+                "EIP712Domain("
+                "string name,"
+                "string version,"
+                "uint256 chainId,"
+                "address verifyingContract"
+                ")"
+            )
         );
 
         // Derive the OfferItem type hash using the corresponding type string.
-        offerItemTypehash = sha3(offerItemTypeString);
+        offerItemTypehash = keccak256(offerItemTypeString);
 
         // Derive ConsiderationItem type hash using corresponding type string.
-        considerationItemTypehash = sha3(considerationItemTypeString);
+        considerationItemTypehash = keccak256(considerationItemTypeString);
 
-        bytes memory orderTypeString =
-            bytes.concat(orderComponentsPartialTypeString, considerationItemTypeString, offerItemTypeString);
+        bytes memory orderTypeString = bytes.concat(
+            orderComponentsPartialTypeString,
+            considerationItemTypeString,
+            offerItemTypeString
+        );
 
         // Derive OrderItem type hash via combination of relevant type strings.
-        orderTypehash = sha3(orderTypeString);
+        orderTypehash = keccak256(orderTypeString);
     }
 
     /**
@@ -8741,7 +8997,9 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
      * @return _typeHash The EIP-712 typehash for the bulk order type with the
      *                   given height.
      */
-    function _lookupBulkOrderTypehash(uint256 _treeHeight) internal pure returns (bytes32 _typeHash) {
+    function _lookupBulkOrderTypehash(
+        uint256 _treeHeight
+    ) internal pure returns (bytes32 _typeHash) {
         // Utilize assembly to efficiently retrieve correct bulk order typehash.
         assembly {
             // Use a Yul function to enable use of the `leave` keyword
@@ -8754,16 +9012,22 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                         // Handle tree heights one and two.
                         if lt(treeHeight, 3) {
                             // Utilize branchless logic to determine typehash.
-                            typeHash :=
-                                ternary(eq(treeHeight, 1), BulkOrder_Typehash_Height_One, BulkOrder_Typehash_Height_Two)
+                            typeHash := ternary(
+                                eq(treeHeight, 1),
+                                BulkOrder_Typehash_Height_One,
+                                BulkOrder_Typehash_Height_Two
+                            )
 
                             // Exit the function once typehash has been located.
                             leave
                         }
 
                         // Handle height three and four via branchless logic.
-                        typeHash :=
-                            ternary(eq(treeHeight, 3), BulkOrder_Typehash_Height_Three, BulkOrder_Typehash_Height_Four)
+                        typeHash := ternary(
+                            eq(treeHeight, 3),
+                            BulkOrder_Typehash_Height_Three,
+                            BulkOrder_Typehash_Height_Four
+                        )
 
                         // Exit the function once typehash has been located.
                         leave
@@ -8772,16 +9036,22 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                     // Handle tree height five and six.
                     if lt(treeHeight, 7) {
                         // Utilize branchless logic to determine typehash.
-                        typeHash :=
-                            ternary(eq(treeHeight, 5), BulkOrder_Typehash_Height_Five, BulkOrder_Typehash_Height_Six)
+                        typeHash := ternary(
+                            eq(treeHeight, 5),
+                            BulkOrder_Typehash_Height_Five,
+                            BulkOrder_Typehash_Height_Six
+                        )
 
                         // Exit the function once typehash has been located.
                         leave
                     }
 
                     // Handle height seven and eight via branchless logic.
-                    typeHash :=
-                        ternary(eq(treeHeight, 7), BulkOrder_Typehash_Height_Seven, BulkOrder_Typehash_Height_Eight)
+                    typeHash := ternary(
+                        eq(treeHeight, 7),
+                        BulkOrder_Typehash_Height_Seven,
+                        BulkOrder_Typehash_Height_Eight
+                    )
 
                     // Exit the function once typehash has been located.
                     leave
@@ -8794,16 +9064,22 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                         // Handle tree height nine and ten.
                         if lt(treeHeight, 11) {
                             // Utilize branchless logic to determine typehash.
-                            typeHash :=
-                                ternary(eq(treeHeight, 9), BulkOrder_Typehash_Height_Nine, BulkOrder_Typehash_Height_Ten)
+                            typeHash := ternary(
+                                eq(treeHeight, 9),
+                                BulkOrder_Typehash_Height_Nine,
+                                BulkOrder_Typehash_Height_Ten
+                            )
 
                             // Exit the function once typehash has been located.
                             leave
                         }
 
                         // Handle height eleven and twelve via branchless logic.
-                        typeHash :=
-                            ternary(eq(treeHeight, 11), BulkOrder_Typehash_Height_Eleven, BulkOrder_Typehash_Height_Twelve)
+                        typeHash := ternary(
+                            eq(treeHeight, 11),
+                            BulkOrder_Typehash_Height_Eleven,
+                            BulkOrder_Typehash_Height_Twelve
+                        )
 
                         // Exit the function once typehash has been located.
                         leave
@@ -8812,17 +9088,21 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                     // Handle tree height thirteen and fourteen.
                     if lt(treeHeight, 15) {
                         // Utilize branchless logic to determine typehash.
-                        typeHash :=
-                            ternary(
-                                eq(treeHeight, 13), BulkOrder_Typehash_Height_Thirteen, BulkOrder_Typehash_Height_Fourteen
-                            )
+                        typeHash := ternary(
+                            eq(treeHeight, 13),
+                            BulkOrder_Typehash_Height_Thirteen,
+                            BulkOrder_Typehash_Height_Fourteen
+                        )
 
                         // Exit the function once typehash has been located.
                         leave
                     }
                     // Handle height fifteen and sixteen via branchless logic.
-                    typeHash :=
-                        ternary(eq(treeHeight, 15), BulkOrder_Typehash_Height_Fifteen, BulkOrder_Typehash_Height_Sixteen)
+                    typeHash := ternary(
+                        eq(treeHeight, 15),
+                        BulkOrder_Typehash_Height_Fifteen,
+                        BulkOrder_Typehash_Height_Sixteen
+                    )
 
                     // Exit the function once typehash has been located.
                     leave
@@ -8833,18 +9113,22 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                     // Handle tree height seventeen and eighteen.
                     if lt(treeHeight, 19) {
                         // Utilize branchless logic to determine typehash.
-                        typeHash :=
-                            ternary(
-                                eq(treeHeight, 17), BulkOrder_Typehash_Height_Seventeen, BulkOrder_Typehash_Height_Eighteen
-                            )
+                        typeHash := ternary(
+                            eq(treeHeight, 17),
+                            BulkOrder_Typehash_Height_Seventeen,
+                            BulkOrder_Typehash_Height_Eighteen
+                        )
 
                         // Exit the function once typehash has been located.
                         leave
                     }
 
                     // Handle height nineteen and twenty via branchless logic.
-                    typeHash :=
-                        ternary(eq(treeHeight, 19), BulkOrder_Typehash_Height_Nineteen, BulkOrder_Typehash_Height_Twenty)
+                    typeHash := ternary(
+                        eq(treeHeight, 19),
+                        BulkOrder_Typehash_Height_Nineteen,
+                        BulkOrder_Typehash_Height_Twenty
+                    )
 
                     // Exit the function once typehash has been located.
                     leave
@@ -8853,18 +9137,22 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
                 // Handle tree height twenty-one and twenty-two.
                 if lt(treeHeight, 23) {
                     // Utilize branchless logic to determine typehash.
-                    typeHash :=
-                        ternary(
-                            eq(treeHeight, 21), BulkOrder_Typehash_Height_TwentyOne, BulkOrder_Typehash_Height_TwentyTwo
-                        )
+                    typeHash := ternary(
+                        eq(treeHeight, 21),
+                        BulkOrder_Typehash_Height_TwentyOne,
+                        BulkOrder_Typehash_Height_TwentyTwo
+                    )
 
                     // Exit the function once typehash has been located.
                     leave
                 }
 
                 // Handle height twenty-three & twenty-four w/ branchless logic.
-                typeHash :=
-                    ternary(eq(treeHeight, 23), BulkOrder_Typehash_Height_TwentyThree, BulkOrder_Typehash_Height_TwentyFour)
+                typeHash := ternary(
+                    eq(treeHeight, 23),
+                    BulkOrder_Typehash_Height_TwentyThree,
+                    BulkOrder_Typehash_Height_TwentyFour
+                )
 
                 // Exit the function once typehash has been located.
                 leave
@@ -8896,7 +9184,9 @@ contract GettersAndDerivers is ConsiderationBase {
      *                          that may optionally be used to transfer approved
      *                          ERC20/721/1155 tokens.
      */
-    constructor(address conduitController) ConsiderationBase(conduitController) {}
+    constructor(
+        address conduitController
+    ) ConsiderationBase(conduitController) {}
 
     /**
      * @dev Internal view function to derive the order hash for a given order.
@@ -8909,13 +9199,14 @@ contract GettersAndDerivers is ConsiderationBase {
      *
      * @return orderHash The hash.
      */
-    function _deriveOrderHash(OrderParameters memory orderParameters, uint256 counter)
-        internal
-        view
-        returns (bytes32 orderHash)
-    {
+    function _deriveOrderHash(
+        OrderParameters memory orderParameters,
+        uint256 counter
+    ) internal view returns (bytes32 orderHash) {
         // Get length of original consideration array and place it on the stack.
-        uint256 originalConsiderationLength = (orderParameters.totalOriginalConsiderationItems);
+        uint256 originalConsiderationLength = (
+            orderParameters.totalOriginalConsiderationItems
+        );
 
         /*
          * Memory layout for an array of structs (dynamic or not) is similar
@@ -8936,7 +9227,9 @@ contract GettersAndDerivers is ConsiderationBase {
             let hashArrPtr := mload(FreeMemoryPointerSlot)
 
             // Get the pointer to the offers array.
-            let offerArrPtr := mload(add(orderParameters, OrderParameters_offer_head_offset))
+            let offerArrPtr := mload(
+                add(orderParameters, OrderParameters_offer_head_offset)
+            )
 
             // Load the length.
             let offerLength := mload(offerArrPtr)
@@ -8945,7 +9238,11 @@ contract GettersAndDerivers is ConsiderationBase {
             offerArrPtr := add(offerArrPtr, OneWord)
 
             // Iterate over the offer items.
-            for { let i := 0 } lt(i, offerLength) { i := add(i, 1) } {
+            for {
+                let i := 0
+            } lt(i, offerLength) {
+                i := add(i, 1)
+            } {
                 // Read the pointer to the offer data and subtract one word
                 // to get typeHash pointer.
                 let ptr := sub(mload(offerArrPtr), OneWord)
@@ -8957,7 +9254,7 @@ contract GettersAndDerivers is ConsiderationBase {
                 mstore(ptr, typeHash)
 
                 // Take the EIP712 hash and store it in the hash array.
-                mstore(hashArrPtr, sha3(ptr, EIP712_OfferItem_size))
+                mstore(hashArrPtr, keccak256(ptr, EIP712_OfferItem_size))
 
                 // Restore the previous word.
                 mstore(ptr, value)
@@ -8968,7 +9265,10 @@ contract GettersAndDerivers is ConsiderationBase {
             }
 
             // Derive the offer hash using the hashes of each item.
-            offerHash := sha3(mload(FreeMemoryPointerSlot), shl(OneWordShift, offerLength))
+            offerHash := keccak256(
+                mload(FreeMemoryPointerSlot),
+                shl(OneWordShift, offerLength)
+            )
         }
 
         // Declare a variable for the derived hash of the consideration array.
@@ -8983,11 +9283,22 @@ contract GettersAndDerivers is ConsiderationBase {
             let hashArrPtr := mload(FreeMemoryPointerSlot)
 
             // Get the pointer to the consideration array.
-            let considerationArrPtr :=
-                add(mload(add(orderParameters, OrderParameters_consideration_head_offset)), OneWord)
+            let considerationArrPtr := add(
+                mload(
+                    add(
+                        orderParameters,
+                        OrderParameters_consideration_head_offset
+                    )
+                ),
+                OneWord
+            )
 
             // Iterate over the consideration items (not including tips).
-            for { let i := 0 } lt(i, originalConsiderationLength) { i := add(i, 1) } {
+            for {
+                let i := 0
+            } lt(i, originalConsiderationLength) {
+                i := add(i, 1)
+            } {
                 // Read the pointer to the consideration data and subtract one
                 // word to get typeHash pointer.
                 let ptr := sub(mload(considerationArrPtr), OneWord)
@@ -8999,7 +9310,10 @@ contract GettersAndDerivers is ConsiderationBase {
                 mstore(ptr, typeHash)
 
                 // Take the EIP712 hash and store it in the hash array.
-                mstore(hashArrPtr, sha3(ptr, EIP712_ConsiderationItem_size))
+                mstore(
+                    hashArrPtr,
+                    keccak256(ptr, EIP712_ConsiderationItem_size)
+                )
 
                 // Restore the previous word.
                 mstore(ptr, value)
@@ -9010,7 +9324,10 @@ contract GettersAndDerivers is ConsiderationBase {
             }
 
             // Derive the consideration hash using the hashes of each item.
-            considerationHash := sha3(mload(FreeMemoryPointerSlot), shl(OneWordShift, originalConsiderationLength))
+            considerationHash := keccak256(
+                mload(FreeMemoryPointerSlot),
+                shl(OneWordShift, originalConsiderationLength)
+            )
         }
 
         // Read order item EIP-712 typehash from runtime code & place on stack.
@@ -9028,7 +9345,10 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(typeHashPtr, typeHash)
 
             // Retrieve the pointer for the offer array head.
-            let offerHeadPtr := add(orderParameters, OrderParameters_offer_head_offset)
+            let offerHeadPtr := add(
+                orderParameters,
+                OrderParameters_offer_head_offset
+            )
 
             // Retrieve the data pointer referenced by the offer head.
             let offerDataPtr := mload(offerHeadPtr)
@@ -9037,7 +9357,10 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(offerHeadPtr, offerHash)
 
             // Retrieve the pointer for the consideration array head.
-            let considerationHeadPtr := add(orderParameters, OrderParameters_consideration_head_offset)
+            let considerationHeadPtr := add(
+                orderParameters,
+                OrderParameters_consideration_head_offset
+            )
 
             // Retrieve the data pointer referenced by the consideration head.
             let considerationDataPtr := mload(considerationHeadPtr)
@@ -9046,13 +9369,16 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(considerationHeadPtr, considerationHash)
 
             // Retrieve the pointer for the counter.
-            let counterPtr := add(orderParameters, OrderParameters_counter_offset)
+            let counterPtr := add(
+                orderParameters,
+                OrderParameters_counter_offset
+            )
 
             // Store the counter at the retrieved memory location.
             mstore(counterPtr, counter)
 
             // Derive the order hash using the full range of order parameters.
-            orderHash := sha3(typeHashPtr, EIP712_Order_size)
+            orderHash := keccak256(typeHashPtr, EIP712_Order_size)
 
             // Restore the value previously held at typehash pointer location.
             mstore(typeHashPtr, previousValue)
@@ -9080,7 +9406,9 @@ contract GettersAndDerivers is ConsiderationBase {
      * @return conduit The address of the conduit associated with the given
      *                 conduit key.
      */
-    function _deriveConduit(bytes32 conduitKey) internal view returns (address conduit) {
+    function _deriveConduit(
+        bytes32 conduitKey
+    ) internal view returns (address conduit) {
         // Read conduit controller address from runtime and place on the stack.
         address conduitController = address(_CONDUIT_CONTROLLER);
 
@@ -9103,18 +9431,17 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(TwoWords, conduitCreationCodeHash)
 
             // Derive conduit by hashing and applying a mask over last 20 bytes.
-            conduit :=
-                and(
-                    // Hash the relevant region.
-                    sha3(
-                        // The region starts at memory pointer 11.
-                        Create2AddressDerivation_ptr,
-                        // The region is 85 bytes long (1 + 20 + 32 + 32).
-                        Create2AddressDerivation_length
-                    ),
-                    // The address equals the last twenty bytes of the hash.
-                    MaskOverLastTwentyBytes
-                )
+            conduit := and(
+                // Hash the relevant region.
+                keccak256(
+                    // The region starts at memory pointer 11.
+                    Create2AddressDerivation_ptr,
+                    // The region is 85 bytes long (1 + 20 + 32 + 32).
+                    Create2AddressDerivation_length
+                ),
+                // The address equals the last twenty bytes of the hash.
+                MaskOverLastTwentyBytes
+            )
 
             // Restore the free memory pointer.
             mstore(FreeMemoryPointerSlot, freeMemoryPointer)
@@ -9130,7 +9457,10 @@ contract GettersAndDerivers is ConsiderationBase {
      * @return The domain separator.
      */
     function _domainSeparator() internal view returns (bytes32) {
-        return block.chainid == _CHAIN_ID ? _DOMAIN_SEPARATOR : _deriveDomainSeparator();
+        return
+            block.chainid == _CHAIN_ID
+                ? _DOMAIN_SEPARATOR
+                : _deriveDomainSeparator();
     }
 
     /**
@@ -9144,7 +9474,11 @@ contract GettersAndDerivers is ConsiderationBase {
     function _information()
         internal
         view
-        returns (string memory, /* version */ bytes32, /* domainSeparator */ address /* conduitController */ )
+        returns (
+            string memory,
+            /* version */ bytes32,
+            /* domainSeparator */ address /* conduitController */
+        )
     {
         // Derive the domain separator.
         bytes32 domainSeparator = _domainSeparator();
@@ -9171,7 +9505,10 @@ contract GettersAndDerivers is ConsiderationBase {
      *
      * @return value The hash.
      */
-    function _deriveEIP712Digest(bytes32 domainSeparator, bytes32 orderHash) internal pure returns (bytes32 value) {
+    function _deriveEIP712Digest(
+        bytes32 domainSeparator,
+        bytes32 orderHash
+    ) internal pure returns (bytes32 value) {
         // Leverage scratch space to perform an efficient hash.
         assembly {
             // Place the EIP-712 prefix at the start of scratch space.
@@ -9187,7 +9524,7 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(EIP712_OrderHash_offset, orderHash)
 
             // Hash the relevant region (65 bytes).
-            value := sha3(0, EIP712_DigestPayload_size)
+            value := keccak256(0, EIP712_DigestPayload_size)
 
             // Clear out the dirtied bits in the memory pointer.
             mstore(EIP712_OrderHash_offset, 0)
@@ -9323,29 +9660,37 @@ contract LowLevelHelpers {
                 // Ensure that sufficient gas is available to copy returndata
                 // while expanding memory where necessary. Start by computing
                 // the word size of returndata and allocated memory.
-                let returnDataWords := shr(OneWordShift, add(returndatasize(), ThirtyOneBytes))
+                let returnDataWords := shr(
+                    OneWordShift,
+                    add(returndatasize(), ThirtyOneBytes)
+                )
 
                 // Note: use the free memory pointer in place of msize() to work
                 // around a Yul warning that prevents accessing msize directly
                 // when the IR pipeline is activated.
-                let msizeWords := shr(OneWordShift, mload(FreeMemoryPointerSlot))
+                let msizeWords := shr(
+                    OneWordShift,
+                    mload(FreeMemoryPointerSlot)
+                )
 
                 // Next, compute the cost of the returndatacopy.
                 let cost := mul(CostPerWord, returnDataWords)
 
                 // Then, compute cost of new memory allocation.
                 if gt(returnDataWords, msizeWords) {
-                    cost :=
+                    cost := add(
+                        cost,
                         add(
-                            cost,
-                            add(
-                                mul(sub(returnDataWords, msizeWords), CostPerWord),
-                                shr(
-                                    MemoryExpansionCoefficientShift,
-                                    sub(mul(returnDataWords, returnDataWords), mul(msizeWords, msizeWords))
+                            mul(sub(returnDataWords, msizeWords), CostPerWord),
+                            shr(
+                                MemoryExpansionCoefficientShift,
+                                sub(
+                                    mul(returnDataWords, returnDataWords),
+                                    mul(msizeWords, msizeWords)
                                 )
                             )
                         )
+                    )
                 }
 
                 // Finally, add a small constant and compare to gas remaining;
@@ -9370,7 +9715,9 @@ contract LowLevelHelpers {
      *
      * @return updatedRecipient The updated recipient.
      */
-    function _substituteCallerForEmptyRecipient(address recipient) internal view returns (address updatedRecipient) {
+    function _substituteCallerForEmptyRecipient(
+        address recipient
+    ) internal view returns (address updatedRecipient) {
         // Utilize assembly to perform a branchless operation on the recipient.
         assembly {
             // Add caller to recipient if recipient equals 0; otherwise add 0.
@@ -9492,7 +9839,10 @@ contract CounterManager is ConsiderationEventsAndErrors, ReentrancyGuard {
         // overflow check as counter cannot be incremented that far.
         assembly {
             // Use second half of previous block hash as a quasi-random number.
-            let quasiRandomNumber := shr(Counter_blockhash_shift, blockhash(sub(number(), 1)))
+            let quasiRandomNumber := shr(
+                Counter_blockhash_shift,
+                blockhash(sub(number(), 1))
+            )
 
             // Write the caller to scratch space.
             mstore(0, caller())
@@ -9501,7 +9851,7 @@ contract CounterManager is ConsiderationEventsAndErrors, ReentrancyGuard {
             mstore(OneWord, _counters.slot)
 
             // Derive the storage pointer for the counter value.
-            let storagePointer := sha3(0, TwoWords)
+            let storagePointer := keccak256(0, TwoWords)
 
             // Derive new counter value using random number and original value.
             newCounter := add(quasiRandomNumber, sload(storagePointer))
@@ -9522,7 +9872,9 @@ contract CounterManager is ConsiderationEventsAndErrors, ReentrancyGuard {
      *
      * @return currentCounter The current counter.
      */
-    function _getCounter(address offerer) internal view returns (uint256 currentCounter) {
+    function _getCounter(
+        address offerer
+    ) internal view returns (uint256 currentCounter) {
         // Return the counter for the supplied offerer.
         currentCounter = _counters[offerer];
     }
@@ -9534,7 +9886,11 @@ contract CounterManager is ConsiderationEventsAndErrors, ReentrancyGuard {
  * @notice Assertions contains logic for making various assertions that do not
  *         fit neatly within a dedicated semantic scope.
  */
-contract Assertions is GettersAndDerivers, CounterManager, TokenTransferrerErrors {
+contract Assertions is
+    GettersAndDerivers,
+    CounterManager,
+    TokenTransferrerErrors
+{
     /**
      * @dev Derive and set hashes, reference chainId, and associated domain
      *      separator during deployment.
@@ -9543,7 +9899,9 @@ contract Assertions is GettersAndDerivers, CounterManager, TokenTransferrerError
      *                          that may optionally be used to transfer approved
      *                          ERC20/721/1155 tokens.
      */
-    constructor(address conduitController) GettersAndDerivers(conduitController) {}
+    constructor(
+        address conduitController
+    ) GettersAndDerivers(conduitController) {}
 
     /**
      * @dev Internal view function to ensure that the supplied consideration
@@ -9556,18 +9914,21 @@ contract Assertions is GettersAndDerivers, CounterManager, TokenTransferrerError
      *
      * @return The hash.
      */
-    function _assertConsiderationLengthAndGetOrderHash(OrderParameters memory orderParameters)
-        internal
-        view
-        returns (bytes32)
-    {
+    function _assertConsiderationLengthAndGetOrderHash(
+        OrderParameters memory orderParameters
+    ) internal view returns (bytes32) {
         // Ensure supplied consideration array length is not less than original.
         _assertConsiderationLengthIsNotLessThanOriginalConsiderationLength(
-            orderParameters.consideration.length, orderParameters.totalOriginalConsiderationItems
+            orderParameters.consideration.length,
+            orderParameters.totalOriginalConsiderationItems
         );
 
         // Derive and return order hash using current counter for the offerer.
-        return _deriveOrderHash(orderParameters, _getCounter(orderParameters.offerer));
+        return
+            _deriveOrderHash(
+                orderParameters,
+                _getCounter(orderParameters.offerer)
+            );
     }
 
     /**
@@ -9632,63 +9993,71 @@ contract Assertions is GettersAndDerivers, CounterManager, TokenTransferrerError
              * 5. Offerer, zone, offer token, and consideration token have no
              *    upper dirty bits — each argument is type(uint160).max or less
              */
-            validOffsets :=
+            validOffsets := and(
                 and(
                     and(
-                        and(
-                            // Order parameters at cd 0x04 must have offset of 0x20.
-                            eq(calldataload(BasicOrder_parameters_cdPtr), BasicOrder_parameters_ptr),
-                            // Additional recipients (cd 0x224) arr offset == 0x240.
-                            eq(
-                                calldataload(BasicOrder_additionalRecipients_head_cdPtr),
-                                BasicOrder_additionalRecipients_head_ptr
-                            )
-                        ),
-                        // Signature offset == 0x260 + (recipients.length * 0x40).
+                        // Order parameters at cd 0x04 must have offset of 0x20.
                         eq(
-                            // Load signature offset from calldata 0x244.
-                            calldataload(BasicOrder_signature_cdPtr),
-                            // Expected offset is start of recipients + len * 64.
-                            add(
-                                BasicOrder_signature_ptr,
-                                shl(
-                                    // Each additional recipient has length of 0x40.
-                                    AdditionalRecipient_size_shift,
-                                    // Additional recipients length at cd 0x264.
-                                    calldataload(BasicOrder_additionalRecipients_length_cdPtr)
-                                )
-                            )
+                            calldataload(BasicOrder_parameters_cdPtr),
+                            BasicOrder_parameters_ptr
+                        ),
+                        // Additional recipients (cd 0x224) arr offset == 0x240.
+                        eq(
+                            calldataload(
+                                BasicOrder_additionalRecipients_head_cdPtr
+                            ),
+                            BasicOrder_additionalRecipients_head_ptr
                         )
                     ),
-                    and(
-                        // Ensure BasicOrderType parameter is less than 0x18.
-                        lt(
-                            // BasicOrderType parameter at calldata offset 0x124.
-                            calldataload(BasicOrder_basicOrderType_cdPtr),
-                            // Value should be less than 24.
-                            BasicOrder_basicOrderType_range
-                        ),
-                        // Ensure no dirty upper bits are present on offerer, zone,
-                        // offer token, or consideration token.
-                        lt(
-                            or(
-                                or(
-                                    // Offerer parameter at calldata offset 0x84.
-                                    calldataload(BasicOrder_offerer_cdPtr),
-                                    // Zone parameter at calldata offset 0xa4.
-                                    calldataload(BasicOrder_zone_cdPtr)
-                                ),
-                                or(
-                                    // Offer token parameter at cd offset 0xc4.
-                                    calldataload(BasicOrder_offerToken_cdPtr),
-                                    // Consideration token parameter at offset 0x24.
-                                    calldataload(BasicOrder_considerationToken_cdPtr)
+                    // Signature offset == 0x260 + (recipients.length * 0x40).
+                    eq(
+                        // Load signature offset from calldata 0x244.
+                        calldataload(BasicOrder_signature_cdPtr),
+                        // Expected offset is start of recipients + len * 64.
+                        add(
+                            BasicOrder_signature_ptr,
+                            shl(
+                                // Each additional recipient has length of 0x40.
+                                AdditionalRecipient_size_shift,
+                                // Additional recipients length at cd 0x264.
+                                calldataload(
+                                    BasicOrder_additionalRecipients_length_cdPtr
                                 )
-                            ),
-                            AddressDirtyUpperBitThreshold
+                            )
                         )
                     )
+                ),
+                and(
+                    // Ensure BasicOrderType parameter is less than 0x18.
+                    lt(
+                        // BasicOrderType parameter at calldata offset 0x124.
+                        calldataload(BasicOrder_basicOrderType_cdPtr),
+                        // Value should be less than 24.
+                        BasicOrder_basicOrderType_range
+                    ),
+                    // Ensure no dirty upper bits are present on offerer, zone,
+                    // offer token, or consideration token.
+                    lt(
+                        or(
+                            or(
+                                // Offerer parameter at calldata offset 0x84.
+                                calldataload(BasicOrder_offerer_cdPtr),
+                                // Zone parameter at calldata offset 0xa4.
+                                calldataload(BasicOrder_zone_cdPtr)
+                            ),
+                            or(
+                                // Offer token parameter at cd offset 0xc4.
+                                calldataload(BasicOrder_offerToken_cdPtr),
+                                // Consideration token parameter at offset 0x24.
+                                calldataload(
+                                    BasicOrder_considerationToken_cdPtr
+                                )
+                            )
+                        ),
+                        AddressDirtyUpperBitThreshold
+                    )
                 )
+            )
         }
 
         // Revert with an error if basic order parameter offsets are invalid.
@@ -9793,26 +10162,37 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                 // Try to recover signer.
                 if iszero(gt(lenDiff, 1)) {
                     // Read the signature `s` value.
-                    let originalSignatureS := mload(add(signature, ECDSA_signature_s_offset))
+                    let originalSignatureS := mload(
+                        add(signature, ECDSA_signature_s_offset)
+                    )
 
                     // Read the first byte of the word after `s`. If the
                     // signature is 65 bytes, this will be the real `v` value.
                     // If not, it will need to be modified - doing it this way
                     // saves an extra condition.
-                    let v := byte(0, mload(add(signature, ECDSA_signature_v_offset)))
+                    let v := byte(
+                        0,
+                        mload(add(signature, ECDSA_signature_v_offset))
+                    )
 
                     // If lenDiff is 1, parse 64-byte signature as ECDSA.
                     if lenDiff {
                         // Extract yParity from highest bit of vs and add 27 to
                         // get v.
-                        v := add(shr(MaxUint8, originalSignatureS), Signature_lower_v)
+                        v := add(
+                            shr(MaxUint8, originalSignatureS),
+                            Signature_lower_v
+                        )
 
                         // Extract canonical s from vs, all but the highest bit.
                         // Temporarily overwrite the original `s` value in the
                         // signature.
                         mstore(
                             add(signature, ECDSA_signature_s_offset),
-                            and(originalSignatureS, EIP2098_allButHighestBitMask)
+                            and(
+                                originalSignatureS,
+                                EIP2098_allButHighestBitMask
+                            )
                         )
                     }
                     // Temporarily overwrite the signature length with `v` to
@@ -9844,7 +10224,10 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                     mstore(signature, signatureLength)
 
                     // Restore cached signature `s` value.
-                    mstore(add(signature, ECDSA_signature_s_offset), originalSignatureS)
+                    mstore(
+                        add(signature, ECDSA_signature_s_offset),
+                        originalSignatureS
+                    )
 
                     // Read the recovered signer from the buffer given as return
                     // space for ecrecover.
@@ -9865,34 +10248,52 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                 // Temporarily overwrite the word before the signature length
                 // and use it as the head of the signature input to
                 // `isValidSignature`, which has a value of 64.
-                mstore(wordBeforeSignaturePtr, EIP1271_isValidSignature_signature_head_offset)
+                mstore(
+                    wordBeforeSignaturePtr,
+                    EIP1271_isValidSignature_signature_head_offset
+                )
 
                 // Get pointer to use for the selector of `isValidSignature`.
-                let selectorPtr := sub(signature, EIP1271_isValidSignature_selector_negativeOffset)
+                let selectorPtr := sub(
+                    signature,
+                    EIP1271_isValidSignature_selector_negativeOffset
+                )
 
                 // Cache the value currently stored at the selector pointer.
                 let cachedWordOverwrittenBySelector := mload(selectorPtr)
 
                 // Cache the value currently stored at the digest pointer.
-                let cachedWordOverwrittenByDigest :=
-                    mload(sub(signature, EIP1271_isValidSignature_digest_negativeOffset))
+                let cachedWordOverwrittenByDigest := mload(
+                    sub(
+                        signature,
+                        EIP1271_isValidSignature_digest_negativeOffset
+                    )
+                )
 
                 // Write the selector first, since it overlaps the digest.
                 mstore(selectorPtr, EIP1271_isValidSignature_selector)
 
                 // Next, write the original digest.
-                mstore(sub(signature, EIP1271_isValidSignature_digest_negativeOffset), originalDigest)
+                mstore(
+                    sub(
+                        signature,
+                        EIP1271_isValidSignature_digest_negativeOffset
+                    ),
+                    originalDigest
+                )
 
                 // Call signer with `isValidSignature` to validate signature.
-                success :=
-                    staticcall(
-                        gas(),
-                        signer,
-                        selectorPtr,
-                        add(originalSignatureLength, EIP1271_isValidSignature_calldata_baseLength),
-                        0,
-                        OneWord
-                    )
+                success := staticcall(
+                    gas(),
+                    signer,
+                    selectorPtr,
+                    add(
+                        originalSignatureLength,
+                        EIP1271_isValidSignature_calldata_baseLength
+                    ),
+                    0,
+                    OneWord
+                )
 
                 // Determine if the signature is valid on successful calls.
                 if success {
@@ -9908,7 +10309,10 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                             // revert(abi.encodeWithSignature(
                             //     "BadContractSignature()"
                             // ))
-                            revert(Error_selector_offset, BadContractSignature_error_length)
+                            revert(
+                                Error_selector_offset,
+                                BadContractSignature_error_length
+                            )
                         }
 
                         // Check if signature length was invalid.
@@ -9920,7 +10324,10 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                             // revert(abi.encodeWithSignature(
                             //     "InvalidSignature()"
                             // ))
-                            revert(Error_selector_offset, InvalidSignature_error_length)
+                            revert(
+                                Error_selector_offset,
+                                InvalidSignature_error_length
+                            )
                         }
 
                         // Check if v was invalid.
@@ -9928,7 +10335,15 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                             eq(signatureLength, ECDSA_MaxLength),
                             iszero(
                                 byte(
-                                    byte(0, mload(add(signature, ECDSA_signature_v_offset))),
+                                    byte(
+                                        0,
+                                        mload(
+                                            add(
+                                                signature,
+                                                ECDSA_signature_v_offset
+                                            )
+                                        )
+                                    ),
                                     ECDSA_twentySeventhAndTwentyEighthBytesSet
                                 )
                             )
@@ -9936,12 +10351,23 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                             // Revert with invalid v value.
                             // Store left-padded selector with push4, mem[28:32]
                             mstore(0, BadSignatureV_error_selector)
-                            mstore(BadSignatureV_error_v_ptr, byte(0, mload(add(signature, ECDSA_signature_v_offset))))
+                            mstore(
+                                BadSignatureV_error_v_ptr,
+                                byte(
+                                    0,
+                                    mload(
+                                        add(signature, ECDSA_signature_v_offset)
+                                    )
+                                )
+                            )
 
                             // revert(abi.encodeWithSignature(
                             //     "BadSignatureV(uint8)", v
                             // ))
-                            revert(Error_selector_offset, BadSignatureV_error_length)
+                            revert(
+                                Error_selector_offset,
+                                BadSignatureV_error_length
+                            )
                         }
 
                         // Revert with generic invalid signer error message.
@@ -9949,7 +10375,10 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                         mstore(0, InvalidSigner_error_selector)
 
                         // revert(abi.encodeWithSignature("InvalidSigner()"))
-                        revert(Error_selector_offset, InvalidSigner_error_length)
+                        revert(
+                            Error_selector_offset,
+                            InvalidSigner_error_length
+                        )
                     }
                 }
 
@@ -9957,7 +10386,13 @@ contract SignatureVerification is SignatureVerificationErrors, LowLevelHelpers {
                 // signature head.
                 mstore(wordBeforeSignaturePtr, cachedWordBeforeSignature)
                 mstore(selectorPtr, cachedWordOverwrittenBySelector)
-                mstore(sub(signature, EIP1271_isValidSignature_digest_negativeOffset), cachedWordOverwrittenByDigest)
+                mstore(
+                    sub(
+                        signature,
+                        EIP1271_isValidSignature_digest_negativeOffset
+                    ),
+                    cachedWordOverwrittenByDigest
+                )
             }
         }
 
@@ -10004,10 +10439,17 @@ contract Verifiers is Assertions, SignatureVerification {
      *
      * @return valid A boolean indicating whether the order is active.
      */
-    function _verifyTime(uint256 startTime, uint256 endTime, bool revertOnInvalid) internal view returns (bool valid) {
+    function _verifyTime(
+        uint256 startTime,
+        uint256 endTime,
+        bool revertOnInvalid
+    ) internal view returns (bool valid) {
         // Mark as valid if order has started and has not already ended.
         assembly {
-            valid := and(iszero(gt(startTime, timestamp())), gt(endTime, timestamp()))
+            valid := and(
+                iszero(gt(startTime, timestamp())),
+                gt(endTime, timestamp())
+            )
         }
 
         // Only revert on invalid if revertOnInvalid has been supplied as true.
@@ -10029,7 +10471,11 @@ contract Verifiers is Assertions, SignatureVerification {
      * @param signature A signature from the offerer indicating that the order
      *                  has been approved.
      */
-    function _verifySignature(address offerer, bytes32 orderHash, bytes memory signature) internal view {
+    function _verifySignature(
+        address offerer,
+        bytes32 orderHash,
+        bytes memory signature
+    ) internal view {
         // Determine whether the offerer is the caller.
         bool offererIsCaller;
         assembly {
@@ -10045,7 +10491,10 @@ contract Verifiers is Assertions, SignatureVerification {
         bytes32 domainSeparator = _domainSeparator();
 
         // Derive original EIP-712 digest using domain separator and order hash.
-        bytes32 originalDigest = _deriveEIP712Digest(domainSeparator, orderHash);
+        bytes32 originalDigest = _deriveEIP712Digest(
+            domainSeparator,
+            orderHash
+        );
 
         // Read the length of the signature from memory and place on the stack.
         uint256 originalSignatureLength = signature.length;
@@ -10062,7 +10511,13 @@ contract Verifiers is Assertions, SignatureVerification {
         }
 
         // Ensure that the signature for the digest is valid for the offerer.
-        _assertValidSignature(offerer, digest, originalDigest, originalSignatureLength, signature);
+        _assertValidSignature(
+            offerer,
+            digest,
+            originalDigest,
+            originalSignatureLength,
+            signature
+        );
     }
 
     /**
@@ -10072,18 +10527,28 @@ contract Verifiers is Assertions, SignatureVerification {
      *
      * @return validLength True if bulk order size is valid, false otherwise.
      */
-    function _isValidBulkOrderSize(uint256 signatureLength) internal pure returns (bool validLength) {
+    function _isValidBulkOrderSize(
+        uint256 signatureLength
+    ) internal pure returns (bool validLength) {
         // Utilize assembly to validate the length; the equivalent logic is
         // (64 + x) + 3 + 32y where (0 <= x <= 1) and (1 <= y <= 24).
         assembly {
-            validLength :=
-                and(
-                    lt(sub(signatureLength, BulkOrderProof_minSize), BulkOrderProof_rangeSize),
-                    lt(
-                        and(add(signatureLength, BulkOrderProof_lengthAdjustmentBeforeMask), ThirtyOneBytes),
-                        BulkOrderProof_lengthRangeAfterMask
-                    )
+            validLength := and(
+                lt(
+                    sub(signatureLength, BulkOrderProof_minSize),
+                    BulkOrderProof_rangeSize
+                ),
+                lt(
+                    and(
+                        add(
+                            signatureLength,
+                            BulkOrderProof_lengthAdjustmentBeforeMask
+                        ),
+                        ThirtyOneBytes
+                    ),
+                    BulkOrderProof_lengthRangeAfterMask
                 )
+            )
         }
     }
 
@@ -10097,11 +10562,10 @@ contract Verifiers is Assertions, SignatureVerification {
      *
      * @return bulkOrderHash The bulk order hash.
      */
-    function _computeBulkOrderProof(bytes memory proofAndSignature, bytes32 leaf)
-        internal
-        pure
-        returns (bytes32 bulkOrderHash)
-    {
+    function _computeBulkOrderProof(
+        bytes memory proofAndSignature,
+        bytes32 leaf
+    ) internal pure returns (bytes32 bulkOrderHash) {
         // Declare arguments for the root hash and the height of the proof.
         bytes32 root;
         uint256 height;
@@ -10137,15 +10601,19 @@ contract Verifiers is Assertions, SignatureVerification {
             mstore(xor(scratchPtr1, OneWord), mload(proof))
 
             // Compute remaining proofs.
-            for { let i := 1 } lt(i, height) { i := add(i, 1) } {
+            for {
+                let i := 1
+            } lt(i, height) {
+                i := add(i, 1)
+            } {
                 proof := add(proof, OneWord)
                 let scratchPtr := shl(OneWordShift, and(shr(i, key), 1))
-                mstore(scratchPtr, sha3(0, TwoWords))
+                mstore(scratchPtr, keccak256(0, TwoWords))
                 mstore(xor(scratchPtr, OneWord), mload(proof))
             }
 
             // Compute root hash.
-            root := sha3(0, TwoWords)
+            root := keccak256(0, TwoWords)
         }
 
         // Retrieve appropriate typehash constant based on height.
@@ -10155,7 +10623,7 @@ contract Verifiers is Assertions, SignatureVerification {
         assembly {
             mstore(0, rootTypeHash)
             mstore(OneWord, root)
-            bulkOrderHash := sha3(0, TwoWords)
+            bulkOrderHash := keccak256(0, TwoWords)
         }
     }
 
@@ -10439,7 +10907,12 @@ contract TokenTransferrer is TokenTransferrerErrors {
      * @param to         The recipient of the transfer.
      * @param amount     The amount to transfer.
      */
-    function _performERC20Transfer(address token, address from, address to, uint256 amount) internal {
+    function _performERC20Transfer(
+        address token,
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
         // Utilize assembly to perform an optimized ERC20 token transfer.
         assembly {
             // The free memory pointer memory slot will be used when populating
@@ -10458,17 +10931,27 @@ contract TokenTransferrer is TokenTransferrerErrors {
             // return data is received (in which case it will be overwritten) or
             // that no data is received (in which case scratch space will be
             // ignored) on a successful call to the given token.
-            let callStatus := call(gas(), token, 0, ERC20_transferFrom_sig_ptr, ERC20_transferFrom_length, 0, OneWord)
+            let callStatus := call(
+                gas(),
+                token,
+                0,
+                ERC20_transferFrom_sig_ptr,
+                ERC20_transferFrom_length,
+                0,
+                OneWord
+            )
 
             // Determine whether transfer was successful using status & result.
-            let success :=
-                and(
-                    // Set success to whether the call reverted, if not check it
-                    // either returned exactly 1 (can't just be non-zero data), or
-                    // had no return data.
-                    or(and(eq(mload(0), 1), gt(returndatasize(), 31)), iszero(returndatasize())),
-                    callStatus
-                )
+            let success := and(
+                // Set success to whether the call reverted, if not check it
+                // either returned exactly 1 (can't just be non-zero data), or
+                // had no return data.
+                or(
+                    and(eq(mload(0), 1), gt(returndatasize(), 31)),
+                    iszero(returndatasize())
+                ),
+                callStatus
+            )
 
             // Handle cases where either the transfer failed or no data was
             // returned. Group these, as most transfers will succeed with data.
@@ -10491,7 +10974,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                                 // necessary. Start by computing the word size
                                 // of returndata and allocated memory. Round up
                                 // to the nearest full word.
-                                let returnDataWords := shr(OneWordShift, add(returndatasize(), ThirtyOneBytes))
+                                let returnDataWords := shr(
+                                    OneWordShift,
+                                    add(returndatasize(), ThirtyOneBytes)
+                                )
 
                                 // Note: use the free memory pointer in place of
                                 // msize() to work around a Yul warning that
@@ -10504,17 +10990,28 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
                                 // Then, compute cost of new memory allocation.
                                 if gt(returnDataWords, msizeWords) {
-                                    cost :=
+                                    cost := add(
+                                        cost,
                                         add(
-                                            cost,
-                                            add(
-                                                mul(sub(returnDataWords, msizeWords), CostPerWord),
-                                                shr(
-                                                    MemoryExpansionCoefficientShift,
-                                                    sub(mul(returnDataWords, returnDataWords), mul(msizeWords, msizeWords))
+                                            mul(
+                                                sub(
+                                                    returnDataWords,
+                                                    msizeWords
+                                                ),
+                                                CostPerWord
+                                            ),
+                                            shr(
+                                                MemoryExpansionCoefficientShift,
+                                                sub(
+                                                    mul(
+                                                        returnDataWords,
+                                                        returnDataWords
+                                                    ),
+                                                    mul(msizeWords, msizeWords)
                                                 )
                                             )
                                         )
+                                    )
                                 }
 
                                 // Finally, add a small constant and compare to
@@ -10532,37 +11029,73 @@ contract TokenTransferrer is TokenTransferrerErrors {
                             }
 
                             // Store left-padded selector with push4, mem[28:32]
-                            mstore(0, TokenTransferGenericFailure_error_selector)
-                            mstore(TokenTransferGenericFailure_error_token_ptr, token)
-                            mstore(TokenTransferGenericFailure_error_from_ptr, from)
+                            mstore(
+                                0,
+                                TokenTransferGenericFailure_error_selector
+                            )
+                            mstore(
+                                TokenTransferGenericFailure_error_token_ptr,
+                                token
+                            )
+                            mstore(
+                                TokenTransferGenericFailure_error_from_ptr,
+                                from
+                            )
                             mstore(TokenTransferGenericFailure_error_to_ptr, to)
-                            mstore(TokenTransferGenericFailure_err_identifier_ptr, 0)
-                            mstore(TokenTransferGenericFailure_error_amount_ptr, amount)
+                            mstore(
+                                TokenTransferGenericFailure_err_identifier_ptr,
+                                0
+                            )
+                            mstore(
+                                TokenTransferGenericFailure_error_amount_ptr,
+                                amount
+                            )
 
                             // revert(abi.encodeWithSignature(
                             //     "TokenTransferGenericFailure(
                             //         address,address,address,uint256,uint256
                             //     )", token, from, to, identifier, amount
                             // ))
-                            revert(Generic_error_selector_offset, TokenTransferGenericFailure_error_length)
+                            revert(
+                                Generic_error_selector_offset,
+                                TokenTransferGenericFailure_error_length
+                            )
                         }
 
                         // Otherwise revert with a message about the token
                         // returning false or non-compliant return values.
 
                         // Store left-padded selector with push4, mem[28:32]
-                        mstore(0, BadReturnValueFromERC20OnTransfer_error_selector)
-                        mstore(BadReturnValueFromERC20OnTransfer_error_token_ptr, token)
-                        mstore(BadReturnValueFromERC20OnTransfer_error_from_ptr, from)
-                        mstore(BadReturnValueFromERC20OnTransfer_error_to_ptr, to)
-                        mstore(BadReturnValueFromERC20OnTransfer_error_amount_ptr, amount)
+                        mstore(
+                            0,
+                            BadReturnValueFromERC20OnTransfer_error_selector
+                        )
+                        mstore(
+                            BadReturnValueFromERC20OnTransfer_error_token_ptr,
+                            token
+                        )
+                        mstore(
+                            BadReturnValueFromERC20OnTransfer_error_from_ptr,
+                            from
+                        )
+                        mstore(
+                            BadReturnValueFromERC20OnTransfer_error_to_ptr,
+                            to
+                        )
+                        mstore(
+                            BadReturnValueFromERC20OnTransfer_error_amount_ptr,
+                            amount
+                        )
 
                         // revert(abi.encodeWithSignature(
                         //     "BadReturnValueFromERC20OnTransfer(
                         //         address,address,address,uint256
                         //     )", token, from, to, amount
                         // ))
-                        revert(Generic_error_selector_offset, BadReturnValueFromERC20OnTransfer_error_length)
+                        revert(
+                            Generic_error_selector_offset,
+                            BadReturnValueFromERC20OnTransfer_error_length
+                        )
                     }
 
                     // Otherwise, revert with error about token not having code:
@@ -10573,7 +11106,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                     // revert(abi.encodeWithSignature(
                     //      "NoContract(address)", account
                     // ))
-                    revert(Generic_error_selector_offset, NoContract_error_length)
+                    revert(
+                        Generic_error_selector_offset,
+                        NoContract_error_length
+                    )
                 }
 
                 // Otherwise, the token just returned no data despite the call
@@ -10601,7 +11137,12 @@ contract TokenTransferrer is TokenTransferrerErrors {
      * @param to         The recipient of the transfer.
      * @param identifier The tokenId to transfer.
      */
-    function _performERC721Transfer(address token, address from, address to, uint256 identifier) internal {
+    function _performERC721Transfer(
+        address token,
+        address from,
+        address to,
+        uint256 identifier
+    ) internal {
         // Utilize assembly to perform an optimized ERC721 token transfer.
         assembly {
             // If the token has no code, revert.
@@ -10627,7 +11168,15 @@ contract TokenTransferrer is TokenTransferrerErrors {
             mstore(ERC721_transferFrom_id_ptr, identifier)
 
             // Perform the call, ignoring return data.
-            let success := call(gas(), token, 0, ERC721_transferFrom_sig_ptr, ERC721_transferFrom_length, 0, 0)
+            let success := call(
+                gas(),
+                token,
+                0,
+                ERC721_transferFrom_sig_ptr,
+                ERC721_transferFrom_length,
+                0,
+                0
+            )
 
             // If the transfer reverted:
             if iszero(success) {
@@ -10638,7 +11187,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                     // returndata while expanding memory where necessary. Start
                     // by computing word size of returndata & allocated memory.
                     // Round up to the nearest full word.
-                    let returnDataWords := shr(OneWordShift, add(returndatasize(), ThirtyOneBytes))
+                    let returnDataWords := shr(
+                        OneWordShift,
+                        add(returndatasize(), ThirtyOneBytes)
+                    )
 
                     // Note: use the free memory pointer in place of msize() to
                     // work around a Yul warning that prevents accessing msize
@@ -10650,17 +11202,22 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
                     // Then, compute cost of new memory allocation.
                     if gt(returnDataWords, msizeWords) {
-                        cost :=
+                        cost := add(
+                            cost,
                             add(
-                                cost,
-                                add(
-                                    mul(sub(returnDataWords, msizeWords), CostPerWord),
-                                    shr(
-                                        MemoryExpansionCoefficientShift,
-                                        sub(mul(returnDataWords, returnDataWords), mul(msizeWords, msizeWords))
+                                mul(
+                                    sub(returnDataWords, msizeWords),
+                                    CostPerWord
+                                ),
+                                shr(
+                                    MemoryExpansionCoefficientShift,
+                                    sub(
+                                        mul(returnDataWords, returnDataWords),
+                                        mul(msizeWords, msizeWords)
                                     )
                                 )
                             )
+                        )
                     }
 
                     // Finally, add a small constant and compare to gas
@@ -10681,7 +11238,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                 mstore(TokenTransferGenericFailure_error_token_ptr, token)
                 mstore(TokenTransferGenericFailure_error_from_ptr, from)
                 mstore(TokenTransferGenericFailure_error_to_ptr, to)
-                mstore(TokenTransferGenericFailure_error_identifier_ptr, identifier)
+                mstore(
+                    TokenTransferGenericFailure_error_identifier_ptr,
+                    identifier
+                )
                 mstore(TokenTransferGenericFailure_error_amount_ptr, 1)
 
                 // revert(abi.encodeWithSignature(
@@ -10689,7 +11249,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                 //         address,address,address,uint256,uint256
                 //     )", token, from, to, identifier, amount
                 // ))
-                revert(Generic_error_selector_offset, TokenTransferGenericFailure_error_length)
+                revert(
+                    Generic_error_selector_offset,
+                    TokenTransferGenericFailure_error_length
+                )
             }
 
             // Restore the original free memory pointer.
@@ -10713,9 +11276,13 @@ contract TokenTransferrer is TokenTransferrerErrors {
      * @param identifier The id to transfer.
      * @param amount     The amount to transfer.
      */
-    function _performERC1155Transfer(address token, address from, address to, uint256 identifier, uint256 amount)
-        internal
-    {
+    function _performERC1155Transfer(
+        address token,
+        address from,
+        address to,
+        uint256 identifier,
+        uint256 amount
+    ) internal {
         // Utilize assembly to perform an optimized ERC1155 token transfer.
         assembly {
             // If the token has no code, revert.
@@ -10738,17 +11305,30 @@ contract TokenTransferrer is TokenTransferrerErrors {
             let slot0xC0 := mload(Slot0xC0)
 
             // Write call data into memory, beginning with function selector.
-            mstore(ERC1155_safeTransferFrom_sig_ptr, ERC1155_safeTransferFrom_signature)
+            mstore(
+                ERC1155_safeTransferFrom_sig_ptr,
+                ERC1155_safeTransferFrom_signature
+            )
             mstore(ERC1155_safeTransferFrom_from_ptr, from)
             mstore(ERC1155_safeTransferFrom_to_ptr, to)
             mstore(ERC1155_safeTransferFrom_id_ptr, identifier)
             mstore(ERC1155_safeTransferFrom_amount_ptr, amount)
-            mstore(ERC1155_safeTransferFrom_data_offset_ptr, ERC1155_safeTransferFrom_data_length_offset)
+            mstore(
+                ERC1155_safeTransferFrom_data_offset_ptr,
+                ERC1155_safeTransferFrom_data_length_offset
+            )
             mstore(ERC1155_safeTransferFrom_data_length_ptr, 0)
 
             // Perform the call, ignoring return data.
-            let success :=
-                call(gas(), token, 0, ERC1155_safeTransferFrom_sig_ptr, ERC1155_safeTransferFrom_length, 0, 0)
+            let success := call(
+                gas(),
+                token,
+                0,
+                ERC1155_safeTransferFrom_sig_ptr,
+                ERC1155_safeTransferFrom_length,
+                0,
+                0
+            )
 
             // If the transfer reverted:
             if iszero(success) {
@@ -10759,7 +11339,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                     // returndata while expanding memory where necessary. Start
                     // by computing word size of returndata & allocated memory.
                     // Round up to the nearest full word.
-                    let returnDataWords := shr(OneWordShift, add(returndatasize(), ThirtyOneBytes))
+                    let returnDataWords := shr(
+                        OneWordShift,
+                        add(returndatasize(), ThirtyOneBytes)
+                    )
 
                     // Note: use the free memory pointer in place of msize() to
                     // work around a Yul warning that prevents accessing msize
@@ -10771,17 +11354,22 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
                     // Then, compute cost of new memory allocation.
                     if gt(returnDataWords, msizeWords) {
-                        cost :=
+                        cost := add(
+                            cost,
                             add(
-                                cost,
-                                add(
-                                    mul(sub(returnDataWords, msizeWords), CostPerWord),
-                                    shr(
-                                        MemoryExpansionCoefficientShift,
-                                        sub(mul(returnDataWords, returnDataWords), mul(msizeWords, msizeWords))
+                                mul(
+                                    sub(returnDataWords, msizeWords),
+                                    CostPerWord
+                                ),
+                                shr(
+                                    MemoryExpansionCoefficientShift,
+                                    sub(
+                                        mul(returnDataWords, returnDataWords),
+                                        mul(msizeWords, msizeWords)
                                     )
                                 )
                             )
+                        )
                     }
 
                     // Finally, add a small constant and compare to gas
@@ -10803,7 +11391,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                 mstore(TokenTransferGenericFailure_error_token_ptr, token)
                 mstore(TokenTransferGenericFailure_error_from_ptr, from)
                 mstore(TokenTransferGenericFailure_error_to_ptr, to)
-                mstore(TokenTransferGenericFailure_error_identifier_ptr, identifier)
+                mstore(
+                    TokenTransferGenericFailure_error_identifier_ptr,
+                    identifier
+                )
                 mstore(TokenTransferGenericFailure_error_amount_ptr, amount)
 
                 // revert(abi.encodeWithSignature(
@@ -10811,7 +11402,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                 //         address,address,address,uint256,uint256
                 //     )", token, from, to, identifier, amount
                 // ))
-                revert(Generic_error_selector_offset, TokenTransferGenericFailure_error_length)
+                revert(
+                    Generic_error_selector_offset,
+                    TokenTransferGenericFailure_error_length
+                )
             }
 
             mstore(Slot0x80, slot0x80) // Restore slot 0x80.
@@ -10841,7 +11435,9 @@ contract TokenTransferrer is TokenTransferrerErrors {
      *
      * @param batchTransfers The group of 1155 batch transfers to perform.
      */
-    function _performERC1155BatchTransfers(ConduitBatch1155Transfer[] calldata batchTransfers) internal {
+    function _performERC1155BatchTransfers(
+        ConduitBatch1155Transfer[] calldata batchTransfers
+    ) internal {
         // Utilize assembly to perform optimized batch 1155 transfers.
         assembly {
             let len := batchTransfers.length
@@ -10857,14 +11453,24 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
             // Write the function selector, which will be reused for each call:
             // safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
-            mstore(ConduitBatch1155Transfer_from_offset, ERC1155_safeBatchTransferFrom_signature)
+            mstore(
+                ConduitBatch1155Transfer_from_offset,
+                ERC1155_safeBatchTransferFrom_signature
+            )
 
             // Iterate over each batch transfer.
-            for { let i := 0 } lt(i, len) { i := add(i, 1) } {
+            for {
+                let i := 0
+            } lt(i, len) {
+                i := add(i, 1)
+            } {
                 // Read the offset to the beginning of the element and add
                 // it to pointer to the beginning of the array head to get
                 // the absolute position of the element in calldata.
-                let elementPtr := add(arrayHeadPtr, calldataload(nextElementHeadPtr))
+                let elementPtr := add(
+                    arrayHeadPtr,
+                    calldataload(nextElementHeadPtr)
+                )
 
                 // Retrieve the token from calldata.
                 let token := calldataload(elementPtr)
@@ -10878,46 +11484,71 @@ contract TokenTransferrer is TokenTransferrerErrors {
                     // revert(abi.encodeWithSignature(
                     //     "NoContract(address)", account
                     // ))
-                    revert(Generic_error_selector_offset, NoContract_error_length)
+                    revert(
+                        Generic_error_selector_offset,
+                        NoContract_error_length
+                    )
                 }
 
                 // Get the total number of supplied ids.
-                let idsLength := calldataload(add(elementPtr, ConduitBatch1155Transfer_ids_length_offset))
+                let idsLength := calldataload(
+                    add(elementPtr, ConduitBatch1155Transfer_ids_length_offset)
+                )
 
                 // Determine the expected offset for the amounts array.
-                let expectedAmountsOffset :=
-                    add(ConduitBatch1155Transfer_amounts_length_baseOffset, shl(OneWordShift, idsLength))
+                let expectedAmountsOffset := add(
+                    ConduitBatch1155Transfer_amounts_length_baseOffset,
+                    shl(OneWordShift, idsLength)
+                )
 
                 // Validate struct encoding.
-                let invalidEncoding :=
-                    iszero(
+                let invalidEncoding := iszero(
+                    and(
+                        // ids.length == amounts.length
+                        eq(
+                            idsLength,
+                            calldataload(add(elementPtr, expectedAmountsOffset))
+                        ),
                         and(
-                            // ids.length == amounts.length
-                            eq(idsLength, calldataload(add(elementPtr, expectedAmountsOffset))),
-                            and(
-                                // ids_offset == 0xa0
-                                eq(
-                                    calldataload(add(elementPtr, ConduitBatch1155Transfer_ids_head_offset)),
-                                    ConduitBatch1155Transfer_ids_length_offset
+                            // ids_offset == 0xa0
+                            eq(
+                                calldataload(
+                                    add(
+                                        elementPtr,
+                                        ConduitBatch1155Transfer_ids_head_offset
+                                    )
                                 ),
-                                // amounts_offset == 0xc0 + ids.length*32
-                                eq(
-                                    calldataload(add(elementPtr, ConduitBatchTransfer_amounts_head_offset)),
-                                    expectedAmountsOffset
-                                )
+                                ConduitBatch1155Transfer_ids_length_offset
+                            ),
+                            // amounts_offset == 0xc0 + ids.length*32
+                            eq(
+                                calldataload(
+                                    add(
+                                        elementPtr,
+                                        ConduitBatchTransfer_amounts_head_offset
+                                    )
+                                ),
+                                expectedAmountsOffset
                             )
                         )
                     )
+                )
 
                 // Revert with an error if the encoding is not valid.
                 if invalidEncoding {
                     // Store left-padded selector with push4, mem[28:32]
-                    mstore(Invalid1155BatchTransferEncoding_ptr, Invalid1155BatchTransferEncoding_selector)
+                    mstore(
+                        Invalid1155BatchTransferEncoding_ptr,
+                        Invalid1155BatchTransferEncoding_selector
+                    )
 
                     // revert(abi.encodeWithSignature(
                     //     "Invalid1155BatchTransferEncoding()"
                     // ))
-                    revert(Invalid1155BatchTransferEncoding_ptr, Invalid1155BatchTransferEncoding_length)
+                    revert(
+                        Invalid1155BatchTransferEncoding_ptr,
+                        Invalid1155BatchTransferEncoding_length
+                    )
                 }
 
                 // Update the offset position for the next loop
@@ -10932,19 +11563,34 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
                 // Determine size of calldata required for ids and amounts. Note
                 // that the size includes both lengths as well as the data.
-                let idsAndAmountsSize := add(TwoWords, shl(TwoWordsShift, idsLength))
+                let idsAndAmountsSize := add(
+                    TwoWords,
+                    shl(TwoWordsShift, idsLength)
+                )
 
                 // Update the offset for the data array in memory.
                 mstore(
                     BatchTransfer1155Params_data_head_ptr,
-                    add(BatchTransfer1155Params_ids_length_offset, idsAndAmountsSize)
+                    add(
+                        BatchTransfer1155Params_ids_length_offset,
+                        idsAndAmountsSize
+                    )
                 )
 
                 // Set the length of the data array in memory to zero.
-                mstore(add(BatchTransfer1155Params_data_length_basePtr, idsAndAmountsSize), 0)
+                mstore(
+                    add(
+                        BatchTransfer1155Params_data_length_basePtr,
+                        idsAndAmountsSize
+                    ),
+                    0
+                )
 
                 // Determine the total calldata size for the call to transfer.
-                let transferDataSize := add(BatchTransfer1155Params_calldata_baseSize, idsAndAmountsSize)
+                let transferDataSize := add(
+                    BatchTransfer1155Params_calldata_baseSize,
+                    idsAndAmountsSize
+                )
 
                 // Copy second section of calldata (including dynamic values).
                 calldatacopy(
@@ -10954,16 +11600,15 @@ contract TokenTransferrer is TokenTransferrerErrors {
                 )
 
                 // Perform the call to transfer 1155 tokens.
-                let success :=
-                    call(
-                        gas(),
-                        token,
-                        0,
-                        ConduitBatch1155Transfer_from_offset, // Data portion start.
-                        transferDataSize, // Location of the length of callData.
-                        0,
-                        0
-                    )
+                let success := call(
+                    gas(),
+                    token,
+                    0,
+                    ConduitBatch1155Transfer_from_offset, // Data portion start.
+                    transferDataSize, // Location of the length of callData.
+                    0,
+                    0
+                )
 
                 // If the transfer reverted:
                 if iszero(success) {
@@ -10974,7 +11619,10 @@ contract TokenTransferrer is TokenTransferrerErrors {
                         // returndata while expanding memory where necessary.
                         // Start by computing word size of returndata and
                         // allocated memory. Round up to the nearest full word.
-                        let returnDataWords := shr(OneWordShift, add(returndatasize(), ThirtyOneBytes))
+                        let returnDataWords := shr(
+                            OneWordShift,
+                            add(returndatasize(), ThirtyOneBytes)
+                        )
 
                         // Note: use transferDataSize in place of msize() to
                         // work around a Yul warning that prevents accessing
@@ -10991,17 +11639,25 @@ contract TokenTransferrer is TokenTransferrerErrors {
 
                         // Then, compute cost of new memory allocation.
                         if gt(returnDataWords, msizeWords) {
-                            cost :=
+                            cost := add(
+                                cost,
                                 add(
-                                    cost,
-                                    add(
-                                        mul(sub(returnDataWords, msizeWords), CostPerWord),
-                                        shr(
-                                            MemoryExpansionCoefficientShift,
-                                            sub(mul(returnDataWords, returnDataWords), mul(msizeWords, msizeWords))
+                                    mul(
+                                        sub(returnDataWords, msizeWords),
+                                        CostPerWord
+                                    ),
+                                    shr(
+                                        MemoryExpansionCoefficientShift,
+                                        sub(
+                                            mul(
+                                                returnDataWords,
+                                                returnDataWords
+                                            ),
+                                            mul(msizeWords, msizeWords)
                                         )
                                     )
                                 )
+                            )
                         }
 
                         // Finally, add a small constant and compare to gas
@@ -11017,18 +11673,27 @@ contract TokenTransferrer is TokenTransferrerErrors {
                     }
 
                     // Set the error signature.
-                    mstore(0, ERC1155BatchTransferGenericFailure_error_signature)
+                    mstore(
+                        0,
+                        ERC1155BatchTransferGenericFailure_error_signature
+                    )
 
                     // Write the token.
                     mstore(ERC1155BatchTransferGenericFailure_token_ptr, token)
 
                     // Increase the offset to ids by 32.
-                    mstore(BatchTransfer1155Params_ids_head_ptr, ERC1155BatchTransferGenericFailure_ids_offset)
+                    mstore(
+                        BatchTransfer1155Params_ids_head_ptr,
+                        ERC1155BatchTransferGenericFailure_ids_offset
+                    )
 
                     // Increase the offset to amounts by 32.
                     mstore(
                         BatchTransfer1155Params_amounts_head_ptr,
-                        add(OneWord, mload(BatchTransfer1155Params_amounts_head_ptr))
+                        add(
+                            OneWord,
+                            mload(BatchTransfer1155Params_amounts_head_ptr)
+                        )
                     )
 
                     // Return modified region. The total size stays the same as
@@ -11077,7 +11742,12 @@ contract Executor is Verifiers, TokenTransferrer {
      * @param accumulator An open-ended array that collects transfers to execute
      *                    against a given conduit in a single call.
      */
-    function _transfer(ReceivedItem memory item, address from, bytes32 conduitKey, bytes memory accumulator) internal {
+    function _transfer(
+        ReceivedItem memory item,
+        address from,
+        bytes32 conduitKey,
+        bytes memory accumulator
+    ) internal {
         // If the item type indicates Ether or a native token...
         if (item.itemType == ItemType.NATIVE) {
             // Ensure neither the token nor the identifier parameters are set.
@@ -11094,13 +11764,36 @@ contract Executor is Verifiers, TokenTransferrer {
             }
 
             // Transfer ERC20 tokens from the source to the recipient.
-            _transferERC20(item.token, from, item.recipient, item.amount, conduitKey, accumulator);
+            _transferERC20(
+                item.token,
+                from,
+                item.recipient,
+                item.amount,
+                conduitKey,
+                accumulator
+            );
         } else if (item.itemType == ItemType.ERC721) {
             // Transfer ERC721 token from the source to the recipient.
-            _transferERC721(item.token, from, item.recipient, item.identifier, item.amount, conduitKey, accumulator);
+            _transferERC721(
+                item.token,
+                from,
+                item.recipient,
+                item.identifier,
+                item.amount,
+                conduitKey,
+                accumulator
+            );
         } else {
             // Transfer ERC1155 token from the source to the recipient.
-            _transferERC1155(item.token, from, item.recipient, item.identifier, item.amount, conduitKey, accumulator);
+            _transferERC1155(
+                item.token,
+                from,
+                item.recipient,
+                item.identifier,
+                item.amount,
+                conduitKey,
+                accumulator
+            );
         }
     }
 
@@ -11111,7 +11804,10 @@ contract Executor is Verifiers, TokenTransferrer {
      * @param to     The recipient of the transfer.
      * @param amount The amount to transfer.
      */
-    function _transferNativeTokens(address payable to, uint256 amount) internal {
+    function _transferNativeTokens(
+        address payable to,
+        uint256 amount
+    ) internal {
         // Ensure that the supplied amount is non-zero.
         _assertNonZeroAmount(amount);
 
@@ -11135,14 +11831,20 @@ contract Executor is Verifiers, TokenTransferrer {
 
                 // Write `to` and `amount` arguments.
                 mstore(NativeTokenTransferGenericFailure_error_account_ptr, to)
-                mstore(NativeTokenTransferGenericFailure_error_amount_ptr, amount)
+                mstore(
+                    NativeTokenTransferGenericFailure_error_amount_ptr,
+                    amount
+                )
 
                 // revert(abi.encodeWithSignature(
                 //     "NativeTokenTransferGenericFailure(address,uint256)",
                 //     to,
                 //     amount
                 // ))
-                revert(Error_selector_offset, NativeTokenTransferGenericFailure_error_length)
+                revert(
+                    Error_selector_offset,
+                    NativeTokenTransferGenericFailure_error_length
+                )
             }
         }
     }
@@ -11183,7 +11885,16 @@ contract Executor is Verifiers, TokenTransferrer {
             _performERC20Transfer(token, from, to, amount);
         } else {
             // Insert the call to the conduit into the accumulator.
-            _insert(conduitKey, accumulator, ConduitItemType.ERC20, token, from, to, uint256(0), amount);
+            _insert(
+                conduitKey,
+                accumulator,
+                ConduitItemType.ERC20,
+                token,
+                from,
+                to,
+                uint256(0),
+                amount
+            );
         }
     }
 
@@ -11227,7 +11938,16 @@ contract Executor is Verifiers, TokenTransferrer {
             _performERC721Transfer(token, from, to, identifier);
         } else {
             // Insert the call to the conduit into the accumulator.
-            _insert(conduitKey, accumulator, ConduitItemType.ERC721, token, from, to, identifier, amount);
+            _insert(
+                conduitKey,
+                accumulator,
+                ConduitItemType.ERC721,
+                token,
+                from,
+                to,
+                identifier,
+                amount
+            );
         }
     }
 
@@ -11269,7 +11989,16 @@ contract Executor is Verifiers, TokenTransferrer {
             _performERC1155Transfer(token, from, to, identifier, amount);
         } else {
             // Insert the call to the conduit into the accumulator.
-            _insert(conduitKey, accumulator, ConduitItemType.ERC1155, token, from, to, identifier, amount);
+            _insert(
+                conduitKey,
+                accumulator,
+                ConduitItemType.ERC1155,
+                token,
+                from,
+                to,
+                identifier,
+                amount
+            );
         }
     }
 
@@ -11286,7 +12015,10 @@ contract Executor is Verifiers, TokenTransferrer {
      *                    signifies that no conduit should be used, with direct
      *                    approvals set on this contract.
      */
-    function _triggerIfArmedAndNotAccumulatable(bytes memory accumulator, bytes32 conduitKey) internal {
+    function _triggerIfArmedAndNotAccumulatable(
+        bytes memory accumulator,
+        bytes32 conduitKey
+    ) internal {
         // Retrieve the current conduit key from the accumulator.
         bytes32 accumulatorConduitKey = _getAccumulatorConduitKey(accumulator);
 
@@ -11341,11 +12073,13 @@ contract Executor is Verifiers, TokenTransferrer {
             callDataOffset := add(accumulator, TwoWords)
 
             // 68 + items * 192
-            callDataSize :=
-                add(
-                    Accumulator_array_offset_ptr,
-                    mul(mload(add(accumulator, Accumulator_array_length_ptr)), Conduit_transferItem_size)
+            callDataSize := add(
+                Accumulator_array_offset_ptr,
+                mul(
+                    mload(add(accumulator, Accumulator_array_length_ptr)),
+                    Conduit_transferItem_size
                 )
+            )
         }
 
         // Call conduit derived from conduit key & supply accumulated transfers.
@@ -11369,7 +12103,11 @@ contract Executor is Verifiers, TokenTransferrer {
      * @param callDataOffset The memory pointer where calldata is contained.
      * @param callDataSize   The size of calldata in memory.
      */
-    function _callConduitUsingOffsets(bytes32 conduitKey, uint256 callDataOffset, uint256 callDataSize) internal {
+    function _callConduitUsingOffsets(
+        bytes32 conduitKey,
+        uint256 callDataOffset,
+        uint256 callDataSize
+    ) internal {
         // Derive the address of the conduit using the conduit key.
         address conduit = _deriveConduit(conduitKey);
 
@@ -11382,7 +12120,15 @@ contract Executor is Verifiers, TokenTransferrer {
             mstore(0, 0)
 
             // Perform call, placing first word of return data in scratch space.
-            success := call(gas(), conduit, 0, callDataOffset, callDataSize, 0, OneWord)
+            success := call(
+                gas(),
+                conduit,
+                0,
+                callDataOffset,
+                callDataSize,
+                0,
+                OneWord
+            )
 
             // Take value from scratch space and place it on the stack.
             result := mload(0)
@@ -11413,14 +12159,14 @@ contract Executor is Verifiers, TokenTransferrer {
      * @return accumulatorConduitKey The conduit key currently set for the
      *                               accumulator.
      */
-    function _getAccumulatorConduitKey(bytes memory accumulator)
-        internal
-        pure
-        returns (bytes32 accumulatorConduitKey)
-    {
+    function _getAccumulatorConduitKey(
+        bytes memory accumulator
+    ) internal pure returns (bytes32 accumulatorConduitKey) {
         // Retrieve the current conduit key from the accumulator.
         assembly {
-            accumulatorConduitKey := mload(add(accumulator, Accumulator_conduitKey_ptr))
+            accumulatorConduitKey := mload(
+                add(accumulator, Accumulator_conduitKey_ptr)
+            )
         }
     }
 
@@ -11462,26 +12208,37 @@ contract Executor is Verifiers, TokenTransferrer {
                 mstore(accumulator, AccumulatorArmed) // "arm" the accumulator.
                 mstore(add(accumulator, Accumulator_conduitKey_ptr), conduitKey)
                 mstore(add(accumulator, Accumulator_selector_ptr), selector)
-                mstore(add(accumulator, Accumulator_array_offset_ptr), Accumulator_array_offset)
+                mstore(
+                    add(accumulator, Accumulator_array_offset_ptr),
+                    Accumulator_array_offset
+                )
                 mstore(add(accumulator, Accumulator_array_length_ptr), elements)
             }
         } else {
             // Otherwise, increase the number of elements by one.
             assembly {
-                elements := add(mload(add(accumulator, Accumulator_array_length_ptr)), 1)
+                elements := add(
+                    mload(add(accumulator, Accumulator_array_length_ptr)),
+                    1
+                )
                 mstore(add(accumulator, Accumulator_array_length_ptr), elements)
             }
         }
 
         // Insert the item.
         assembly {
-            let itemPointer :=
-                sub(add(accumulator, mul(elements, Conduit_transferItem_size)), Accumulator_itemSizeOffsetDifference)
+            let itemPointer := sub(
+                add(accumulator, mul(elements, Conduit_transferItem_size)),
+                Accumulator_itemSizeOffsetDifference
+            )
             mstore(itemPointer, itemType)
             mstore(add(itemPointer, Conduit_transferItem_token_ptr), token)
             mstore(add(itemPointer, Conduit_transferItem_from_ptr), from)
             mstore(add(itemPointer, Conduit_transferItem_to_ptr), to)
-            mstore(add(itemPointer, Conduit_transferItem_identifier_ptr), identifier)
+            mstore(
+                add(itemPointer, Conduit_transferItem_identifier_ptr),
+                identifier
+            )
             mstore(add(itemPointer, Conduit_transferItem_amount_ptr), amount)
         }
     }
@@ -11519,7 +12276,11 @@ interface ZoneInteractionErrors {
  * @author 0age
  * @notice ZoneInteraction contains logic related to interacting with zones.
  */
-contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLevelHelpers {
+contract ZoneInteraction is
+    ConsiderationEncoder,
+    ZoneInteractionErrors,
+    LowLevelHelpers
+{
     /**
      * @dev Internal function to determine if an order has a restricted order
      *      type and, if so, to ensure that either the zone is the caller or
@@ -11541,10 +12302,19 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
         // validation will be skipped.
         if (_isRestrictedAndCallerNotZone(orderType, parameters.zone)) {
             // Encode the `validateOrder` call in memory.
-            (MemoryPointer callData, uint256 size) = _encodeValidateBasicOrder(orderHash, parameters);
+            (MemoryPointer callData, uint256 size) = _encodeValidateBasicOrder(
+                orderHash,
+                parameters
+            );
 
             // Perform `validateOrder` call and ensure magic value was returned.
-            _callAndCheckStatus(parameters.zone, orderHash, callData, size, InvalidRestrictedOrder_error_selector);
+            _callAndCheckStatus(
+                parameters.zone,
+                orderHash,
+                callData,
+                size,
+                InvalidRestrictedOrder_error_selector
+            );
         }
     }
 
@@ -11575,12 +12345,24 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
         OrderParameters memory parameters = advancedOrder.parameters;
 
         // OrderType 2-3 require zone to be caller or approve via validateOrder.
-        if (_isRestrictedAndCallerNotZone(parameters.orderType, parameters.zone)) {
+        if (
+            _isRestrictedAndCallerNotZone(parameters.orderType, parameters.zone)
+        ) {
             // Encode the `validateOrder` call in memory.
-            (callData, size) = _encodeValidateOrder(orderHash, parameters, advancedOrder.extraData, orderHashes);
+            (callData, size) = _encodeValidateOrder(
+                orderHash,
+                parameters,
+                advancedOrder.extraData,
+                orderHashes
+            );
 
             // Set the target to the zone.
-            target = (parameters.toMemoryPointer().offset(OrderParameters_zone_offset).readAddress());
+            target = (
+                parameters
+                    .toMemoryPointer()
+                    .offset(OrderParameters_zone_offset)
+                    .readAddress()
+            );
 
             // Set the restricted-order-specific error selector.
             errorSelector = InvalidRestrictedOrder_error_selector;
@@ -11591,12 +12373,20 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
             // Shift the target 96 bits to the left.
             uint256 shiftedOfferer;
             assembly {
-                shiftedOfferer := shl(ContractOrder_orderHash_offerer_shift, target)
+                shiftedOfferer := shl(
+                    ContractOrder_orderHash_offerer_shift,
+                    target
+                )
             }
 
             // Encode the `ratifyOrder` call in memory.
-            (callData, size) =
-                _encodeRatifyOrder(orderHash, parameters, advancedOrder.extraData, orderHashes, shiftedOfferer);
+            (callData, size) = _encodeRatifyOrder(
+                orderHash,
+                parameters,
+                advancedOrder.extraData,
+                orderHashes,
+                shiftedOfferer
+            );
 
             // Set the contract-order-specific error selector.
             errorSelector = InvalidContractOrder_error_selector;
@@ -11618,20 +12408,18 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
      * @return mustValidate True if the order type is restricted and the caller
      *                      is not the specified zone, false otherwise.
      */
-    function _isRestrictedAndCallerNotZone(OrderType orderType, address zone)
-        internal
-        view
-        returns (bool mustValidate)
-    {
+    function _isRestrictedAndCallerNotZone(
+        OrderType orderType,
+        address zone
+    ) internal view returns (bool mustValidate) {
         assembly {
-            mustValidate :=
-                and(
-                    // Note that this check requires that there are no order types
-                    // beyond the current set (0-4).  It will need to be modified if
-                    // more order types are added.
-                    and(lt(orderType, 4), gt(orderType, 1)),
-                    iszero(eq(caller(), zone))
-                )
+            mustValidate := and(
+                // Note that this check requires that there are no order types
+                // beyond the current set (0-4).  It will need to be modified if
+                // more order types are added.
+                and(lt(orderType, 4), gt(orderType, 1)),
+                iszero(eq(caller(), zone))
+            )
         }
     }
 
@@ -11684,7 +12472,10 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
                 //     "InvalidRestrictedOrder(bytes32)",
                 //     orderHash
                 // ))
-                revert(Error_selector_offset, InvalidRestrictedOrder_error_length)
+                revert(
+                    Error_selector_offset,
+                    InvalidRestrictedOrder_error_length
+                )
             }
         }
 
@@ -11699,7 +12490,10 @@ contract ZoneInteraction is ConsiderationEncoder, ZoneInteractionErrors, LowLeve
                 //     "InvalidRestrictedOrder(bytes32)",
                 //     orderHash
                 // ))
-                revert(Error_selector_offset, InvalidRestrictedOrder_error_length)
+                revert(
+                    Error_selector_offset,
+                    InvalidRestrictedOrder_error_length
+                )
             }
         }
     }
@@ -11738,7 +12532,10 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @param signature A signature from the offerer indicating that the order
      *                  has been approved.
      */
-    function _validateBasicOrderAndUpdateStatus(bytes32 orderHash, bytes calldata signature) internal {
+    function _validateBasicOrderAndUpdateStatus(
+        bytes32 orderHash,
+        bytes calldata signature
+    ) internal {
         // Retrieve offerer directly using fixed calldata offset based on strict
         // basic parameter encoding.
         address offerer;
@@ -11786,7 +12583,10 @@ contract OrderValidator is Executor, ZoneInteraction {
      *                        will be filled.
      * @return denominator    A value indicating the total size of the order.
      */
-    function _validateOrderAndUpdateStatus(AdvancedOrder memory advancedOrder, bool revertOnInvalid)
+    function _validateOrderAndUpdateStatus(
+        AdvancedOrder memory advancedOrder,
+        bool revertOnInvalid
+    )
         internal
         returns (bytes32 orderHash, uint256 numerator, uint256 denominator)
     {
@@ -11794,7 +12594,13 @@ contract OrderValidator is Executor, ZoneInteraction {
         OrderParameters memory orderParameters = advancedOrder.parameters;
 
         // Ensure current timestamp falls between order start time and end time.
-        if (!_verifyTime(orderParameters.startTime, orderParameters.endTime, revertOnInvalid)) {
+        if (
+            !_verifyTime(
+                orderParameters.startTime,
+                orderParameters.endTime,
+                revertOnInvalid
+            )
+        ) {
             // Assuming an invalid time and no revert, return zeroed out values.
             return (bytes32(0), 0, 0);
         }
@@ -11802,9 +12608,15 @@ contract OrderValidator is Executor, ZoneInteraction {
         // Read numerator and denominator from memory and place on the stack.
         // Note that overflowed values are masked.
         assembly {
-            numerator := and(mload(add(advancedOrder, AdvancedOrder_numerator_offset)), MaxUint120)
+            numerator := and(
+                mload(add(advancedOrder, AdvancedOrder_numerator_offset)),
+                MaxUint120
+            )
 
-            denominator := and(mload(add(advancedOrder, AdvancedOrder_denominator_offset)), MaxUint120)
+            denominator := and(
+                mload(add(advancedOrder, AdvancedOrder_denominator_offset)),
+                MaxUint120
+            )
         }
 
         // Declare variable for tracking the validity of the supplied fraction.
@@ -11829,7 +12641,12 @@ contract OrderValidator is Executor, ZoneInteraction {
             // Return the generated order based on the order params and the
             // provided extra data. If revertOnInvalid is true, the function
             // will revert if the input is invalid.
-            return _getGeneratedOrder(orderParameters, advancedOrder.extraData, revertOnInvalid);
+            return
+                _getGeneratedOrder(
+                    orderParameters,
+                    advancedOrder.extraData,
+                    revertOnInvalid
+                );
         }
 
         // Ensure numerator does not exceed denominator and is not zero.
@@ -11843,7 +12660,13 @@ contract OrderValidator is Executor, ZoneInteraction {
         }
 
         // If attempting partial fill (n < d) check order type & ensure support.
-        if (_doesNotSupportPartialFills(orderParameters.orderType, numerator, denominator)) {
+        if (
+            _doesNotSupportPartialFills(
+                orderParameters.orderType,
+                numerator,
+                denominator
+            )
+        ) {
             // Revert if partial fill was attempted on an unsupported order.
             _revertPartialFillsNotEnabledForOrder();
         }
@@ -11865,7 +12688,11 @@ contract OrderValidator is Executor, ZoneInteraction {
 
         // If the order is not already validated, verify the supplied signature.
         if (!orderStatus.isValidated) {
-            _verifySignature(orderParameters.offerer, orderHash, advancedOrder.signature);
+            _verifySignature(
+                orderParameters.offerer,
+                orderHash,
+                advancedOrder.signature
+            );
         }
 
         // Utilize assembly to determine the fraction to fill and update status.
@@ -11873,10 +12700,17 @@ contract OrderValidator is Executor, ZoneInteraction {
             let orderStatusSlot := orderStatus.slot
             // Read filled amount as numerator and denominator and put on stack.
             let filledNumerator := sload(orderStatusSlot)
-            let filledDenominator := shr(OrderStatus_filledDenominator_offset, filledNumerator)
+            let filledDenominator := shr(
+                OrderStatus_filledDenominator_offset,
+                filledNumerator
+            )
 
             // "Loop" until the appropriate fill fraction has been determined.
-            for {} 1 {} {
+            for {
+
+            } 1 {
+
+            } {
                 // If no portion of the order has been filled yet...
                 if iszero(filledDenominator) {
                     // fill the full supplied fraction.
@@ -11887,7 +12721,10 @@ contract OrderValidator is Executor, ZoneInteraction {
                 }
 
                 // Shift and mask to calculate the current filled numerator.
-                filledNumerator := and(shr(OrderStatus_filledNumerator_offset, filledNumerator), MaxUint120)
+                filledNumerator := and(
+                    shr(OrderStatus_filledNumerator_offset, filledNumerator),
+                    MaxUint120
+                )
 
                 // If denominator of 1 supplied, fill entire remaining amount.
                 if eq(denominator, 1) {
@@ -11911,7 +12748,10 @@ contract OrderValidator is Executor, ZoneInteraction {
 
                     // Once adjusted, if current + supplied numerator exceeds
                     // the denominator:
-                    let carry := mul(sub(filledNumerator, denominator), gt(filledNumerator, denominator))
+                    let carry := mul(
+                        sub(filledNumerator, denominator),
+                        gt(filledNumerator, denominator)
+                    )
 
                     // reduce the amount to fill by the excess.
                     numerator := sub(numerator, carry)
@@ -11936,7 +12776,10 @@ contract OrderValidator is Executor, ZoneInteraction {
 
                 // Once adjusted, if current + supplied numerator exceeds
                 // denominator:
-                let carry := mul(sub(filledNumerator, denominator), gt(filledNumerator, denominator))
+                let carry := mul(
+                    sub(filledNumerator, denominator),
+                    gt(filledNumerator, denominator)
+                )
 
                 // reduce the amount to fill by the excess.
                 numerator := sub(numerator, carry)
@@ -11945,11 +12788,18 @@ contract OrderValidator is Executor, ZoneInteraction {
                 filledNumerator := sub(filledNumerator, carry)
 
                 // Check filledNumerator and denominator for uint120 overflow.
-                if or(gt(filledNumerator, MaxUint120), gt(denominator, MaxUint120)) {
+                if or(
+                    gt(filledNumerator, MaxUint120),
+                    gt(denominator, MaxUint120)
+                ) {
                     // Derive greatest common divisor using euclidean algorithm.
                     function gcd(_a, _b) -> out {
                         // "Loop" until only one non-zero value remains.
-                        for {} _b {} {
+                        for {
+
+                        } _b {
+
+                        } {
                             // Assign the second value to a temporary variable.
                             let _c := _b
 
@@ -11965,7 +12815,10 @@ contract OrderValidator is Executor, ZoneInteraction {
                     }
 
                     // Determine the amount to scale down the fill fractions.
-                    let scaleDown := gcd(numerator, gcd(filledNumerator, denominator))
+                    let scaleDown := gcd(
+                        numerator,
+                        gcd(filledNumerator, denominator)
+                    )
 
                     // Ensure that the divisor is at least one.
                     let safeScaleDown := add(scaleDown, iszero(scaleDown))
@@ -11976,7 +12829,10 @@ contract OrderValidator is Executor, ZoneInteraction {
                     denominator := div(denominator, safeScaleDown)
 
                     // Perform the overflow check a second time.
-                    if or(gt(filledNumerator, MaxUint120), gt(denominator, MaxUint120)) {
+                    if or(
+                        gt(filledNumerator, MaxUint120),
+                        gt(denominator, MaxUint120)
+                    ) {
                         // Store the Panic error signature.
                         mstore(0, Panic_error_selector)
                         // Store the arithmetic (0x11) panic code.
@@ -12001,7 +12857,10 @@ contract OrderValidator is Executor, ZoneInteraction {
                 or(
                     OrderStatus_ValidatedAndNotCancelled,
                     or(
-                        shl(OrderStatus_filledNumerator_offset, filledNumerator),
+                        shl(
+                            OrderStatus_filledNumerator_offset,
+                            filledNumerator
+                        ),
                         shl(OrderStatus_filledDenominator_offset, denominator)
                     )
                 )
@@ -12023,11 +12882,10 @@ contract OrderValidator is Executor, ZoneInteraction {
      *
      * @return isInvalid Error buffer indicating if items are incompatible.
      */
-    function _compareItems(MemoryPointer originalItem, MemoryPointer newItem)
-        internal
-        pure
-        returns (uint256 isInvalid)
-    {
+    function _compareItems(
+        MemoryPointer originalItem,
+        MemoryPointer newItem
+    ) internal pure returns (uint256 isInvalid) {
         assembly {
             let itemType := mload(originalItem)
             let identifier := mload(add(originalItem, Common_identifier_offset))
@@ -12042,23 +12900,31 @@ contract OrderValidator is Executor, ZoneInteraction {
             let originalAmount := mload(add(originalItem, Common_amount_offset))
             let newAmount := mload(add(newItem, Common_amount_offset))
 
-            isInvalid :=
-                iszero(
+            isInvalid := iszero(
+                and(
+                    // originalItem.token == newItem.token &&
+                    // originalItem.itemType == newItem.itemType
                     and(
-                        // originalItem.token == newItem.token &&
-                        // originalItem.itemType == newItem.itemType
-                        and(
-                            eq(mload(add(originalItem, Common_token_offset)), mload(add(newItem, Common_token_offset))),
-                            eq(itemType, mload(newItem))
+                        eq(
+                            mload(add(originalItem, Common_token_offset)),
+                            mload(add(newItem, Common_token_offset))
                         ),
-                        // originalItem.identifier == newItem.identifier &&
-                        // originalItem.startAmount == originalItem.endAmount
-                        and(
-                            eq(identifier, mload(add(newItem, Common_identifier_offset))),
-                            eq(originalAmount, mload(add(originalItem, Common_endAmount_offset)))
+                        eq(itemType, mload(newItem))
+                    ),
+                    // originalItem.identifier == newItem.identifier &&
+                    // originalItem.startAmount == originalItem.endAmount
+                    and(
+                        eq(
+                            identifier,
+                            mload(add(newItem, Common_identifier_offset))
+                        ),
+                        eq(
+                            originalAmount,
+                            mload(add(originalItem, Common_endAmount_offset))
                         )
                     )
                 )
+            )
         }
     }
 
@@ -12072,13 +12938,17 @@ contract OrderValidator is Executor, ZoneInteraction {
      *
      * @return isInvalid Error buffer indicating if recipients are incompatible.
      */
-    function _checkRecipients(address originalRecipient, address newRecipient)
-        internal
-        pure
-        returns (uint256 isInvalid)
-    {
+    function _checkRecipients(
+        address originalRecipient,
+        address newRecipient
+    ) internal pure returns (uint256 isInvalid) {
         assembly {
-            isInvalid := iszero(or(iszero(originalRecipient), eq(newRecipient, originalRecipient)))
+            isInvalid := iszero(
+                or(
+                    iszero(originalRecipient),
+                    eq(newRecipient, originalRecipient)
+                )
+            )
         }
     }
 
@@ -12101,20 +12971,30 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return numerator   The numerator.
      * @return denominator The denominator.
      */
-    function _getGeneratedOrder(OrderParameters memory orderParameters, bytes memory context, bool revertOnInvalid)
+    function _getGeneratedOrder(
+        OrderParameters memory orderParameters,
+        bytes memory context,
+        bool revertOnInvalid
+    )
         internal
         returns (bytes32 orderHash, uint256 numerator, uint256 denominator)
     {
         // Ensure that consideration array length is equal to the total original
         // consideration items value.
-        if (orderParameters.consideration.length != orderParameters.totalOriginalConsiderationItems) {
+        if (
+            orderParameters.consideration.length !=
+            orderParameters.totalOriginalConsiderationItems
+        ) {
             _revertConsiderationLengthNotEqualToTotalOriginal();
         }
 
         {
             address offerer = orderParameters.offerer;
             bool success;
-            (MemoryPointer cdPtr, uint256 size) = _encodeGenerateOrder(orderParameters, context);
+            (MemoryPointer cdPtr, uint256 size) = _encodeGenerateOrder(
+                orderParameters,
+                context
+            );
             assembly {
                 success := call(gas(), offerer, 0, cdPtr, size, 0, 0)
             }
@@ -12132,7 +13012,10 @@ contract OrderValidator is Executor, ZoneInteraction {
 
                 assembly {
                     // Shift offerer address up 96 bytes and combine with nonce.
-                    orderHash := xor(contractNonce, shl(ContractOrder_orderHash_offerer_shift, offerer))
+                    orderHash := xor(
+                        contractNonce,
+                        shl(ContractOrder_orderHash_offerer_shift, offerer)
+                    )
                 }
             }
 
@@ -12147,8 +13030,11 @@ contract OrderValidator is Executor, ZoneInteraction {
         // consideration items being sent to their designated recipients.
 
         // Decode the returned contract order and/or update the error buffer.
-        (uint256 errorBuffer, OfferItem[] memory offer, ConsiderationItem[] memory consideration) =
-            _convertGetGeneratedOrderResult(_decodeGenerateOrderReturndata)();
+        (
+            uint256 errorBuffer,
+            OfferItem[] memory offer,
+            ConsiderationItem[] memory consideration
+        ) = _convertGetGeneratedOrderResult(_decodeGenerateOrderReturndata)();
 
         // Revert if the returndata could not be decoded correctly.
         if (errorBuffer != 0) {
@@ -12166,18 +13052,24 @@ contract OrderValidator is Executor, ZoneInteraction {
             }
 
             // Iterate over each specified offer (e.g. minimumReceived) item.
-            for (uint256 i = 0; i < originalOfferLength;) {
+            for (uint256 i = 0; i < originalOfferLength; ) {
                 // Retrieve the pointer to the originally supplied item.
-                MemoryPointer mPtrOriginal = orderParameters.offer[i].toMemoryPointer();
+                MemoryPointer mPtrOriginal = orderParameters
+                    .offer[i]
+                    .toMemoryPointer();
 
                 // Retrieve the pointer to the newly returned item.
                 MemoryPointer mPtrNew = offer[i].toMemoryPointer();
 
                 // Compare the items and update the error buffer accordingly.
-                errorBuffer |= _cast(
-                    mPtrOriginal.offset(Common_amount_offset).readUint256()
-                        > mPtrNew.offset(Common_amount_offset).readUint256()
-                ) | _compareItems(mPtrOriginal, mPtrNew);
+                errorBuffer |=
+                    _cast(
+                        mPtrOriginal
+                            .offset(Common_amount_offset)
+                            .readUint256() >
+                            mPtrNew.offset(Common_amount_offset).readUint256()
+                    ) |
+                    _compareItems(mPtrOriginal, mPtrNew);
 
                 // Increment the array (cannot overflow as index starts at 0).
                 unchecked {
@@ -12191,7 +13083,9 @@ contract OrderValidator is Executor, ZoneInteraction {
 
         {
             // Designate lengths & memory locations.
-            ConsiderationItem[] memory originalConsiderationArray = (orderParameters.consideration);
+            ConsiderationItem[] memory originalConsiderationArray = (
+                orderParameters.consideration
+            );
             uint256 newConsiderationLength = consideration.length;
 
             // New consideration items cannot be created.
@@ -12200,22 +13094,31 @@ contract OrderValidator is Executor, ZoneInteraction {
             }
 
             // Iterate over returned consideration & do not exceed maximumSpent.
-            for (uint256 i = 0; i < newConsiderationLength;) {
+            for (uint256 i = 0; i < newConsiderationLength; ) {
                 // Retrieve the pointer to the originally supplied item.
-                MemoryPointer mPtrOriginal = originalConsiderationArray[i].toMemoryPointer();
+                MemoryPointer mPtrOriginal = originalConsiderationArray[i]
+                    .toMemoryPointer();
 
                 // Retrieve the pointer to the newly returned item.
                 MemoryPointer mPtrNew = consideration[i].toMemoryPointer();
 
                 // Compare the items and update the error buffer accordingly
                 // and ensure that the recipients are equal when provided.
-                errorBuffer |= _cast(
-                    mPtrNew.offset(Common_amount_offset).readUint256()
-                        > mPtrOriginal.offset(Common_amount_offset).readUint256()
-                ) | _compareItems(mPtrOriginal, mPtrNew)
-                    | _checkRecipients(
-                        mPtrOriginal.offset(ConsiderItem_recipient_offset).readAddress(),
-                        mPtrNew.offset(ConsiderItem_recipient_offset).readAddress()
+                errorBuffer |=
+                    _cast(
+                        mPtrNew.offset(Common_amount_offset).readUint256() >
+                            mPtrOriginal
+                                .offset(Common_amount_offset)
+                                .readUint256()
+                    ) |
+                    _compareItems(mPtrOriginal, mPtrNew) |
+                    _checkRecipients(
+                        mPtrOriginal
+                            .offset(ConsiderItem_recipient_offset)
+                            .readAddress(),
+                        mPtrNew
+                            .offset(ConsiderItem_recipient_offset)
+                            .readAddress()
                     );
 
                 // Increment the array (cannot overflow as index starts at 0).
@@ -12249,7 +13152,9 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return cancelled A boolean indicating whether the supplied orders were
      *                   successfully cancelled.
      */
-    function _cancel(OrderComponents[] calldata orders) internal returns (bool cancelled) {
+    function _cancel(
+        OrderComponents[] calldata orders
+    ) internal returns (bool cancelled) {
         // Ensure that the reentrancy guard is not currently set.
         _assertNonReentrant();
 
@@ -12265,7 +13170,7 @@ contract OrderValidator is Executor, ZoneInteraction {
             uint256 totalOrders = orders.length;
 
             // Iterate over each order.
-            for (uint256 i = 0; i < totalOrders;) {
+            for (uint256 i = 0; i < totalOrders; ) {
                 // Retrieve the order.
                 OrderComponents calldata order = orders[i];
 
@@ -12276,17 +13181,23 @@ contract OrderValidator is Executor, ZoneInteraction {
                 assembly {
                     // If caller is neither the offerer nor zone, or a contract
                     // order is present, flag anyInvalidCallerOrContractOrder.
-                    anyInvalidCallerOrContractOrder :=
+                    anyInvalidCallerOrContractOrder := or(
+                        anyInvalidCallerOrContractOrder,
+                        // orderType == CONTRACT ||
+                        // !(caller == offerer || caller == zone)
                         or(
-                            anyInvalidCallerOrContractOrder,
-                            // orderType == CONTRACT ||
-                            // !(caller == offerer || caller == zone)
-                            or(eq(orderType, 4), iszero(or(eq(caller(), offerer), eq(caller(), zone))))
+                            eq(orderType, 4),
+                            iszero(
+                                or(eq(caller(), offerer), eq(caller(), zone))
+                            )
                         )
+                    )
                 }
 
                 bytes32 orderHash = _deriveOrderHash(
-                    _toOrderParametersReturnType(_decodeOrderComponentsAsOrderParameters)(order.toCalldataPointer()),
+                    _toOrderParametersReturnType(
+                        _decodeOrderComponentsAsOrderParameters
+                    )(order.toCalldataPointer()),
                     order.counter
                 );
 
@@ -12328,7 +13239,9 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return validated A boolean indicating whether the supplied orders were
      *                   successfully validated.
      */
-    function _validate(Order[] memory orders) internal returns (bool validated) {
+    function _validate(
+        Order[] memory orders
+    ) internal returns (bool validated) {
         // Ensure that the reentrancy guard is not currently set.
         _assertNonReentrant();
 
@@ -12359,7 +13272,9 @@ contract OrderValidator is Executor, ZoneInteraction {
                 offerer = orderParameters.offerer;
 
                 // Get current counter & use it w/ params to derive order hash.
-                orderHash = _assertConsiderationLengthAndGetOrderHash(orderParameters);
+                orderHash = _assertConsiderationLengthAndGetOrderHash(
+                    orderParameters
+                );
 
                 // Retrieve the order status using the derived order hash.
                 orderStatus = _orderStatus[orderHash];
@@ -12376,7 +13291,10 @@ contract OrderValidator is Executor, ZoneInteraction {
                 if (!orderStatus.isValidated) {
                     // Ensure that consideration array length is equal to the
                     // total original consideration items value.
-                    if (orderParameters.consideration.length != orderParameters.totalOriginalConsiderationItems) {
+                    if (
+                        orderParameters.consideration.length !=
+                        orderParameters.totalOriginalConsiderationItems
+                    ) {
                         _revertConsiderationLengthNotEqualToTotalOriginal();
                     }
 
@@ -12413,16 +13331,28 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return totalSize   The total size of the order that is either filled or
      *                     unfilled (i.e. the "denominator").
      */
-    function _getOrderStatus(bytes32 orderHash)
+    function _getOrderStatus(
+        bytes32 orderHash
+    )
         internal
         view
-        returns (bool isValidated, bool isCancelled, uint256 totalFilled, uint256 totalSize)
+        returns (
+            bool isValidated,
+            bool isCancelled,
+            uint256 totalFilled,
+            uint256 totalSize
+        )
     {
         // Retrieve the order status using the order hash.
         OrderStatus storage orderStatus = _orderStatus[orderHash];
 
         // Return the fields on the order status.
-        return (orderStatus.isValidated, orderStatus.isCancelled, orderStatus.numerator, orderStatus.denominator);
+        return (
+            orderStatus.isValidated,
+            orderStatus.isCancelled,
+            orderStatus.numerator,
+            orderStatus.denominator
+        );
     }
 
     /**
@@ -12436,7 +13366,10 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return numerator   The numerator.
      * @return denominator The denominator.
      */
-    function _revertOrReturnEmpty(bool revertOnInvalid, bytes32 contractOrderHash)
+    function _revertOrReturnEmpty(
+        bool revertOnInvalid,
+        bytes32 contractOrderHash
+    )
         internal
         pure
         returns (bytes32 orderHash, uint256 numerator, uint256 denominator)
@@ -12460,17 +13393,20 @@ contract OrderValidator is Executor, ZoneInteraction {
      * @return isFullOrder A boolean indicating whether the order type only
      *                     supports full fills.
      */
-    function _doesNotSupportPartialFills(OrderType orderType, uint256 numerator, uint256 denominator)
-        internal
-        pure
-        returns (bool isFullOrder)
-    {
+    function _doesNotSupportPartialFills(
+        OrderType orderType,
+        uint256 numerator,
+        uint256 denominator
+    ) internal pure returns (bool isFullOrder) {
         // The "full" order types are even, while "partial" order types are odd.
         // Bitwise and by 1 is equivalent to modulo by 2, but 2 gas cheaper. The
         // check is only necessary if numerator is less than denominator.
         assembly {
             // Equivalent to `uint256(orderType) & 1 == 0`.
-            isFullOrder := and(lt(numerator, denominator), iszero(and(orderType, 1)))
+            isFullOrder := and(
+                lt(numerator, denominator),
+                iszero(and(orderType, 1))
+            )
         }
     }
 }
@@ -12518,7 +13454,9 @@ contract BasicOrderFulfiller is OrderValidator {
      *
      * @return A boolean indicating whether the order has been fulfilled.
      */
-    function _validateAndFulfillBasicOrder(BasicOrderParameters calldata parameters) internal returns (bool) {
+    function _validateAndFulfillBasicOrder(
+        BasicOrderParameters calldata parameters
+    ) internal returns (bool) {
         // Declare enums for order type & route to extract from basicOrderType.
         BasicOrderRouteType route;
         OrderType orderType;
@@ -12551,7 +13489,10 @@ contract BasicOrderFulfiller is OrderValidator {
             // Utilize assembly to compare the route to the callvalue.
             assembly {
                 // route 0 and 1 are payable, otherwise route is not payable.
-                correctPayableStatus := eq(additionalRecipientsItemType, iszero(callvalue()))
+                correctPayableStatus := eq(
+                    additionalRecipientsItemType,
+                    iszero(callvalue())
+                )
             }
 
             // Revert if msg.value has not been supplied as part of payable
@@ -12576,13 +13517,15 @@ contract BasicOrderFulfiller is OrderValidator {
                 offerTypeIsAdditionalRecipientsType := gt(route, 3)
 
                 // If route > 3 additionalRecipientsToken is at 0xc4 else 0x24.
-                additionalRecipientsToken :=
-                    calldataload(
-                        add(
-                            BasicOrder_considerationToken_cdPtr,
-                            mul(offerTypeIsAdditionalRecipientsType, BasicOrder_common_params_size)
+                additionalRecipientsToken := calldataload(
+                    add(
+                        BasicOrder_considerationToken_cdPtr,
+                        mul(
+                            offerTypeIsAdditionalRecipientsType,
+                            BasicOrder_common_params_size
                         )
                     )
+                )
 
                 // If route > 2, receivedItemType is route - 2. If route is 2,
                 // the receivedItemType is ERC20 (1). Otherwise, it is native
@@ -12611,8 +13554,12 @@ contract BasicOrderFulfiller is OrderValidator {
         // Utilize assembly to derive conduit (if relevant) based on route.
         assembly {
             // use offerer conduit for routes 0-3, fulfiller conduit otherwise.
-            conduitKey :=
-                calldataload(add(BasicOrder_offererConduit_cdPtr, shl(OneWordShift, offerTypeIsAdditionalRecipientsType)))
+            conduitKey := calldataload(
+                add(
+                    BasicOrder_offererConduit_cdPtr,
+                    shl(OneWordShift, offerTypeIsAdditionalRecipientsType)
+                )
+            )
         }
 
         // Transfer tokens based on the route.
@@ -12630,7 +13577,10 @@ contract BasicOrderFulfiller is OrderValidator {
                     mstore(0, UnusedItemParameters_error_selector)
 
                     // revert(abi.encodeWithSignature("UnusedItemParameters()"))
-                    revert(Error_selector_offset, UnusedItemParameters_error_length)
+                    revert(
+                        Error_selector_offset,
+                        UnusedItemParameters_error_length
+                    )
                 }
             }
 
@@ -12697,7 +13647,10 @@ contract BasicOrderFulfiller is OrderValidator {
             }
 
             // Transfer ERC20 tokens to all recipients and wrap up.
-            _transferERC20AndFinalize(offerTypeIsAdditionalRecipientsType, accumulator);
+            _transferERC20AndFinalize(
+                offerTypeIsAdditionalRecipientsType,
+                accumulator
+            );
 
             // Trigger any remaining accumulated transfers via call to conduit.
             _triggerIfArmed(accumulator);
@@ -12769,8 +13722,14 @@ contract BasicOrderFulfiller is OrderValidator {
                 mstore(0, InvalidTime_error_selector)
 
                 // Store arguments.
-                mstore(InvalidTime_error_startTime_ptr, calldataload(BasicOrder_startTime_cdPtr))
-                mstore(InvalidTime_error_endTime_ptr, calldataload(BasicOrder_endTime_cdPtr))
+                mstore(
+                    InvalidTime_error_startTime_ptr,
+                    calldataload(BasicOrder_startTime_cdPtr)
+                )
+                mstore(
+                    InvalidTime_error_endTime_ptr,
+                    calldataload(BasicOrder_endTime_cdPtr)
+                )
 
                 // revert(abi.encodeWithSignature(
                 //     "InvalidTime(uint256,uint256)",
@@ -12792,7 +13751,10 @@ contract BasicOrderFulfiller is OrderValidator {
                 // revert(abi.encodeWithSignature(
                 //     "MissingOriginalConsiderationItems()"
                 // ))
-                revert(Error_selector_offset, MissingOriginalConsiderationItems_error_length)
+                revert(
+                    Error_selector_offset,
+                    MissingOriginalConsiderationItems_error_length
+                )
             }
         }
 
@@ -12830,24 +13792,38 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 // Write ConsiderationItem type hash and item type to memory.
                 mstore(BasicOrder_considerationItem_typeHash_ptr, typeHash)
-                mstore(BasicOrder_considerationItem_itemType_ptr, receivedItemType)
+                mstore(
+                    BasicOrder_considerationItem_itemType_ptr,
+                    receivedItemType
+                )
 
                 // Copy calldata region with (token, identifier, amount) from
                 // BasicOrderParameters to ConsiderationItem. The
                 // considerationAmount is written to startAmount and endAmount
                 // as basic orders do not have dynamic amounts.
-                calldatacopy(BasicOrder_considerationItem_token_ptr, BasicOrder_considerationToken_cdPtr, ThreeWords)
+                calldatacopy(
+                    BasicOrder_considerationItem_token_ptr,
+                    BasicOrder_considerationToken_cdPtr,
+                    ThreeWords
+                )
 
                 // Copy calldata region with considerationAmount and offerer
                 // from BasicOrderParameters to endAmount and recipient in
                 // ConsiderationItem.
-                calldatacopy(BasicOrder_considerationItem_endAmount_ptr, BasicOrder_considerationAmount_cdPtr, TwoWords)
+                calldatacopy(
+                    BasicOrder_considerationItem_endAmount_ptr,
+                    BasicOrder_considerationAmount_cdPtr,
+                    TwoWords
+                )
 
                 // Calculate EIP712 ConsiderationItem hash and store it in the
                 // array of EIP712 consideration hashes.
                 mstore(
                     BasicOrder_considerationHashesArray_ptr,
-                    sha3(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
+                    keccak256(
+                        BasicOrder_considerationItem_typeHash_ptr,
+                        EIP712_ConsiderationItem_size
+                    )
                 )
 
                 /*
@@ -12856,21 +13832,31 @@ contract BasicOrderFulfiller is OrderValidator {
                  */
 
                 // Get the length of the additional recipients array.
-                let totalAdditionalRecipients := calldataload(BasicOrder_additionalRecipients_length_cdPtr)
+                let totalAdditionalRecipients := calldataload(
+                    BasicOrder_additionalRecipients_length_cdPtr
+                )
 
                 // Calculate pointer to length of OrderFulfilled consideration
                 // array.
-                let eventConsiderationArrPtr :=
-                    add(OrderFulfilled_consideration_length_baseOffset, shl(OneWordShift, totalAdditionalRecipients))
+                let eventConsiderationArrPtr := add(
+                    OrderFulfilled_consideration_length_baseOffset,
+                    shl(OneWordShift, totalAdditionalRecipients)
+                )
 
                 // Set the length of the consideration array to the number of
                 // additional recipients, plus one for the primary consideration
                 // item.
-                mstore(eventConsiderationArrPtr, add(totalAdditionalRecipients, 1))
+                mstore(
+                    eventConsiderationArrPtr,
+                    add(totalAdditionalRecipients, 1)
+                )
 
                 // Overwrite the consideration array pointer so it points to the
                 // body of the first element
-                eventConsiderationArrPtr := add(eventConsiderationArrPtr, OneWord)
+                eventConsiderationArrPtr := add(
+                    eventConsiderationArrPtr,
+                    OneWord
+                )
 
                 // Set itemType at start of the ReceivedItem memory region.
                 mstore(eventConsiderationArrPtr, receivedItemType)
@@ -12878,7 +13864,9 @@ contract BasicOrderFulfiller is OrderValidator {
                 // Copy calldata region (token, identifier, amount & recipient)
                 // from BasicOrderParameters to ReceivedItem memory.
                 calldatacopy(
-                    add(eventConsiderationArrPtr, Common_token_offset), BasicOrder_considerationToken_cdPtr, FourWords
+                    add(eventConsiderationArrPtr, Common_token_offset),
+                    BasicOrder_considerationToken_cdPtr,
+                    FourWords
                 )
 
                 /*
@@ -12893,13 +13881,21 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 // Put pointer to consideration hashes array on the stack.
                 // This will be updated as each additional recipient is hashed
-                let considerationHashesPtr := BasicOrder_considerationHashesArray_ptr
+                let
+                    considerationHashesPtr
+                := BasicOrder_considerationHashesArray_ptr
 
                 // Write item type, token, & identifier for additional recipient
                 // to memory region for hashing EIP712 ConsiderationItem; these
                 // values will be reused for each recipient.
-                mstore(BasicOrder_considerationItem_itemType_ptr, additionalRecipientsItemType)
-                mstore(BasicOrder_considerationItem_token_ptr, additionalRecipientsToken)
+                mstore(
+                    BasicOrder_considerationItem_itemType_ptr,
+                    additionalRecipientsItemType
+                )
+                mstore(
+                    BasicOrder_considerationItem_token_ptr,
+                    additionalRecipientsToken
+                )
                 mstore(BasicOrder_considerationItem_identifier_ptr, 0)
 
                 // Declare a stack variable where all additional recipients will
@@ -12908,40 +13904,62 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 // Read length of the additionalRecipients array from calldata
                 // and iterate.
-                totalAdditionalRecipients := calldataload(BasicOrder_totalOriginalAdditionalRecipients_cdPtr)
+                totalAdditionalRecipients := calldataload(
+                    BasicOrder_totalOriginalAdditionalRecipients_cdPtr
+                )
                 let i := 0
-                for {} lt(i, totalAdditionalRecipients) { i := add(i, 1) } {
+                for {
+
+                } lt(i, totalAdditionalRecipients) {
+                    i := add(i, 1)
+                } {
                     /*
                      * Calculate EIP712 ConsiderationItem hash for recipient.
                      */
 
                     // Retrieve calldata pointer for additional recipient.
-                    let additionalRecipientCdPtr :=
-                        add(BasicOrder_additionalRecipients_data_cdPtr, mul(AdditionalRecipient_size, i))
+                    let additionalRecipientCdPtr := add(
+                        BasicOrder_additionalRecipients_data_cdPtr,
+                        mul(AdditionalRecipient_size, i)
+                    )
 
                     // Copy startAmount from calldata to the ConsiderationItem
                     // struct.
-                    calldatacopy(BasicOrder_considerationItem_startAmount_ptr, additionalRecipientCdPtr, OneWord)
+                    calldatacopy(
+                        BasicOrder_considerationItem_startAmount_ptr,
+                        additionalRecipientCdPtr,
+                        OneWord
+                    )
 
                     // Copy endAmount and recipient from calldata to the
                     // ConsiderationItem struct.
                     calldatacopy(
-                        BasicOrder_considerationItem_endAmount_ptr, additionalRecipientCdPtr, AdditionalRecipient_size
+                        BasicOrder_considerationItem_endAmount_ptr,
+                        additionalRecipientCdPtr,
+                        AdditionalRecipient_size
                     )
 
                     // Include the recipient as part of combined recipients.
-                    combinedAdditionalRecipients :=
-                        or(combinedAdditionalRecipients, calldataload(add(additionalRecipientCdPtr, OneWord)))
+                    combinedAdditionalRecipients := or(
+                        combinedAdditionalRecipients,
+                        calldataload(add(additionalRecipientCdPtr, OneWord))
+                    )
 
                     // Add 1 word to the pointer as part of each loop to reduce
                     // operations needed to get local offset into the array.
-                    considerationHashesPtr := add(considerationHashesPtr, OneWord)
+                    considerationHashesPtr := add(
+                        considerationHashesPtr,
+                        OneWord
+                    )
 
                     // Calculate EIP712 ConsiderationItem hash and store it in
                     // the array of consideration hashes.
                     mstore(
                         considerationHashesPtr,
-                        sha3(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
+                        keccak256(
+                            BasicOrder_considerationItem_typeHash_ptr,
+                            EIP712_ConsiderationItem_size
+                        )
                     )
 
                     /*
@@ -12952,31 +13970,46 @@ contract BasicOrderFulfiller is OrderValidator {
                     // beginning of the ReceivedItem struct of the previous
                     // element in the array. Increase it by the size of the
                     // struct to arrive at the pointer for the current element.
-                    eventConsiderationArrPtr := add(eventConsiderationArrPtr, ReceivedItem_size)
+                    eventConsiderationArrPtr := add(
+                        eventConsiderationArrPtr,
+                        ReceivedItem_size
+                    )
 
                     // Write itemType to the ReceivedItem struct.
-                    mstore(eventConsiderationArrPtr, additionalRecipientsItemType)
+                    mstore(
+                        eventConsiderationArrPtr,
+                        additionalRecipientsItemType
+                    )
 
                     // Write token to the next word of the ReceivedItem struct.
-                    mstore(add(eventConsiderationArrPtr, OneWord), additionalRecipientsToken)
+                    mstore(
+                        add(eventConsiderationArrPtr, OneWord),
+                        additionalRecipientsToken
+                    )
 
                     // Copy endAmount & recipient words to ReceivedItem struct.
                     calldatacopy(
-                        add(eventConsiderationArrPtr, ReceivedItem_amount_offset), additionalRecipientCdPtr, TwoWords
+                        add(
+                            eventConsiderationArrPtr,
+                            ReceivedItem_amount_offset
+                        ),
+                        additionalRecipientCdPtr,
+                        TwoWords
                     )
                 }
 
                 /*
                  * 4. Hash packed array of ConsiderationItem EIP712 hashes:
-                 *   `sha3(abi.encodePacked(receivedItemHashes))`
+                 *   `keccak256(abi.encodePacked(receivedItemHashes))`
                  * Note that it is set at 0x60 — all other memory begins at
                  * 0x80. 0x60 is the "zero slot" and will be restored at the end
                  * of the assembly section and before required by the compiler.
                  */
                 mstore(
                     receivedItemsHash_ptr,
-                    sha3(
-                        BasicOrder_considerationHashesArray_ptr, shl(OneWordShift, add(totalAdditionalRecipients, 1))
+                    keccak256(
+                        BasicOrder_considerationHashesArray_ptr,
+                        shl(OneWordShift, add(totalAdditionalRecipients, 1))
                     )
                 )
 
@@ -12988,33 +14021,57 @@ contract BasicOrderFulfiller is OrderValidator {
                  */
 
                 // Overwrite length to length of the additionalRecipients array.
-                totalAdditionalRecipients := calldataload(BasicOrder_additionalRecipients_length_cdPtr)
+                totalAdditionalRecipients := calldataload(
+                    BasicOrder_additionalRecipients_length_cdPtr
+                )
 
-                for {} lt(i, totalAdditionalRecipients) { i := add(i, 1) } {
+                for {
+
+                } lt(i, totalAdditionalRecipients) {
+                    i := add(i, 1)
+                } {
                     // Retrieve calldata pointer for additional recipient.
-                    let additionalRecipientCdPtr :=
-                        add(BasicOrder_additionalRecipients_data_cdPtr, mul(AdditionalRecipient_size, i))
+                    let additionalRecipientCdPtr := add(
+                        BasicOrder_additionalRecipients_data_cdPtr,
+                        mul(AdditionalRecipient_size, i)
+                    )
 
                     // At this point, eventConsiderationArrPtr points to the
                     // beginning of the ReceivedItem struct of the previous
                     // element in the array. Increase it by the size of the
                     // struct to arrive at the pointer for the current element.
-                    eventConsiderationArrPtr := add(eventConsiderationArrPtr, ReceivedItem_size)
+                    eventConsiderationArrPtr := add(
+                        eventConsiderationArrPtr,
+                        ReceivedItem_size
+                    )
 
                     // Write itemType to the ReceivedItem struct.
-                    mstore(eventConsiderationArrPtr, additionalRecipientsItemType)
+                    mstore(
+                        eventConsiderationArrPtr,
+                        additionalRecipientsItemType
+                    )
 
                     // Write token to the next word of the ReceivedItem struct.
-                    mstore(add(eventConsiderationArrPtr, OneWord), additionalRecipientsToken)
+                    mstore(
+                        add(eventConsiderationArrPtr, OneWord),
+                        additionalRecipientsToken
+                    )
 
                     // Copy endAmount & recipient words to ReceivedItem struct.
                     calldatacopy(
-                        add(eventConsiderationArrPtr, ReceivedItem_amount_offset), additionalRecipientCdPtr, TwoWords
+                        add(
+                            eventConsiderationArrPtr,
+                            ReceivedItem_amount_offset
+                        ),
+                        additionalRecipientCdPtr,
+                        TwoWords
                     )
 
                     // Include the recipient as part of combined recipients.
-                    combinedAdditionalRecipients :=
-                        or(combinedAdditionalRecipients, calldataload(add(additionalRecipientCdPtr, OneWord)))
+                    combinedAdditionalRecipients := or(
+                        combinedAdditionalRecipients,
+                        calldataload(add(additionalRecipientCdPtr, OneWord))
+                    )
                 }
 
                 // Ensure no dirty upper bits on combined additional recipients.
@@ -13026,7 +14083,10 @@ contract BasicOrderFulfiller is OrderValidator {
                     // revert(abi.encodeWithSignature(
                     //     "InvalidBasicOrderParameterEncoding()"
                     // ))
-                    revert(Error_selector_offset, InvalidBasicOrderParameterEncoding_error_length)
+                    revert(
+                        Error_selector_offset,
+                        InvalidBasicOrderParameterEncoding_error_length
+                    )
                 }
             }
         }
@@ -13063,31 +14123,49 @@ contract BasicOrderFulfiller is OrderValidator {
                 // startAmount) in OfferItem struct. The offerAmount is written
                 // to startAmount and endAmount as basic orders do not have
                 // dynamic amounts.
-                calldatacopy(BasicOrder_offerItem_token_ptr, BasicOrder_offerToken_cdPtr, ThreeWords)
+                calldatacopy(
+                    BasicOrder_offerItem_token_ptr,
+                    BasicOrder_offerToken_cdPtr,
+                    ThreeWords
+                )
 
                 // Copy offerAmount from calldata to endAmount in OfferItem
                 // struct.
-                calldatacopy(BasicOrder_offerItem_endAmount_ptr, BasicOrder_offerAmount_cdPtr, OneWord)
+                calldatacopy(
+                    BasicOrder_offerItem_endAmount_ptr,
+                    BasicOrder_offerAmount_cdPtr,
+                    OneWord
+                )
 
                 // Compute EIP712 OfferItem hash, write result to scratch space:
-                //   `sha3(abi.encode(offeredItem))`
-                mstore(0, sha3(BasicOrder_offerItem_typeHash_ptr, EIP712_OfferItem_size))
+                //   `keccak256(abi.encode(offeredItem))`
+                mstore(
+                    0,
+                    keccak256(
+                        BasicOrder_offerItem_typeHash_ptr,
+                        EIP712_OfferItem_size
+                    )
+                )
 
                 /*
                  * 2. Calculate hash of array of EIP712 hashes and write the
                  * result to the corresponding OfferItem struct:
-                 *   `sha3(abi.encodePacked(offerItemHashes))`
+                 *   `keccak256(abi.encodePacked(offerItemHashes))`
                  */
-                mstore(BasicOrder_order_offerHashes_ptr, sha3(0, OneWord))
+                mstore(BasicOrder_order_offerHashes_ptr, keccak256(0, OneWord))
 
                 /*
                  * 3. Write SpentItem to offer array in OrderFulfilled event.
                  */
-                let eventConsiderationArrPtr :=
-                    add(
-                        OrderFulfilled_offer_length_baseOffset,
-                        shl(OneWordShift, calldataload(BasicOrder_additionalRecipients_length_cdPtr))
+                let eventConsiderationArrPtr := add(
+                    OrderFulfilled_offer_length_baseOffset,
+                    shl(
+                        OneWordShift,
+                        calldataload(
+                            BasicOrder_additionalRecipients_length_cdPtr
+                        )
                     )
+                )
 
                 // Set a length of 1 for the offer array.
                 mstore(eventConsiderationArrPtr, 1)
@@ -13099,7 +14177,9 @@ contract BasicOrderFulfiller is OrderValidator {
                 // offerAmount) from OrderParameters to (token, identifier,
                 // amount) in SpentItem struct.
                 calldatacopy(
-                    add(eventConsiderationArrPtr, AdditionalRecipient_size), BasicOrder_offerToken_cdPtr, ThreeWords
+                    add(eventConsiderationArrPtr, AdditionalRecipient_size),
+                    BasicOrder_offerToken_cdPtr,
+                    ThreeWords
                 )
             }
         }
@@ -13112,8 +14192,8 @@ contract BasicOrderFulfiller is OrderValidator {
              *   - 0x80:   Order EIP-712 typehash (constant)
              *   - 0xa0:   orderParameters.offerer
              *   - 0xc0:   orderParameters.zone
-             *   - 0xe0:   sha3(abi.encodePacked(offerHashes))
-             *   - 0x100:  sha3(abi.encodePacked(considerationHashes))
+             *   - 0xe0:   keccak256(abi.encodePacked(offerHashes))
+             *   - 0x100:  keccak256(abi.encodePacked(considerationHashes))
              *   - 0x120:  orderParameters.basicOrderType (% 4 = orderType)
              *   - 0x140:  orderParameters.startTime
              *   - 0x160:  orderParameters.endTime
@@ -13141,23 +14221,37 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 // Copy offerer and zone from OrderParameters in calldata to the
                 // Order struct.
-                calldatacopy(BasicOrder_order_offerer_ptr, BasicOrder_offerer_cdPtr, TwoWords)
+                calldatacopy(
+                    BasicOrder_order_offerer_ptr,
+                    BasicOrder_offerer_cdPtr,
+                    TwoWords
+                )
 
                 // Copy receivedItemsHash from zero slot to the Order struct.
-                mstore(BasicOrder_order_considerationHashes_ptr, mload(receivedItemsHash_ptr))
+                mstore(
+                    BasicOrder_order_considerationHashes_ptr,
+                    mload(receivedItemsHash_ptr)
+                )
 
                 // Write the supplied orderType to the Order struct.
                 mstore(BasicOrder_order_orderType_ptr, orderType)
 
                 // Copy startTime, endTime, zoneHash, salt & conduit from
                 // calldata to the Order struct.
-                calldatacopy(BasicOrder_order_startTime_ptr, BasicOrder_startTime_cdPtr, FiveWords)
+                calldatacopy(
+                    BasicOrder_order_startTime_ptr,
+                    BasicOrder_startTime_cdPtr,
+                    FiveWords
+                )
 
                 // Write offerer's counter, retrieved from storage, to struct.
                 mstore(BasicOrder_order_counter_ptr, counter)
 
                 // Compute the EIP712 Order hash.
-                orderHash := sha3(BasicOrder_order_typeHash_ptr, EIP712_Order_size)
+                orderHash := keccak256(
+                    BasicOrder_order_typeHash_ptr,
+                    EIP712_Order_size
+                )
             }
         }
 
@@ -13192,10 +14286,13 @@ contract BasicOrderFulfiller is OrderValidator {
              */
 
             // Derive pointer to start of OrderFulfilled event data.
-            let eventDataPtr :=
-                add(
-                    OrderFulfilled_baseOffset, shl(OneWordShift, calldataload(BasicOrder_additionalRecipients_length_cdPtr))
+            let eventDataPtr := add(
+                OrderFulfilled_baseOffset,
+                shl(
+                    OneWordShift,
+                    calldataload(BasicOrder_additionalRecipients_length_cdPtr)
                 )
+            )
 
             // Write the order hash to the head of the event's data region.
             mstore(eventDataPtr, orderHash)
@@ -13218,11 +14315,13 @@ contract BasicOrderFulfiller is OrderValidator {
             // Derive total data size including SpentItem and ReceivedItem data.
             // SpentItem portion is already included in the baseSize constant,
             // as there can only be one element in the array.
-            let dataSize :=
-                add(
-                    OrderFulfilled_baseSize,
-                    mul(calldataload(BasicOrder_additionalRecipients_length_cdPtr), ReceivedItem_size)
+            let dataSize := add(
+                OrderFulfilled_baseSize,
+                mul(
+                    calldataload(BasicOrder_additionalRecipients_length_cdPtr),
+                    ReceivedItem_size
                 )
+            )
 
             // Emit OrderFulfilled log with three topics (the event signature
             // as well as the two indexed arguments, the offerer and the zone).
@@ -13269,7 +14368,10 @@ contract BasicOrderFulfiller is OrderValidator {
      *                   signifies that no conduit should be used, with direct
      *                   approvals set on this contract.
      */
-    function _transferIndividual721Or1155Item(ItemType itemType, bytes32 conduitKey) internal {
+    function _transferIndividual721Or1155Item(
+        ItemType itemType,
+        bytes32 conduitKey
+    ) internal {
         // Retrieve token, from, identifier, and amount from calldata using
         // fixed calldata offsets based on strict basic parameter encoding.
         address token;
@@ -13298,36 +14400,65 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 // Write the offset to the ConduitTransfer array in memory.
                 mstore(
-                    add(callDataOffset, Conduit_execute_ConduitTransfer_offset_ptr), Conduit_execute_ConduitTransfer_ptr
+                    add(
+                        callDataOffset,
+                        Conduit_execute_ConduitTransfer_offset_ptr
+                    ),
+                    Conduit_execute_ConduitTransfer_ptr
                 )
 
                 // Write the length of the ConduitTransfer array to memory.
                 mstore(
-                    add(callDataOffset, Conduit_execute_ConduitTransfer_length_ptr),
+                    add(
+                        callDataOffset,
+                        Conduit_execute_ConduitTransfer_length_ptr
+                    ),
                     Conduit_execute_ConduitTransfer_length
                 )
 
                 // Write the item type to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferItemType_ptr), itemType)
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferItemType_ptr),
+                    itemType
+                )
 
                 // Write the token to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferToken_ptr), token)
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferToken_ptr),
+                    token
+                )
 
                 // Write the transfer source to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferFrom_ptr), from)
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferFrom_ptr),
+                    from
+                )
 
                 // Write the transfer recipient (the caller) to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferTo_ptr), caller())
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferTo_ptr),
+                    caller()
+                )
 
                 // Write the token identifier to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferIdentifier_ptr), identifier)
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferIdentifier_ptr),
+                    identifier
+                )
 
                 // Write the transfer amount to memory.
-                mstore(add(callDataOffset, Conduit_execute_transferAmount_ptr), amount)
+                mstore(
+                    add(callDataOffset, Conduit_execute_transferAmount_ptr),
+                    amount
+                )
             }
 
             // Perform the call to the conduit.
-            _callConduitUsingOffsets(conduitKey, callDataOffset, OneConduitExecute_size);
+            _callConduitUsingOffsets(
+                conduitKey,
+                callDataOffset,
+                OneConduitExecute_size
+            );
         } else {
             // Otherwise, determine whether it is an ERC721 or ERC1155 item.
             if (itemType == ItemType.ERC721) {
@@ -13340,7 +14471,13 @@ contract BasicOrderFulfiller is OrderValidator {
                 _performERC721Transfer(token, from, msg.sender, identifier);
             } else {
                 // Perform transfer to caller via the token contract directly.
-                _performERC1155Transfer(token, from, msg.sender, identifier, amount);
+                _performERC1155Transfer(
+                    token,
+                    from,
+                    msg.sender,
+                    identifier,
+                    amount
+                );
             }
         }
     }
@@ -13365,8 +14502,10 @@ contract BasicOrderFulfiller is OrderValidator {
         assembly {
             amount := calldataload(BasicOrder_considerationAmount_cdPtr)
             to := calldataload(BasicOrder_offerer_cdPtr)
-            totalAdditionalRecipientsDataSize :=
-                shl(AdditionalRecipient_size_shift, calldataload(BasicOrder_additionalRecipients_length_cdPtr))
+            totalAdditionalRecipientsDataSize := shl(
+                AdditionalRecipient_size_shift,
+                calldataload(BasicOrder_additionalRecipients_length_cdPtr)
+            )
         }
 
         uint256 additionalRecipientAmount;
@@ -13375,13 +14514,24 @@ contract BasicOrderFulfiller is OrderValidator {
         // Skip overflow check as for loop is indexed starting at zero.
         unchecked {
             // Iterate over additional recipient data by two-word element.
-            for (uint256 i = 0; i < totalAdditionalRecipientsDataSize; i += AdditionalRecipient_size) {
+            for (
+                uint256 i = 0;
+                i < totalAdditionalRecipientsDataSize;
+                i += AdditionalRecipient_size
+            ) {
                 assembly {
                     // Retrieve calldata pointer for additional recipient.
-                    let additionalRecipientCdPtr := add(BasicOrder_additionalRecipients_data_cdPtr, i)
+                    let additionalRecipientCdPtr := add(
+                        BasicOrder_additionalRecipients_data_cdPtr,
+                        i
+                    )
 
-                    additionalRecipientAmount := calldataload(additionalRecipientCdPtr)
-                    recipient := calldataload(add(OneWord, additionalRecipientCdPtr))
+                    additionalRecipientAmount := calldataload(
+                        additionalRecipientCdPtr
+                    )
+                    recipient := calldataload(
+                        add(OneWord, additionalRecipientCdPtr)
+                    )
                 }
 
                 // Ensure that sufficient native tokens are available.
@@ -13411,7 +14561,10 @@ contract BasicOrderFulfiller is OrderValidator {
             // Skip underflow check as nativeTokensRemaining > amount.
             unchecked {
                 // Transfer remaining native tokens to the caller.
-                _transferNativeTokens(payable(msg.sender), nativeTokensRemaining - amount);
+                _transferNativeTokens(
+                    payable(msg.sender),
+                    nativeTokensRemaining - amount
+                );
             }
         }
     }
@@ -13429,7 +14582,10 @@ contract BasicOrderFulfiller is OrderValidator {
      * @param accumulator An open-ended array that collects transfers to execute
      *                    against a given conduit in a single call.
      */
-    function _transferERC20AndFinalize(bool fromOfferer, bytes memory accumulator) internal {
+    function _transferERC20AndFinalize(
+        bool fromOfferer,
+        bytes memory accumulator
+    ) internal {
         // Declare from and to variables determined by fromOfferer value.
         address from;
         address to;
@@ -13461,7 +14617,9 @@ contract BasicOrderFulfiller is OrderValidator {
                     from := caller()
                     to := calldataload(BasicOrder_offerer_cdPtr)
                     token := calldataload(BasicOrder_considerationToken_cdPtr)
-                    identifier := calldataload(BasicOrder_considerationIdentifier_cdPtr)
+                    identifier := calldataload(
+                        BasicOrder_considerationIdentifier_cdPtr
+                    )
                     amount := calldataload(BasicOrder_considerationAmount_cdPtr)
                 }
             }
@@ -13478,27 +14636,41 @@ contract BasicOrderFulfiller is OrderValidator {
         // Utilize assembly to derive conduit (if relevant) based on route.
         assembly {
             // Use offerer conduit if fromOfferer, fulfiller conduit otherwise.
-            conduitKey := calldataload(sub(BasicOrder_fulfillerConduit_cdPtr, shl(OneWordShift, fromOfferer)))
+            conduitKey := calldataload(
+                sub(
+                    BasicOrder_fulfillerConduit_cdPtr,
+                    shl(OneWordShift, fromOfferer)
+                )
+            )
         }
 
         // Retrieve total size of additional recipients data and place on stack.
         uint256 totalAdditionalRecipientsDataSize;
         assembly {
-            totalAdditionalRecipientsDataSize :=
-                shl(AdditionalRecipient_size_shift, calldataload(BasicOrder_additionalRecipients_length_cdPtr))
+            totalAdditionalRecipientsDataSize := shl(
+                AdditionalRecipient_size_shift,
+                calldataload(BasicOrder_additionalRecipients_length_cdPtr)
+            )
         }
 
         uint256 additionalRecipientAmount;
         address recipient;
 
         // Iterate over each additional recipient.
-        for (uint256 i = 0; i < totalAdditionalRecipientsDataSize;) {
+        for (uint256 i = 0; i < totalAdditionalRecipientsDataSize; ) {
             assembly {
                 // Retrieve calldata pointer for additional recipient.
-                let additionalRecipientCdPtr := add(BasicOrder_additionalRecipients_data_cdPtr, i)
+                let additionalRecipientCdPtr := add(
+                    BasicOrder_additionalRecipients_data_cdPtr,
+                    i
+                )
 
-                additionalRecipientAmount := calldataload(additionalRecipientCdPtr)
-                recipient := calldataload(add(OneWord, additionalRecipientCdPtr))
+                additionalRecipientAmount := calldataload(
+                    additionalRecipientCdPtr
+                )
+                recipient := calldataload(
+                    add(OneWord, additionalRecipientCdPtr)
+                )
             }
 
             // Decrement the amount to transfer to fulfiller if indicated.
@@ -13507,7 +14679,14 @@ contract BasicOrderFulfiller is OrderValidator {
             }
 
             // Transfer ERC20 tokens to additional recipient given approval.
-            _transferERC20(token, from, recipient, additionalRecipientAmount, conduitKey, accumulator);
+            _transferERC20(
+                token,
+                from,
+                recipient,
+                additionalRecipientAmount,
+                conduitKey,
+                accumulator
+            );
 
             // Skip overflow check as for loop is indexed starting at zero.
             unchecked {
@@ -13607,10 +14786,10 @@ contract CriteriaResolution is CriteriaResolutionErrors {
      *                           any transferable token identifier is valid and
      *                           that no proof needs to be supplied.
      */
-    function _applyCriteriaResolvers(AdvancedOrder[] memory advancedOrders, CriteriaResolver[] memory criteriaResolvers)
-        internal
-        pure
-    {
+    function _applyCriteriaResolvers(
+        AdvancedOrder[] memory advancedOrders,
+        CriteriaResolver[] memory criteriaResolvers
+    ) internal pure {
         // Skip overflow checks as all for loops are indexed starting at zero.
         unchecked {
             // Retrieve length of criteria resolvers array and place on stack.
@@ -13622,14 +14801,18 @@ contract CriteriaResolution is CriteriaResolutionErrors {
             // Iterate over each criteria resolver.
             for (uint256 i = 0; i < totalCriteriaResolvers; ++i) {
                 // Retrieve the criteria resolver.
-                CriteriaResolver memory criteriaResolver = (criteriaResolvers[i]);
+                CriteriaResolver memory criteriaResolver = (
+                    criteriaResolvers[i]
+                );
 
                 // Read the order index from memory and place it on the stack.
                 uint256 orderIndex = criteriaResolver.orderIndex;
 
                 // Ensure that the order index is in range.
                 if (orderIndex >= totalAdvancedOrders) {
-                    _revertOrderCriteriaResolverOutOfRange(criteriaResolver.side);
+                    _revertOrderCriteriaResolverOutOfRange(
+                        criteriaResolver.side
+                    );
                 }
 
                 // Retrieve the referenced advanced order.
@@ -13641,7 +14824,9 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 }
 
                 // Retrieve the parameters for the order.
-                OrderParameters memory orderParameters = (advancedOrder.parameters);
+                OrderParameters memory orderParameters = (
+                    advancedOrder.parameters
+                );
 
                 {
                     // Get a pointer to the list of items to give to
@@ -13654,15 +14839,18 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                     uint256 componentIndex = criteriaResolver.index;
 
                     // Get error selector for `OfferCriteriaResolverOutOfRange`.
-                    uint256 errorSelector = (OfferCriteriaResolverOutOfRange_error_selector);
+                    uint256 errorSelector = (
+                        OfferCriteriaResolverOutOfRange_error_selector
+                    );
 
                     // If the resolver refers to a consideration item...
                     if (criteriaResolver.side != Side.OFFER) {
                         // Get the pointer to `orderParameters.consideration`
                         // Using the array directly has a significant impact on
                         // the optimized compiler output.
-                        MemoryPointer considerationPtr =
-                            orderParameters.toMemoryPointer().pptr(OrderParameters_consideration_head_offset);
+                        MemoryPointer considerationPtr = orderParameters
+                            .toMemoryPointer()
+                            .pptr(OrderParameters_consideration_head_offset);
 
                         // Replace the items pointer with a pointer to the
                         // consideration array.
@@ -13672,7 +14860,9 @@ contract CriteriaResolution is CriteriaResolutionErrors {
 
                         // Replace the error selector with the selector for
                         // `ConsiderationCriteriaResolverOutOfRange`.
-                        errorSelector = (ConsiderationCriteriaResolverOutOfRange_err_selector);
+                        errorSelector = (
+                            ConsiderationCriteriaResolverOutOfRange_err_selector
+                        );
                     }
 
                     // Ensure that the component index is in range.
@@ -13696,7 +14886,11 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                     }
 
                     // Apply the criteria resolver to the item in question.
-                    _updateCriteriaItem(items, componentIndex, criteriaResolver);
+                    _updateCriteriaItem(
+                        items,
+                        componentIndex,
+                        criteriaResolver
+                    );
                 }
             }
 
@@ -13711,7 +14905,9 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 }
 
                 // Retrieve the parameters for the order.
-                OrderParameters memory orderParameters = (advancedOrder.parameters);
+                OrderParameters memory orderParameters = (
+                    advancedOrder.parameters
+                );
 
                 // Read consideration length from memory and place on stack.
                 uint256 totalItems = orderParameters.consideration.length;
@@ -13719,7 +14915,11 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 // Iterate over each consideration item on the order.
                 for (uint256 j = 0; j < totalItems; ++j) {
                     // Ensure item type no longer indicates criteria usage.
-                    if (_isItemWithCriteria(orderParameters.consideration[j].itemType)) {
+                    if (
+                        _isItemWithCriteria(
+                            orderParameters.consideration[j].itemType
+                        )
+                    ) {
                         _revertUnresolvedConsiderationCriteria(i, j);
                     }
                 }
@@ -13730,7 +14930,9 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 // Iterate over each offer item on the order.
                 for (uint256 j = 0; j < totalItems; ++j) {
                     // Ensure item type no longer indicates criteria usage.
-                    if (_isItemWithCriteria(orderParameters.offer[j].itemType)) {
+                    if (
+                        _isItemWithCriteria(orderParameters.offer[j].itemType)
+                    ) {
                         _revertUnresolvedOfferCriteria(i, j);
                     }
                 }
@@ -13766,7 +14968,11 @@ contract CriteriaResolution is CriteriaResolutionErrors {
         // If criteria is not 0 (i.e. a collection-wide criteria-based item)...
         if (identifierOrCriteria != uint256(0)) {
             // Verify identifier inclusion in criteria root using proof.
-            _verifyProof(criteriaResolver.identifier, identifierOrCriteria, criteriaResolver.criteriaProof);
+            _verifyProof(
+                criteriaResolver.identifier,
+                identifierOrCriteria,
+                criteriaResolver.criteriaProof
+            );
         } else if (criteriaResolver.criteriaProof.length != 0) {
             // Revert if non-empty proof is supplied for a collection-wide item.
             _revertInvalidProof();
@@ -13796,7 +15002,9 @@ contract CriteriaResolution is CriteriaResolutionErrors {
      * @return withCriteria A boolean indicating that the item type in question
      *                      represents a criteria-based item.
      */
-    function _isItemWithCriteria(ItemType itemType) internal pure returns (bool withCriteria) {
+    function _isItemWithCriteria(
+        ItemType itemType
+    ) internal pure returns (bool withCriteria) {
         // ERC721WithCriteria is ItemType 4. ERC1155WithCriteria is ItemType 5.
         assembly {
             withCriteria := gt(itemType, 3)
@@ -13811,7 +15019,11 @@ contract CriteriaResolution is CriteriaResolutionErrors {
      * @param root  The merkle root that inclusion will be proved against.
      * @param proof The merkle proof.
      */
-    function _verifyProof(uint256 leaf, uint256 root, bytes32[] memory proof) internal pure {
+    function _verifyProof(
+        uint256 leaf,
+        uint256 root,
+        bytes32[] memory proof
+    ) internal pure {
         // Declare a variable that will be used to determine proof validity.
         bool isValid;
 
@@ -13821,7 +15033,7 @@ contract CriteriaResolution is CriteriaResolutionErrors {
             mstore(0, leaf)
 
             // Derive the hash of the leaf to use as the initial proof element.
-            let computedHash := sha3(0, OneWord)
+            let computedHash := keccak256(0, OneWord)
 
             // Get memory start location of the first element in proof array.
             let data := add(proof, OneWord)
@@ -13848,7 +15060,7 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 mstore(xor(scratch, OneWord), loadedData)
 
                 // Derive the updated hash.
-                computedHash := sha3(0, TwoWords)
+                computedHash := keccak256(0, TwoWords)
             }
 
             // Compare the final hash to the supplied root.
@@ -13930,22 +15142,25 @@ contract AmountDeriver is AmountDerivationErrors {
             }
 
             // Aggregate new amounts weighted by time with rounding factor.
-            uint256 totalBeforeDivision = ((startAmount * remaining) + (endAmount * elapsed));
+            uint256 totalBeforeDivision = ((startAmount * remaining) +
+                (endAmount * elapsed));
 
             // Use assembly to combine operations and skip divide-by-zero check.
             assembly {
                 // Multiply by iszero(iszero(totalBeforeDivision)) to ensure
                 // amount is set to zero if totalBeforeDivision is zero,
                 // as intermediate overflow can occur if it is zero.
-                amount :=
-                    mul(
-                        iszero(iszero(totalBeforeDivision)),
-                        // Subtract 1 from the numerator and add 1 to the result if
-                        // roundUp is true to get the proper rounding direction.
-                        // Division is performed with no zero check as duration
-                        // cannot be zero as long as startTime < endTime.
-                        add(div(sub(totalBeforeDivision, roundUp), duration), roundUp)
+                amount := mul(
+                    iszero(iszero(totalBeforeDivision)),
+                    // Subtract 1 from the numerator and add 1 to the result if
+                    // roundUp is true to get the proper rounding direction.
+                    // Division is performed with no zero check as duration
+                    // cannot be zero as long as startTime < endTime.
+                    add(
+                        div(sub(totalBeforeDivision, roundUp), duration),
+                        roundUp
                     )
+                )
             }
 
             // Return the current amount.
@@ -13971,11 +15186,11 @@ contract AmountDeriver is AmountDerivationErrors {
      *
      * @return newValue The value after applying the fraction.
      */
-    function _getFraction(uint256 numerator, uint256 denominator, uint256 value)
-        internal
-        pure
-        returns (uint256 newValue)
-    {
+    function _getFraction(
+        uint256 numerator,
+        uint256 denominator,
+        uint256 value
+    ) internal pure returns (uint256 newValue) {
         // Return value early in cases where the fraction resolves to 1.
         if (numerator == denominator) {
             return value;
@@ -14054,7 +15269,11 @@ contract AmountDeriver is AmountDerivationErrors {
  *         single order is being fulfilled and where basic order fulfillment is
  *         not available as an option.
  */
-contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDeriver {
+contract OrderFulfiller is
+    BasicOrderFulfiller,
+    CriteriaResolution,
+    AmountDeriver
+{
     /**
      * @dev Derive and set hashes, reference chainId, and associated domain
      *      separator during deployment.
@@ -14063,7 +15282,9 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
      *                          that may optionally be used to transfer approved
      *                          ERC20/721/1155 tokens.
      */
-    constructor(address conduitController) BasicOrderFulfiller(conduitController) {}
+    constructor(
+        address conduitController
+    ) BasicOrderFulfiller(conduitController) {}
 
     /**
      * @dev Internal function to validate an order and update its status, adjust
@@ -14104,8 +15325,11 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
         );
 
         // Validate order, update status, and determine fraction to fill.
-        (bytes32 orderHash, uint256 fillNumerator, uint256 fillDenominator) =
-            _validateOrderAndUpdateStatus(advancedOrder, true);
+        (
+            bytes32 orderHash,
+            uint256 fillNumerator,
+            uint256 fillDenominator
+        ) = _validateOrderAndUpdateStatus(advancedOrder, true);
 
         // Create an array with length 1 containing the order.
         AdvancedOrder[] memory advancedOrders = new AdvancedOrder[](1);
@@ -14120,14 +15344,24 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
         OrderParameters memory orderParameters = advancedOrders[0].parameters;
 
         // Perform each item transfer with the appropriate fractional amount.
-        _applyFractionsAndTransferEach(orderParameters, fillNumerator, fillDenominator, fulfillerConduitKey, recipient);
+        _applyFractionsAndTransferEach(
+            orderParameters,
+            fillNumerator,
+            fillDenominator,
+            fulfillerConduitKey,
+            recipient
+        );
 
         // Declare empty bytes32 array and populate with the order hash.
         bytes32[] memory orderHashes = new bytes32[](1);
         orderHashes[0] = orderHash;
 
         // Ensure restricted orders have a valid submitter or pass a zone check.
-        _assertRestrictedAdvancedOrderValidity(advancedOrders[0], orderHashes, orderHash);
+        _assertRestrictedAdvancedOrderValidity(
+            advancedOrders[0],
+            orderHashes,
+            orderHash
+        );
 
         // Emit an event signifying that the order has been fulfilled.
         _emitOrderFulfilledEvent(
@@ -14227,22 +15461,37 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
                 {
                     // Apply fill fraction to get offer item amount to transfer.
                     uint256 amount = _applyFraction(
-                        offerItem.startAmount, offerItem.endAmount, numerator, denominator, startTime, endTime, false
+                        offerItem.startAmount,
+                        offerItem.endAmount,
+                        numerator,
+                        denominator,
+                        startTime,
+                        endTime,
+                        false
                     );
 
                     // Utilize assembly to set overloaded offerItem arguments.
                     assembly {
                         // Write new fractional amount to startAmount as amount.
-                        mstore(add(offerItem, ReceivedItem_amount_offset), amount)
+                        mstore(
+                            add(offerItem, ReceivedItem_amount_offset),
+                            amount
+                        )
 
                         // Write recipient to endAmount.
-                        mstore(add(offerItem, ReceivedItem_recipient_offset), recipient)
+                        mstore(
+                            add(offerItem, ReceivedItem_recipient_offset),
+                            recipient
+                        )
                     }
                 }
 
                 // Transfer the item from the offerer to the recipient.
                 _toOfferItemInput(_transfer)(
-                    offerItem, orderParameters.offerer, orderParameters.conduitKey, accumulator
+                    offerItem,
+                    orderParameters.offerer,
+                    orderParameters.conduitKey,
+                    accumulator
                 );
             }
 
@@ -14252,14 +15501,13 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
                 OrderType orderType = orderParameters.orderType;
                 uint256 invalidNativeOfferItem;
                 assembly {
-                    invalidNativeOfferItem :=
-                        and(
-                            // Note that this check requires that there are no order
-                            // types beyond the current set (0-4).  It will need to
-                            // be modified if more order types are added.
-                            lt(orderType, 4),
-                            anyNativeItems
-                        )
+                    invalidNativeOfferItem := and(
+                        // Note that this check requires that there are no order
+                        // types beyond the current set (0-4).  It will need to
+                        // be modified if more order types are added.
+                        lt(orderType, 4),
+                        anyNativeItems
+                    )
                 }
                 if (invalidNativeOfferItem != 0) {
                     _revertInvalidNativeOfferItem();
@@ -14288,13 +15536,17 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
         // Declare a nested scope to minimize stack depth.
         unchecked {
             // Read consideration array length from memory and place on stack.
-            uint256 totalConsiderationItems = orderParameters.consideration.length;
+            uint256 totalConsiderationItems = orderParameters
+                .consideration
+                .length;
 
             // Iterate over each consideration item on the order.
             // Skip overflow check as for loop is indexed starting at zero.
             for (uint256 i = 0; i < totalConsiderationItems; ++i) {
                 // Retrieve the consideration item.
-                ConsiderationItem memory considerationItem = (orderParameters.consideration[i]);
+                ConsiderationItem memory considerationItem = (
+                    orderParameters.consideration[i]
+                );
 
                 // Apply fraction & derive considerationItem amount to transfer.
                 uint256 amount = _applyFraction(
@@ -14310,12 +15562,20 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
                 // Use assembly to set overloaded considerationItem arguments.
                 assembly {
                     // Write derived fractional amount to startAmount as amount.
-                    mstore(add(considerationItem, ReceivedItem_amount_offset), amount)
+                    mstore(
+                        add(considerationItem, ReceivedItem_amount_offset),
+                        amount
+                    )
 
                     // Write original recipient to endAmount as recipient.
                     mstore(
                         add(considerationItem, ReceivedItem_recipient_offset),
-                        mload(add(considerationItem, ConsiderationItem_recipient_offset))
+                        mload(
+                            add(
+                                considerationItem,
+                                ConsiderationItem_recipient_offset
+                            )
+                        )
                     )
                 }
 
@@ -14332,7 +15592,12 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
                 }
 
                 // Transfer item from caller to recipient specified by the item.
-                _toConsiderationItemInput(_transfer)(considerationItem, msg.sender, fulfillerConduitKey, accumulator);
+                _toConsiderationItemInput(_transfer)(
+                    considerationItem,
+                    msg.sender,
+                    fulfillerConduitKey,
+                    accumulator
+                );
             }
         }
 
@@ -14384,7 +15649,14 @@ contract OrderFulfiller is BasicOrderFulfiller, CriteriaResolution, AmountDerive
         }
 
         // Emit an event signifying that the order has been fulfilled.
-        emit OrderFulfilled(orderHash, offerer, zone, recipient, spentItems, receivedItems);
+        emit OrderFulfilled(
+            orderHash,
+            offerer,
+            zone,
+            recipient,
+            spentItems,
+            receivedItems
+        );
     }
 }
 
@@ -14462,7 +15734,9 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
         uint256 fulfillmentIndex
     ) internal pure returns (Execution memory execution) {
         // Ensure 1+ of both offer and consideration components are supplied.
-        if (offerComponents.length == 0 || considerationComponents.length == 0) {
+        if (
+            offerComponents.length == 0 || considerationComponents.length == 0
+        ) {
             _revertOfferAndConsiderationRequiredOnFulfillment();
         }
 
@@ -14470,7 +15744,11 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
         Execution memory considerationExecution;
 
         // Validate & aggregate consideration items to new Execution object.
-        _aggregateValidFulfillmentConsiderationItems(advancedOrders, considerationComponents, considerationExecution);
+        _aggregateValidFulfillmentConsiderationItems(
+            advancedOrders,
+            considerationComponents,
+            considerationExecution
+        );
 
         // Retrieve the consideration item from the execution struct.
         ReceivedItem memory considerationItem = considerationExecution.item;
@@ -14489,32 +15767,43 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
         // Recipient does not need to be specified because it will always be set
         // to that of the consideration.
         // Validate & aggregate offer items to Execution object.
-        _aggregateValidFulfillmentOfferItems(advancedOrders, offerComponents, execution);
+        _aggregateValidFulfillmentOfferItems(
+            advancedOrders,
+            offerComponents,
+            execution
+        );
 
         // Ensure offer & consideration item types, tokens, & identifiers match.
         // (a != b || c != d || e != f) == (((a ^ b) | (c ^ d) | (e ^ f)) != 0),
         // but the second expression requires less gas to evaluate.
         if (
-            (
-                (uint8(execution.item.itemType) ^ uint8(considerationItem.itemType))
-                    | (uint160(execution.item.token) ^ uint160(considerationItem.token))
-                    | (execution.item.identifier ^ considerationItem.identifier)
-            ) != 0
+            ((uint8(execution.item.itemType) ^
+                uint8(considerationItem.itemType)) |
+                (uint160(execution.item.token) ^
+                    uint160(considerationItem.token)) |
+                (execution.item.identifier ^ considerationItem.identifier)) != 0
         ) {
-            _revertMismatchedFulfillmentOfferAndConsiderationComponents(fulfillmentIndex);
+            _revertMismatchedFulfillmentOfferAndConsiderationComponents(
+                fulfillmentIndex
+            );
         }
 
         // If total consideration amount exceeds the offer amount...
         if (considerationItem.amount > execution.item.amount) {
             // Retrieve the first consideration component from the fulfillment.
-            FulfillmentComponent memory targetComponent = (considerationComponents[0]);
+            FulfillmentComponent memory targetComponent = (
+                considerationComponents[0]
+            );
 
             // Skip underflow check as the conditional being true implies that
             // considerationItem.amount > execution.item.amount.
             unchecked {
                 // Add excess consideration item amount to original order array.
-                advancedOrders[targetComponent.orderIndex].parameters.consideration[targetComponent.itemIndex]
-                    .startAmount = (considerationItem.amount - execution.item.amount);
+                advancedOrders[targetComponent.orderIndex]
+                    .parameters
+                    .consideration[targetComponent.itemIndex]
+                    .startAmount = (considerationItem.amount -
+                    execution.item.amount);
             }
         } else {
             // Retrieve the first offer component from the fulfillment.
@@ -14524,8 +15813,11 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
             // execution.item.amount >= considerationItem.amount.
             unchecked {
                 // Add excess offer item amount to the original array of orders.
-                advancedOrders[targetComponent.orderIndex].parameters.offer[targetComponent.itemIndex].startAmount =
-                    (execution.item.amount - considerationItem.amount);
+                advancedOrders[targetComponent.orderIndex]
+                    .parameters
+                    .offer[targetComponent.itemIndex]
+                    .startAmount = (execution.item.amount -
+                    considerationItem.amount);
             }
 
             // Reduce total offer amount to equal the consideration amount.
@@ -14583,12 +15875,20 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 item.recipient = payable(recipient);
 
                 // Return execution for aggregated items provided by offerer.
-                _aggregateValidFulfillmentOfferItems(advancedOrders, fulfillmentComponents, execution);
+                _aggregateValidFulfillmentOfferItems(
+                    advancedOrders,
+                    fulfillmentComponents,
+                    execution
+                );
             } else {
                 // Otherwise, fulfillment components are consideration
                 // components. Return execution for aggregated items provided by
                 // the fulfiller.
-                _aggregateValidFulfillmentConsiderationItems(advancedOrders, fulfillmentComponents, execution);
+                _aggregateValidFulfillmentConsiderationItems(
+                    advancedOrders,
+                    fulfillmentComponents,
+                    execution
+                );
 
                 // Set the caller as the offerer on the execution.
                 execution.offerer = msg.sender;
@@ -14640,8 +15940,13 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 let fulfillmentHeadPtr := offerComponents
 
                 // Get position one word past last element in head of array.
-                let endPtr := add(offerComponents, shl(OneWordShift, mload(offerComponents)))
-            } lt(fulfillmentHeadPtr, endPtr) {} {
+                let endPtr := add(
+                    offerComponents,
+                    shl(OneWordShift, mload(offerComponents))
+                )
+            } lt(fulfillmentHeadPtr, endPtr) {
+
+            } {
                 // Increment position in considerationComponents head.
                 fulfillmentHeadPtr := add(fulfillmentHeadPtr, OneWord)
 
@@ -14649,43 +15954,54 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 let orderIndex := mload(mload(fulfillmentHeadPtr))
 
                 // Ensure that the order index is not out of range.
-                if iszero(lt(orderIndex, mload(advancedOrders))) { throwInvalidFulfillmentComponentData() }
+                if iszero(lt(orderIndex, mload(advancedOrders))) {
+                    throwInvalidFulfillmentComponentData()
+                }
 
                 // Read advancedOrders[orderIndex] pointer from its array head.
-                let orderPtr :=
-                    mload(
-                        // Calculate head position of advancedOrders[orderIndex].
-                        add(add(advancedOrders, OneWord), shl(OneWordShift, orderIndex))
+                let orderPtr := mload(
+                    // Calculate head position of advancedOrders[orderIndex].
+                    add(
+                        add(advancedOrders, OneWord),
+                        shl(OneWordShift, orderIndex)
                     )
+                )
 
                 // Read the pointer to OrderParameters from the AdvancedOrder.
                 let paramsPtr := mload(orderPtr)
 
                 // Retrieve item index using an offset of fulfillment pointer.
-                let itemIndex := mload(add(mload(fulfillmentHeadPtr), Fulfillment_itemIndex_offset))
+                let itemIndex := mload(
+                    add(mload(fulfillmentHeadPtr), Fulfillment_itemIndex_offset)
+                )
 
                 let offerItemPtr
                 {
                     // Load the offer array pointer.
-                    let offerArrPtr := mload(add(paramsPtr, OrderParameters_offer_head_offset))
+                    let offerArrPtr := mload(
+                        add(paramsPtr, OrderParameters_offer_head_offset)
+                    )
 
                     // If the offer item index is out of range or the numerator
                     // is zero, skip this item.
                     if or(
                         iszero(lt(itemIndex, mload(offerArrPtr))),
-                        iszero(mload(add(orderPtr, AdvancedOrder_numerator_offset)))
-                    ) { continue }
+                        iszero(
+                            mload(add(orderPtr, AdvancedOrder_numerator_offset))
+                        )
+                    ) {
+                        continue
+                    }
 
                     // Retrieve offer item pointer using the item index.
-                    offerItemPtr :=
-                        mload(
-                            add(
-                                // Get pointer to beginning of receivedItem.
-                                add(offerArrPtr, OneWord),
-                                // Calculate offset to pointer for desired order.
-                                shl(OneWordShift, itemIndex)
-                            )
+                    offerItemPtr := mload(
+                        add(
+                            // Get pointer to beginning of receivedItem.
+                            add(offerArrPtr, OneWord),
+                            // Calculate offset to pointer for desired order.
+                            shl(OneWordShift, itemIndex)
                         )
+                    )
                 }
 
                 // Declare a separate scope for the amount update.
@@ -14698,7 +16014,13 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
 
                     // Update error buffer:
                     // 1 = zero amount, 2 = overflow, 3 = both.
-                    errorBuffer := or(errorBuffer, or(shl(1, lt(newAmount, amount)), iszero(mload(amountPtr))))
+                    errorBuffer := or(
+                        errorBuffer,
+                        or(
+                            shl(1, lt(newAmount, amount)),
+                            iszero(mload(amountPtr))
+                        )
+                    )
 
                     // Update the amount to the new, summed amount.
                     amount := newAmount
@@ -14720,30 +16042,43 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     mstore(receivedItem, mload(offerItemPtr))
 
                     // Set the token on the received item.
-                    mstore(add(receivedItem, Common_token_offset), mload(add(offerItemPtr, Common_token_offset)))
+                    mstore(
+                        add(receivedItem, Common_token_offset),
+                        mload(add(offerItemPtr, Common_token_offset))
+                    )
 
                     // Set the identifier on the received item.
                     mstore(
-                        add(receivedItem, Common_identifier_offset), mload(add(offerItemPtr, Common_identifier_offset))
+                        add(receivedItem, Common_identifier_offset),
+                        mload(add(offerItemPtr, Common_identifier_offset))
                     )
 
                     // Set offerer on returned execution using order pointer.
-                    mstore(add(execution, Execution_offerer_offset), mload(paramsPtr))
+                    mstore(
+                        add(execution, Execution_offerer_offset),
+                        mload(paramsPtr)
+                    )
 
                     // Set execution conduitKey via order pointer offset.
                     mstore(
-                        add(execution, Execution_conduit_offset), mload(add(paramsPtr, OrderParameters_conduit_offset))
+                        add(execution, Execution_conduit_offset),
+                        mload(add(paramsPtr, OrderParameters_conduit_offset))
                     )
 
                     // Calculate the hash of (itemType, token, identifier).
-                    dataHash := sha3(receivedItem, ReceivedItem_CommonParams_size)
+                    dataHash := keccak256(
+                        receivedItem,
+                        ReceivedItem_CommonParams_size
+                    )
 
                     // If component index > 0, swap component pointer with
                     // pointer to first component so that any remainder after
                     // fulfillment can be added back to the first item.
                     let firstFulfillmentHeadPtr := add(offerComponents, OneWord)
                     if xor(firstFulfillmentHeadPtr, fulfillmentHeadPtr) {
-                        let firstFulfillmentPtr := mload(firstFulfillmentHeadPtr)
+                        let firstFulfillmentPtr := mload(
+                            firstFulfillmentHeadPtr
+                        )
                         let fulfillmentPtr := mload(fulfillmentHeadPtr)
                         mstore(firstFulfillmentHeadPtr, fulfillmentPtr)
                     }
@@ -14753,15 +16088,29 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     if or(
                         or(
                             // The offerer must match on both items.
-                            xor(mload(paramsPtr), mload(add(execution, Execution_offerer_offset))),
+                            xor(
+                                mload(paramsPtr),
+                                mload(add(execution, Execution_offerer_offset))
+                            ),
                             // The conduit key must match on both items.
                             xor(
-                                mload(add(paramsPtr, OrderParameters_conduit_offset)),
+                                mload(
+                                    add(
+                                        paramsPtr,
+                                        OrderParameters_conduit_offset
+                                    )
+                                ),
                                 mload(add(execution, Execution_conduit_offset))
                             )
                         ),
                         // The itemType, token, and identifier must match.
-                        xor(dataHash, sha3(offerItemPtr, ReceivedItem_CommonParams_size))
+                        xor(
+                            dataHash,
+                            keccak256(
+                                offerItemPtr,
+                                ReceivedItem_CommonParams_size
+                            )
+                        )
                     ) {
                         // Throw if any of the requirements are not met.
                         throwInvalidFulfillmentComponentData()
@@ -14781,7 +16130,10 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     mstore(0, MissingItemAmount_error_selector)
 
                     // revert(abi.encodeWithSignature("MissingItemAmount()"))
-                    revert(Error_selector_offset, MissingItemAmount_error_length)
+                    revert(
+                        Error_selector_offset,
+                        MissingItemAmount_error_length
+                    )
                 }
 
                 // If errorBuffer is not 1 or 0, the sum overflowed.
@@ -14797,7 +16149,10 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 // revert(abi.encodeWithSignature(
                 //     "InvalidFulfillmentComponentData()"
                 // ))
-                revert(Error_selector_offset, InvalidFulfillmentComponentData_error_length)
+                revert(
+                    Error_selector_offset,
+                    InvalidFulfillmentComponentData_error_length
+                )
             }
 
             // Declare function for reverts due to arithmetic overflows.
@@ -14853,8 +16208,13 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 let fulfillmentHeadPtr := considerationComponents
 
                 // Get position one word past last element in head of array.
-                let endPtr := add(considerationComponents, shl(OneWordShift, mload(considerationComponents)))
-            } lt(fulfillmentHeadPtr, endPtr) {} {
+                let endPtr := add(
+                    considerationComponents,
+                    shl(OneWordShift, mload(considerationComponents))
+                )
+            } lt(fulfillmentHeadPtr, endPtr) {
+
+            } {
                 // Increment position in considerationComponents head.
                 fulfillmentHeadPtr := add(fulfillmentHeadPtr, OneWord)
 
@@ -14862,60 +16222,77 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 let orderIndex := mload(mload(fulfillmentHeadPtr))
 
                 // Ensure that the order index is not out of range.
-                if iszero(lt(orderIndex, mload(advancedOrders))) { throwInvalidFulfillmentComponentData() }
+                if iszero(lt(orderIndex, mload(advancedOrders))) {
+                    throwInvalidFulfillmentComponentData()
+                }
 
                 // Read advancedOrders[orderIndex] pointer from its array head.
-                let orderPtr :=
-                    mload(
-                        // Calculate head position of advancedOrders[orderIndex].
-                        add(add(advancedOrders, OneWord), shl(OneWordShift, orderIndex))
+                let orderPtr := mload(
+                    // Calculate head position of advancedOrders[orderIndex].
+                    add(
+                        add(advancedOrders, OneWord),
+                        shl(OneWordShift, orderIndex)
                     )
+                )
 
                 // Retrieve item index using an offset of fulfillment pointer.
-                let itemIndex := mload(add(mload(fulfillmentHeadPtr), Fulfillment_itemIndex_offset))
+                let itemIndex := mload(
+                    add(mload(fulfillmentHeadPtr), Fulfillment_itemIndex_offset)
+                )
 
                 let considerationItemPtr
                 {
                     // Load consideration array pointer.
-                    let considerationArrPtr :=
-                        mload(
-                            add(
-                                // Read OrderParameters pointer from AdvancedOrder.
-                                mload(orderPtr),
-                                OrderParameters_consideration_head_offset
-                            )
+                    let considerationArrPtr := mload(
+                        add(
+                            // Read OrderParameters pointer from AdvancedOrder.
+                            mload(orderPtr),
+                            OrderParameters_consideration_head_offset
                         )
+                    )
 
                     // If the consideration item index is out of range or the
                     // numerator is zero, skip this item.
                     if or(
                         iszero(lt(itemIndex, mload(considerationArrPtr))),
-                        iszero(mload(add(orderPtr, AdvancedOrder_numerator_offset)))
-                    ) { continue }
+                        iszero(
+                            mload(add(orderPtr, AdvancedOrder_numerator_offset))
+                        )
+                    ) {
+                        continue
+                    }
 
                     // Retrieve consideration item pointer using the item index.
-                    considerationItemPtr :=
-                        mload(
-                            add(
-                                // Get pointer to beginning of receivedItem.
-                                add(considerationArrPtr, OneWord),
-                                // Calculate offset to pointer for desired order.
-                                shl(OneWordShift, itemIndex)
-                            )
+                    considerationItemPtr := mload(
+                        add(
+                            // Get pointer to beginning of receivedItem.
+                            add(considerationArrPtr, OneWord),
+                            // Calculate offset to pointer for desired order.
+                            shl(OneWordShift, itemIndex)
                         )
+                    )
                 }
 
                 // Declare a separate scope for the amount update.
                 {
                     // Retrieve amount pointer using consideration item pointer.
-                    let amountPtr := add(considerationItemPtr, Common_amount_offset)
+                    let amountPtr := add(
+                        considerationItemPtr,
+                        Common_amount_offset
+                    )
 
                     // Add consideration item amount to execution amount.
                     let newAmount := add(amount, mload(amountPtr))
 
                     // Update error buffer:
                     // 1 = zero amount, 2 = overflow, 3 = both.
-                    errorBuffer := or(errorBuffer, or(shl(1, lt(newAmount, amount)), iszero(mload(amountPtr))))
+                    errorBuffer := or(
+                        errorBuffer,
+                        or(
+                            shl(1, lt(newAmount, amount)),
+                            iszero(mload(amountPtr))
+                        )
+                    )
 
                     // Update the amount to the new, summed amount.
                     amount := newAmount
@@ -14937,13 +16314,16 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
 
                     // Set the token on the received item.
                     mstore(
-                        add(receivedItem, Common_token_offset), mload(add(considerationItemPtr, Common_token_offset))
+                        add(receivedItem, Common_token_offset),
+                        mload(add(considerationItemPtr, Common_token_offset))
                     )
 
                     // Set the identifier on the received item.
                     mstore(
                         add(receivedItem, Common_identifier_offset),
-                        mload(add(considerationItemPtr, Common_identifier_offset))
+                        mload(
+                            add(considerationItemPtr, Common_identifier_offset)
+                        )
                     )
 
                     // Set the recipient on the received item. Note that this
@@ -14951,21 +16331,34 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     // _validateOrdersAndPrepareToFulfill function.
                     mstore(
                         add(receivedItem, ReceivedItem_recipient_offset),
-                        mload(add(considerationItemPtr, ReceivedItem_recipient_offset))
+                        mload(
+                            add(
+                                considerationItemPtr,
+                                ReceivedItem_recipient_offset
+                            )
+                        )
                     )
 
                     // Calculate the hash of (itemType, token, identifier,
                     // recipient). This is run after amount is set to zero, so
                     // there will be one blank word after identifier included in
                     // the hash buffer.
-                    dataHash := sha3(considerationItemPtr, ReceivedItem_size)
+                    dataHash := keccak256(
+                        considerationItemPtr,
+                        ReceivedItem_size
+                    )
 
                     // If component index > 0, swap component pointer with
                     // pointer to first component so that any remainder after
                     // fulfillment can be added back to the first item.
-                    let firstFulfillmentHeadPtr := add(considerationComponents, OneWord)
+                    let firstFulfillmentHeadPtr := add(
+                        considerationComponents,
+                        OneWord
+                    )
                     if xor(firstFulfillmentHeadPtr, fulfillmentHeadPtr) {
-                        let firstFulfillmentPtr := mload(firstFulfillmentHeadPtr)
+                        let firstFulfillmentPtr := mload(
+                            firstFulfillmentHeadPtr
+                        )
                         let fulfillmentPtr := mload(fulfillmentHeadPtr)
                         mstore(firstFulfillmentHeadPtr, fulfillmentPtr)
                     }
@@ -14979,7 +16372,7 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                         // recipient). This is run after amount is set to zero,
                         // so there will be one blank word after identifier
                         // included in the hash buffer.
-                        sha3(considerationItemPtr, ReceivedItem_size)
+                        keccak256(considerationItemPtr, ReceivedItem_size)
                     ) {
                         // Throw if any of the requirements are not met.
                         throwInvalidFulfillmentComponentData()
@@ -15001,7 +16394,10 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     mstore(0, MissingItemAmount_error_selector)
 
                     // revert(abi.encodeWithSignature("MissingItemAmount()"))
-                    revert(Error_selector_offset, MissingItemAmount_error_length)
+                    revert(
+                        Error_selector_offset,
+                        MissingItemAmount_error_length
+                    )
                 }
 
                 // If errorBuffer is not 1 or 0, `amount` overflowed.
@@ -15017,7 +16413,10 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                 // revert(abi.encodeWithSignature(
                 //     "InvalidFulfillmentComponentData()"
                 // ))
-                revert(Error_selector_offset, InvalidFulfillmentComponentData_error_length)
+                revert(
+                    Error_selector_offset,
+                    InvalidFulfillmentComponentData_error_length
+                )
             }
 
             // Declare function for reverts due to arithmetic overflows.
@@ -15122,7 +16521,13 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         bytes32 fulfillerConduitKey,
         address recipient,
         uint256 maximumFulfilled
-    ) internal returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    )
+        internal
+        returns (
+            bool[] memory,
+            /* availableOrders */ Execution[] memory /* executions */
+        )
+    {
         // Validate orders, apply amounts, & determine if they use conduits.
         (bytes32[] memory orderHashes, bool containsNonOpen) = _validateOrdersAndPrepareToFulfill(
             advancedOrders,
@@ -15133,15 +16538,16 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         );
 
         // Aggregate used offer and consideration items and execute transfers.
-        return _executeAvailableFulfillments(
-            advancedOrders,
-            offerFulfillments,
-            considerationFulfillments,
-            fulfillerConduitKey,
-            recipient,
-            orderHashes,
-            containsNonOpen
-        );
+        return
+            _executeAvailableFulfillments(
+                advancedOrders,
+                offerFulfillments,
+                considerationFulfillments,
+                fulfillerConduitKey,
+                recipient,
+                orderHashes,
+                containsNonOpen
+            );
     }
 
     /**
@@ -15205,7 +16611,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
              * 1000011100100000000110110 1 000001 fulfillAvailableAdvancedOrders
              *                           ^ 7th bit
              */
-            invalidNativeOfferItemErrorBuffer := and(NonMatchSelector_MagicMask, calldataload(0))
+            invalidNativeOfferItemErrorBuffer := and(
+                NonMatchSelector_MagicMask,
+                calldataload(0)
+            )
         }
 
         // Declare variables for later use.
@@ -15246,8 +16655,14 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                 }
 
                 // Validate it, update status, and determine fraction to fill.
-                (bytes32 orderHash, uint256 numerator, uint256 denominator) =
-                    _validateOrderAndUpdateStatus(advancedOrder, revertOnInvalid);
+                (
+                    bytes32 orderHash,
+                    uint256 numerator,
+                    uint256 denominator
+                ) = _validateOrderAndUpdateStatus(
+                        advancedOrder,
+                        revertOnInvalid
+                    );
 
                 // Do not track hash or adjust prices if order is not fulfilled.
                 if (numerator == 0) {
@@ -15312,12 +16727,18 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                     // type is not a contract order type, set the first bit of
                     // the error buffer to true.
                     assembly {
-                        invalidNativeOfferItemErrorBuffer :=
-                            or(invalidNativeOfferItemErrorBuffer, lt(mload(offerItem), mload(0)))
+                        invalidNativeOfferItemErrorBuffer := or(
+                            invalidNativeOfferItemErrorBuffer,
+                            lt(mload(offerItem), mload(0))
+                        )
                     }
 
                     // Apply order fill fraction to offer item end amount.
-                    uint256 endAmount = _getFraction(numerator, denominator, offerItem.endAmount);
+                    uint256 endAmount = _getFraction(
+                        numerator,
+                        denominator,
+                        offerItem.endAmount
+                    );
 
                     // Reuse same fraction if start and end amounts are equal.
                     if (offerItem.startAmount == offerItem.endAmount) {
@@ -15325,7 +16746,11 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                         offerItem.startAmount = endAmount;
                     } else {
                         // Apply order fill fraction to offer item start amount.
-                        offerItem.startAmount = _getFraction(numerator, denominator, offerItem.startAmount);
+                        offerItem.startAmount = _getFraction(
+                            numerator,
+                            denominator,
+                            offerItem.startAmount
+                        );
                     }
 
                     // Adjust offer amount using current time; round down.
@@ -15352,19 +16777,31 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                 // Iterate over each consideration item on the order.
                 for (uint256 j = 0; j < totalConsiderationItems; ++j) {
                     // Retrieve the consideration item.
-                    ConsiderationItem memory considerationItem = (consideration[j]);
+                    ConsiderationItem memory considerationItem = (
+                        consideration[j]
+                    );
 
                     // Apply fraction to consideration item end amount.
-                    uint256 endAmount = _getFraction(numerator, denominator, considerationItem.endAmount);
+                    uint256 endAmount = _getFraction(
+                        numerator,
+                        denominator,
+                        considerationItem.endAmount
+                    );
 
                     // Reuse same fraction if start and end amounts are equal.
-                    if (considerationItem.startAmount == considerationItem.endAmount) {
+                    if (
+                        considerationItem.startAmount ==
+                        considerationItem.endAmount
+                    ) {
                         // Apply derived amount to both start and end amount.
                         considerationItem.startAmount = endAmount;
                     } else {
                         // Apply fraction to consideration item start amount.
-                        considerationItem.startAmount =
-                            _getFraction(numerator, denominator, considerationItem.startAmount);
+                        considerationItem.startAmount = _getFraction(
+                            numerator,
+                            denominator,
+                            considerationItem.startAmount
+                        );
                     }
 
                     // Adjust consideration amount using current time; round up.
@@ -15388,11 +16825,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                     assembly {
                         // Derive the pointer to the recipient using the item
                         // pointer along with the offset to the recipient.
-                        let considerationItemRecipientPtr :=
-                            add(
-                                considerationItem,
-                                ConsiderationItem_recipient_offset // recipient
-                            )
+                        let considerationItemRecipientPtr := add(
+                            considerationItem,
+                            ConsiderationItem_recipient_offset // recipient
+                        )
 
                         // Write recipient to endAmount, as endAmount is not
                         // used from this point on and can be repurposed to fit
@@ -15419,7 +16855,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         // error buffer, the current function is not matchOrders or
         // matchAdvancedOrders. If the value is 1 + (1 << 230), then both the
         // 1st and 231st bits were set; in that case, revert with an error.
-        if (invalidNativeOfferItemErrorBuffer == NonMatchSelector_InvalidErrorValue) {
+        if (
+            invalidNativeOfferItemErrorBuffer ==
+            NonMatchSelector_InvalidErrorValue
+        ) {
             _revertInvalidNativeOfferItem();
         }
 
@@ -15448,7 +16887,9 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                 }
 
                 // Retrieve parameters for the order in question.
-                OrderParameters memory orderParameters = (advancedOrder.parameters);
+                OrderParameters memory orderParameters = (
+                    advancedOrder.parameters
+                );
 
                 // Emit an OrderFulfilled event.
                 _emitOrderFulfilledEvent(
@@ -15528,12 +16969,17 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         address recipient,
         bytes32[] memory orderHashes,
         bool containsNonOpen
-    ) internal returns (bool[] memory availableOrders, Execution[] memory executions) {
+    )
+        internal
+        returns (bool[] memory availableOrders, Execution[] memory executions)
+    {
         // Retrieve length of offer fulfillments array and place on the stack.
         uint256 totalOfferFulfillments = offerFulfillments.length;
 
         // Retrieve length of consideration fulfillments array & place on stack.
-        uint256 totalConsiderationFulfillments = (considerationFulfillments.length);
+        uint256 totalConsiderationFulfillments = (
+            considerationFulfillments.length
+        );
 
         // Allocate an execution for each offer and consideration fulfillment.
         executions = new Execution[](
@@ -15546,10 +16992,14 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
             uint256 totalFilteredExecutions = 0;
 
             // Iterate over each offer fulfillment.
-            for (uint256 i = 0; i < totalOfferFulfillments;) {
+            for (uint256 i = 0; i < totalOfferFulfillments; ) {
                 // Derive aggregated execution corresponding with fulfillment.
                 Execution memory execution = _aggregateAvailable(
-                    advancedOrders, Side.OFFER, offerFulfillments[i], fulfillerConduitKey, recipient
+                    advancedOrders,
+                    Side.OFFER,
+                    offerFulfillments[i],
+                    fulfillerConduitKey,
+                    recipient
                 );
 
                 // If the execution is filterable...
@@ -15566,7 +17016,7 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
             }
 
             // Iterate over each consideration fulfillment.
-            for (uint256 i = 0; i < totalConsiderationFulfillments;) {
+            for (uint256 i = 0; i < totalConsiderationFulfillments; ) {
                 // Derive aggregated execution corresponding with fulfillment.
                 Execution memory execution = _aggregateAvailable(
                     advancedOrders,
@@ -15582,7 +17032,9 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                     ++totalFilteredExecutions;
                 } else {
                     // Otherwise, assign the execution to the executions array.
-                    executions[i + totalOfferFulfillments - totalFilteredExecutions] = execution;
+                    executions[
+                        i + totalOfferFulfillments - totalFilteredExecutions
+                    ] = execution;
                 }
 
                 // Increment iterator.
@@ -15593,7 +17045,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
             if (totalFilteredExecutions != 0) {
                 // reduce the total length of the executions array.
                 assembly {
-                    mstore(executions, sub(mload(executions), totalFilteredExecutions))
+                    mstore(
+                        executions,
+                        sub(mload(executions), totalFilteredExecutions)
+                    )
                 }
             }
         }
@@ -15604,8 +17059,13 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         }
 
         // Perform final checks and return.
-        availableOrders =
-            _performFinalChecksAndExecuteOrders(advancedOrders, executions, orderHashes, recipient, containsNonOpen);
+        availableOrders = _performFinalChecksAndExecuteOrders(
+            advancedOrders,
+            executions,
+            orderHashes,
+            recipient,
+            containsNonOpen
+        );
 
         return (availableOrders, executions);
     }
@@ -15637,7 +17097,7 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         bytes32[] memory orderHashes,
         address recipient,
         bool containsNonOpen
-    ) internal returns (bool[] memory /* availableOrders */ ) {
+    ) internal returns (bool[] memory /* availableOrders */) {
         // Retrieve the length of the advanced orders array and place on stack.
         uint256 totalOrders = advancedOrders.length;
 
@@ -15659,7 +17119,7 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
             uint256 totalExecutions = executions.length;
 
             // Iterate over each execution.
-            for (uint256 i = 0; i < totalExecutions;) {
+            for (uint256 i = 0; i < totalExecutions; ) {
                 // Retrieve the execution and the associated received item.
                 Execution memory execution = executions[i];
                 ReceivedItem memory item = execution.item;
@@ -15678,7 +17138,12 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                 }
 
                 // Transfer the item specified by the execution.
-                _transfer(item, execution.offerer, execution.conduitKey, accumulator);
+                _transfer(
+                    item,
+                    execution.offerer,
+                    execution.conduitKey,
+                    accumulator
+                );
 
                 // Skip overflow check as for loop is indexed starting at zero.
                 unchecked {
@@ -15728,16 +17193,28 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                             // make offerItem compatible with the ReceivedItem input
                             // to _transfer and cache the original endAmount so it
                             // can be restored after the transfer.
-                            uint256 originalEndAmount = _replaceEndAmountWithRecipient(offerItem, recipient);
+                            uint256 originalEndAmount = _replaceEndAmountWithRecipient(
+                                    offerItem,
+                                    recipient
+                                );
 
                             // Transfer excess offer item amount to recipient.
                             _toOfferItemInput(_transfer)(
-                                offerItem, parameters.offerer, parameters.conduitKey, accumulator
+                                offerItem,
+                                parameters.offerer,
+                                parameters.conduitKey,
+                                accumulator
                             );
 
                             // Restore the original endAmount in offerItem.
                             assembly {
-                                mstore(add(offerItem, ReceivedItem_recipient_offset), originalEndAmount)
+                                mstore(
+                                    add(
+                                        offerItem,
+                                        ReceivedItem_recipient_offset
+                                    ),
+                                    originalEndAmount
+                                )
                             }
                         }
 
@@ -15748,14 +17225,18 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
 
                 {
                     // Read consideration items & ensure they are fulfilled.
-                    ConsiderationItem[] memory consideration = (parameters.consideration);
+                    ConsiderationItem[] memory consideration = (
+                        parameters.consideration
+                    );
 
                     // Read length of consideration array & place on stack.
                     uint256 totalConsiderationItems = consideration.length;
 
                     // Iterate over each consideration item.
                     for (uint256 j = 0; j < totalConsiderationItems; ++j) {
-                        ConsiderationItem memory considerationItem = (consideration[j]);
+                        ConsiderationItem memory considerationItem = (
+                            consideration[j]
+                        );
 
                         // Retrieve remaining amount on consideration item.
                         uint256 unmetAmount = considerationItem.startAmount;
@@ -15769,8 +17250,16 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                         assembly {
                             // Write recipient to startAmount.
                             mstore(
-                                add(considerationItem, ReceivedItem_amount_offset),
-                                mload(add(considerationItem, ConsiderationItem_recipient_offset))
+                                add(
+                                    considerationItem,
+                                    ReceivedItem_amount_offset
+                                ),
+                                mload(
+                                    add(
+                                        considerationItem,
+                                        ConsiderationItem_recipient_offset
+                                    )
+                                )
                             )
                         }
                     }
@@ -15789,7 +17278,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
 
         // Return any remaining native token balance to the caller.
         if (remainingNativeTokenBalance != 0) {
-            _transferNativeTokens(payable(msg.sender), remainingNativeTokenBalance);
+            _transferNativeTokens(
+                payable(msg.sender),
+                remainingNativeTokenBalance
+            );
         }
 
         // If any restricted or contract orders are present in the group of
@@ -15797,11 +17289,15 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         // calls after all executions and related transfers are complete.
         if (containsNonOpen) {
             // Iterate over each order a second time.
-            for (uint256 i = 0; i < totalOrders;) {
+            for (uint256 i = 0; i < totalOrders; ) {
                 // Ensure the order in question is being fulfilled.
                 if (availableOrders[i]) {
                     // Check restricted orders and contract orders.
-                    _assertRestrictedAdvancedOrderValidity(advancedOrders[i], orderHashes, orderHashes[i]);
+                    _assertRestrictedAdvancedOrderValidity(
+                        advancedOrders[i],
+                        orderHashes,
+                        orderHashes[i]
+                    );
                 }
 
                 // Skip overflow checks as for loop is indexed starting at zero.
@@ -15895,7 +17391,7 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         CriteriaResolver[] memory criteriaResolvers,
         Fulfillment[] memory fulfillments,
         address recipient
-    ) internal returns (Execution[] memory /* executions */ ) {
+    ) internal returns (Execution[] memory /* executions */) {
         // Validate orders, update order status, and determine item amounts.
         (bytes32[] memory orderHashes, bool containsNonOpen) = _validateOrdersAndPrepareToFulfill(
             advancedOrders,
@@ -15909,7 +17405,14 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         _emitOrdersMatched(orderHashes);
 
         // Fulfill the orders using the supplied fulfillments and recipient.
-        return _fulfillAdvancedOrders(advancedOrders, fulfillments, orderHashes, recipient, containsNonOpen);
+        return
+            _fulfillAdvancedOrders(
+                advancedOrders,
+                fulfillments,
+                orderHashes,
+                recipient,
+                containsNonOpen
+            );
     }
 
     /**
@@ -15960,7 +17463,10 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
 
                 // Derive the execution corresponding with the fulfillment.
                 Execution memory execution = _applyFulfillment(
-                    advancedOrders, fulfillment.offerComponents, fulfillment.considerationComponents, i
+                    advancedOrders,
+                    fulfillment.offerComponents,
+                    fulfillment.considerationComponents,
+                    i
                 );
 
                 // If the execution is filterable...
@@ -15977,13 +17483,22 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
             if (totalFilteredExecutions != 0) {
                 // reduce the total length of the executions array.
                 assembly {
-                    mstore(executions, sub(mload(executions), totalFilteredExecutions))
+                    mstore(
+                        executions,
+                        sub(mload(executions), totalFilteredExecutions)
+                    )
                 }
             }
         }
 
         // Perform final checks and execute orders.
-        _performFinalChecksAndExecuteOrders(advancedOrders, executions, orderHashes, recipient, containsNonOpen);
+        _performFinalChecksAndExecuteOrders(
+            advancedOrders,
+            executions,
+            orderHashes,
+            recipient,
+            containsNonOpen
+        );
 
         // Return the executions array.
         return executions;
@@ -16000,26 +17515,27 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
      * @return filterable A boolean indicating whether the execution in question
      *                    can be filtered from the executions array.
      */
-    function _isFilterableExecution(Execution memory execution) internal pure returns (bool filterable) {
+    function _isFilterableExecution(
+        Execution memory execution
+    ) internal pure returns (bool filterable) {
         // Utilize assembly to efficiently determine if execution is filterable.
         assembly {
             // Retrieve the received item referenced by the execution.
             let item := mload(execution)
 
             // Determine whether the execution is filterable.
-            filterable :=
-                and(
-                    // Determine if offerer and recipient are the same address.
-                    eq(
-                        // Retrieve the recipient's address from the received item.
-                        mload(add(item, ReceivedItem_recipient_offset)),
-                        // Retrieve the offerer's address from the execution.
-                        mload(add(execution, Execution_offerer_offset))
-                    ),
-                    // Determine if received item's item type is non-zero, thereby
-                    // indicating that the execution does not involve native tokens.
-                    iszero(iszero(mload(item)))
-                )
+            filterable := and(
+                // Determine if offerer and recipient are the same address.
+                eq(
+                    // Retrieve the recipient's address from the received item.
+                    mload(add(item, ReceivedItem_recipient_offset)),
+                    // Retrieve the offerer's address from the execution.
+                    mload(add(execution, Execution_offerer_offset))
+                ),
+                // Determine if received item's item type is non-zero, thereby
+                // indicating that the execution does not involve native tokens.
+                iszero(iszero(mload(item)))
+            )
         }
     }
 }
@@ -16086,12 +17602,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      * @return fulfilled A boolean indicating whether the order has been
      *                   successfully fulfilled.
      */
-    function fulfillBasicOrder(BasicOrderParameters calldata parameters)
-        external
-        payable
-        override
-        returns (bool fulfilled)
-    {
+    function fulfillBasicOrder(
+        BasicOrderParameters calldata parameters
+    ) external payable override returns (bool fulfilled) {
         // Validate and fulfill the basic order.
         fulfilled = _validateAndFulfillBasicOrder(parameters);
     }
@@ -16124,12 +17637,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      * @return fulfilled A boolean indicating whether the order has been
      *                   successfully fulfilled.
      */
-    function fulfillBasicOrder_efficient_6GL6yc(BasicOrderParameters calldata parameters)
-        external
-        payable
-        override
-        returns (bool fulfilled)
-    {
+    function fulfillBasicOrder_efficient_6GL6yc(
+        BasicOrderParameters calldata parameters
+    ) external payable override returns (bool fulfilled) {
         // Validate and fulfill the basic order.
         fulfilled = _validateAndFulfillBasicOrder(parameters);
     }
@@ -16165,7 +17675,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
     ) external payable override returns (bool fulfilled) {
         // Convert order to "advanced" order, then validate and fulfill it.
         fulfilled = _validateAndFulfillAdvancedOrder(
-            _toAdvancedOrderReturnType(_decodeOrderAsAdvancedOrder)(CalldataStart.pptr()),
+            _toAdvancedOrderReturnType(_decodeOrderAsAdvancedOrder)(
+                CalldataStart.pptr()
+            ),
             new CriteriaResolver[](0), // No criteria resolvers supplied.
             fulfillerConduitKey,
             msg.sender
@@ -16229,9 +17741,13 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
     ) external payable override returns (bool fulfilled) {
         // Validate and fulfill the order.
         fulfilled = _validateAndFulfillAdvancedOrder(
-            _toAdvancedOrderReturnType(_decodeAdvancedOrder)(CalldataStart.pptr()),
+            _toAdvancedOrderReturnType(_decodeAdvancedOrder)(
+                CalldataStart.pptr()
+            ),
             _toCriteriaResolversReturnType(_decodeCriteriaResolvers)(
-                CalldataStart.pptr(Offset_fulfillAdvancedOrder_criteriaResolvers)
+                CalldataStart.pptr(
+                    Offset_fulfillAdvancedOrder_criteriaResolvers
+                )
             ),
             fulfillerConduitKey,
             _substituteCallerForEmptyRecipient(recipient)
@@ -16306,21 +17822,40 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
         FulfillmentComponent[][] calldata,
         bytes32 fulfillerConduitKey,
         uint256 maximumFulfilled
-    ) external payable override returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    )
+        external
+        payable
+        override
+        returns (
+            bool[] memory,
+            /* availableOrders */ Execution[] memory /* executions */
+        )
+    {
         // Convert orders to "advanced" orders and fulfill all available orders.
-        return _fulfillAvailableAdvancedOrders(
-            _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()), // Convert to advanced orders.
-            new CriteriaResolver[](0), // No criteria resolvers supplied.
-            _toNestedFulfillmentComponentsReturnType(_decodeNestedFulfillmentComponents)(
-                CalldataStart.pptr(Offset_fulfillAvailableOrders_offerFulfillments)
-            ),
-            _toNestedFulfillmentComponentsReturnType(_decodeNestedFulfillmentComponents)(
-                CalldataStart.pptr(Offset_fulfillAvailableOrders_considerationFulfillments)
-            ),
-            fulfillerConduitKey,
-            msg.sender,
-            maximumFulfilled
-        );
+        return
+            _fulfillAvailableAdvancedOrders(
+                _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(
+                    CalldataStart.pptr()
+                ), // Convert to advanced orders.
+                new CriteriaResolver[](0), // No criteria resolvers supplied.
+                _toNestedFulfillmentComponentsReturnType(
+                    _decodeNestedFulfillmentComponents
+                )(
+                    CalldataStart.pptr(
+                        Offset_fulfillAvailableOrders_offerFulfillments
+                    )
+                ),
+                _toNestedFulfillmentComponentsReturnType(
+                    _decodeNestedFulfillmentComponents
+                )(
+                    CalldataStart.pptr(
+                        Offset_fulfillAvailableOrders_considerationFulfillments
+                    )
+                ),
+                fulfillerConduitKey,
+                msg.sender,
+                maximumFulfilled
+            );
     }
 
     /**
@@ -16421,23 +17956,44 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
         bytes32 fulfillerConduitKey,
         address recipient,
         uint256 maximumFulfilled
-    ) external payable override returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    )
+        external
+        payable
+        override
+        returns (
+            bool[] memory,
+            /* availableOrders */ Execution[] memory /* executions */
+        )
+    {
         // Fulfill all available orders.
-        return _fulfillAvailableAdvancedOrders(
-            _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(CalldataStart.pptr()),
-            _toCriteriaResolversReturnType(_decodeCriteriaResolvers)(
-                CalldataStart.pptr(Offset_fulfillAvailableAdvancedOrders_criteriaResolvers)
-            ),
-            _toNestedFulfillmentComponentsReturnType(_decodeNestedFulfillmentComponents)(
-                CalldataStart.pptr(Offset_fulfillAvailableAdvancedOrders_offerFulfillments)
-            ),
-            _toNestedFulfillmentComponentsReturnType(_decodeNestedFulfillmentComponents)(
-                CalldataStart.pptr(Offset_fulfillAvailableAdvancedOrders_cnsdrationFlflmnts)
-            ),
-            fulfillerConduitKey,
-            _substituteCallerForEmptyRecipient(recipient),
-            maximumFulfilled
-        );
+        return
+            _fulfillAvailableAdvancedOrders(
+                _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(
+                    CalldataStart.pptr()
+                ),
+                _toCriteriaResolversReturnType(_decodeCriteriaResolvers)(
+                    CalldataStart.pptr(
+                        Offset_fulfillAvailableAdvancedOrders_criteriaResolvers
+                    )
+                ),
+                _toNestedFulfillmentComponentsReturnType(
+                    _decodeNestedFulfillmentComponents
+                )(
+                    CalldataStart.pptr(
+                        Offset_fulfillAvailableAdvancedOrders_offerFulfillments
+                    )
+                ),
+                _toNestedFulfillmentComponentsReturnType(
+                    _decodeNestedFulfillmentComponents
+                )(
+                    CalldataStart.pptr(
+                        Offset_fulfillAvailableAdvancedOrders_cnsdrationFlflmnts
+                    )
+                ),
+                fulfillerConduitKey,
+                _substituteCallerForEmptyRecipient(recipient),
+                maximumFulfilled
+            );
     }
 
     /**
@@ -16478,14 +18034,19 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
          * @custom:name fulfillments
          */
         Fulfillment[] calldata
-    ) external payable override returns (Execution[] memory /* executions */ ) {
+    ) external payable override returns (Execution[] memory /* executions */) {
         // Convert to advanced, validate, and match orders using fulfillments.
-        return _matchAdvancedOrders(
-            _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()),
-            new CriteriaResolver[](0), // No criteria resolvers supplied.
-            _toFulfillmentsReturnType(_decodeFulfillments)(CalldataStart.pptr(Offset_matchOrders_fulfillments)),
-            msg.sender
-        );
+        return
+            _matchAdvancedOrders(
+                _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(
+                    CalldataStart.pptr()
+                ),
+                new CriteriaResolver[](0), // No criteria resolvers supplied.
+                _toFulfillmentsReturnType(_decodeFulfillments)(
+                    CalldataStart.pptr(Offset_matchOrders_fulfillments)
+                ),
+                msg.sender
+            );
     }
 
     /**
@@ -16554,16 +18115,23 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
          */
         Fulfillment[] calldata,
         address recipient
-    ) external payable override returns (Execution[] memory /* executions */ ) {
+    ) external payable override returns (Execution[] memory /* executions */) {
         // Validate and match the advanced orders using supplied fulfillments.
-        return _matchAdvancedOrders(
-            _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(CalldataStart.pptr()),
-            _toCriteriaResolversReturnType(_decodeCriteriaResolvers)(
-                CalldataStart.pptr(Offset_matchAdvancedOrders_criteriaResolvers)
-            ),
-            _toFulfillmentsReturnType(_decodeFulfillments)(CalldataStart.pptr(Offset_matchAdvancedOrders_fulfillments)),
-            _substituteCallerForEmptyRecipient(recipient)
-        );
+        return
+            _matchAdvancedOrders(
+                _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(
+                    CalldataStart.pptr()
+                ),
+                _toCriteriaResolversReturnType(_decodeCriteriaResolvers)(
+                    CalldataStart.pptr(
+                        Offset_matchAdvancedOrders_criteriaResolvers
+                    )
+                ),
+                _toFulfillmentsReturnType(_decodeFulfillments)(
+                    CalldataStart.pptr(Offset_matchAdvancedOrders_fulfillments)
+                ),
+                _substituteCallerForEmptyRecipient(recipient)
+            );
     }
 
     /**
@@ -16577,7 +18145,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      * @return cancelled A boolean indicating whether the supplied orders have
      *                   been successfully cancelled.
      */
-    function cancel(OrderComponents[] calldata orders) external override returns (bool cancelled) {
+    function cancel(
+        OrderComponents[] calldata orders
+    ) external override returns (bool cancelled) {
         // Cancel the orders.
         cancelled = _cancel(orders);
     }
@@ -16602,8 +18172,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
          * @custom:name orders
          */
         Order[] calldata
-    ) external override returns (bool /* validated */ ) {
-        return _validate(_toOrdersReturnType(_decodeOrders)(CalldataStart.pptr()));
+    ) external override returns (bool /* validated */) {
+        return
+            _validate(_toOrdersReturnType(_decodeOrders)(CalldataStart.pptr()));
     }
 
     /**
@@ -16636,7 +18207,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
 
         // Derive order hash by supplying order parameters along with counter.
         orderHash = _deriveOrderHash(
-            _toOrderParametersReturnType(_decodeOrderComponentsAsOrderParameters)(orderPointer),
+            _toOrderParametersReturnType(
+                _decodeOrderComponentsAsOrderParameters
+            )(orderPointer),
             // Read order counter
             orderPointer.offset(OrderParameters_counter_offset).readUint256()
         );
@@ -16663,11 +18236,18 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      * @return totalSize   The total size of the order that is either filled or
      *                     unfilled (i.e. the "denominator").
      */
-    function getOrderStatus(bytes32 orderHash)
+    function getOrderStatus(
+        bytes32 orderHash
+    )
         external
         view
         override
-        returns (bool isValidated, bool isCancelled, uint256 totalFilled, uint256 totalSize)
+        returns (
+            bool isValidated,
+            bool isCancelled,
+            uint256 totalFilled,
+            uint256 totalSize
+        )
     {
         // Retrieve the order status using the order hash.
         return _getOrderStatus(orderHash);
@@ -16680,7 +18260,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      *
      * @return counter The current counter.
      */
-    function getCounter(address offerer) external view override returns (uint256 counter) {
+    function getCounter(
+        address offerer
+    ) external view override returns (uint256 counter) {
         // Return the counter for the supplied offerer.
         counter = _getCounter(offerer);
     }
@@ -16696,7 +18278,11 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
         external
         view
         override
-        returns (string memory version, bytes32 domainSeparator, address conduitController)
+        returns (
+            string memory version,
+            bytes32 domainSeparator,
+            address conduitController
+        )
     {
         // Return the information for this contract.
         return _information();
@@ -16711,7 +18297,9 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      *
      * @return nonce The contract offerer nonce.
      */
-    function getContractOffererNonce(address contractOfferer) external view override returns (uint256 nonce) {
+    function getContractOffererNonce(
+        address contractOfferer
+    ) external view override returns (uint256 nonce) {
         nonce = _contractNonces[contractOfferer];
     }
 
@@ -16720,7 +18308,12 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
      *
      * @return contractName The name of this contract.
      */
-    function name() external pure override returns (string memory /* contractName */ ) {
+    function name()
+        external
+        pure
+        override
+        returns (string memory /* contractName */)
+    {
         // Return the name of the contract.
         return _name();
     }
@@ -16842,4 +18435,3 @@ contract Seaport is Consideration {
         return "Seaport";
     }
 }
-
