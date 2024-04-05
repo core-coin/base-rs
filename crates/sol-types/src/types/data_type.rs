@@ -11,7 +11,7 @@
 use crate::{abi::token::*, private::SolTypeValue, utils, SolType, Word};
 use alloc::{string::String as RustString, vec::Vec};
 use alloy_primitives::{
-    keccak256, Address as RustAddress, Bytes as RustBytes, FixedBytes as RustFixedBytes,
+    sha3, Address as RustAddress, Bytes as RustBytes, FixedBytes as RustFixedBytes,
     Function as RustFunction, I256, U256,
 };
 use core::{borrow::Borrow, fmt::*, hash::Hash, marker::PhantomData, ops::*};
@@ -299,7 +299,7 @@ impl<T: ?Sized + AsRef<[u8]>> SolTypeValue<Bytes> for T {
 
     #[inline]
     fn stv_eip712_data_word(&self) -> Word {
-        keccak256(Bytes::abi_encode_packed(self))
+        sha3(Bytes::abi_encode_packed(self))
     }
 
     #[inline]
@@ -347,7 +347,7 @@ impl<T: ?Sized + AsRef<str>> SolTypeValue<String> for T {
 
     #[inline]
     fn stv_eip712_data_word(&self) -> Word {
-        keccak256(String::abi_encode_packed(self))
+        sha3(String::abi_encode_packed(self))
     }
 
     #[inline]
@@ -406,7 +406,7 @@ where
         for item in self {
             encoded.extend_from_slice(T::stv_eip712_data_word(item).as_slice());
         }
-        keccak256(encoded)
+        sha3(encoded)
     }
 
     #[inline]
@@ -550,7 +550,7 @@ where
         // SAFETY: Flattening [[u8; 32]; N] to [u8; N * 32] is valid
         let encoded: &[u8] =
             unsafe { core::slice::from_raw_parts(encoded.as_ptr().cast(), N * 32) };
-        keccak256(encoded)
+        sha3(encoded)
     }
 
     #[inline]
@@ -680,7 +680,7 @@ macro_rules! tuple_encodable_impls {
                 )+];
                 // SAFETY: Flattening [[u8; 32]; $count] to [u8; $count * 32] is valid
                 let encoding: &[u8] = unsafe { core::slice::from_raw_parts(encoding.as_ptr().cast(), $count * 32) };
-                keccak256(encoding).into()
+                sha3(encoding).into()
             }
         }
     };

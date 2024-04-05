@@ -148,11 +148,11 @@ pub(crate) fn event_full_signature(name: &str, inputs: &[EventParam]) -> String 
     preimage
 }
 
-/// `keccak256(preimage)[..4]`
+/// `sha3(preimage)[..4]`
 pub(crate) fn selector(preimage: &str) -> Selector {
     // SAFETY: splitting an array
     unsafe {
-        alloy_primitives::keccak256(preimage.as_bytes())
+        alloy_primitives::sha3(preimage.as_bytes())
             .0
             .get_unchecked(..4)
             .try_into()

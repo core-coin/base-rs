@@ -8,7 +8,7 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use alloy_primitives::{keccak256, B256};
+use alloy_primitives::{sha3, B256};
 use alloy_sol_types::SolStruct;
 use core::{cmp::Ordering, fmt};
 use parser::{RootType, TypeSpecifier, TypeStem};
@@ -434,9 +434,9 @@ impl Resolver {
         }))
     }
 
-    /// Compute the keccak256 hash of the EIP-712 `encodeType` string.
+    /// Compute the sha3 hash of the EIP-712 `encodeType` string.
     pub fn type_hash(&self, name: &str) -> Result<B256> {
-        self.encode_type(name).map(keccak256)
+        self.encode_type(name).map(sha3)
     }
 
     /// Encode the data according to EIP-712 `encodeData` rules.
@@ -485,7 +485,7 @@ impl Resolver {
             DynSolValue::String(s) => s.as_bytes(),
             _ => unreachable!("all types are words or covered in the match"),
         };
-        Ok(keccak256(to_hash))
+        Ok(sha3(to_hash))
     }
 
     /// Check if the resolver graph contains a type by its name.

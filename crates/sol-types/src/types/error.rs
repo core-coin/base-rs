@@ -26,7 +26,7 @@ pub trait SolError: Sized {
     /// The error's ABI signature.
     const SIGNATURE: &'static str;
 
-    /// The error selector: `keccak256(SIGNATURE)[0..4]`
+    /// The error selector: `sha3(SIGNATURE)[0..4]`
     const SELECTOR: [u8; 4];
 
     /// Convert from the tuple type used for ABI encoding and decoding.
@@ -421,7 +421,7 @@ mod tests {
     use super::*;
     use crate::{sol, types::interface::SolInterface};
     use alloc::string::ToString;
-    use alloy_primitives::{address, hex, keccak256};
+    use alloy_primitives::{address, hex, sha3};
 
     #[test]
     fn revert_encoding() {
@@ -447,16 +447,8 @@ mod tests {
 
     #[test]
     fn selectors() {
-        assert_eq!(
-            Revert::SELECTOR,
-            &keccak256(b"Error(string)")[..4],
-            "Revert selector is incorrect"
-        );
-        assert_eq!(
-            Panic::SELECTOR,
-            &keccak256(b"Panic(uint256)")[..4],
-            "Panic selector is incorrect"
-        );
+        assert_eq!(Revert::SELECTOR, &sha3(b"Error(string)")[..4], "Revert selector is incorrect");
+        assert_eq!(Panic::SELECTOR, &sha3(b"Panic(uint256)")[..4], "Panic selector is incorrect");
     }
 
     #[test]

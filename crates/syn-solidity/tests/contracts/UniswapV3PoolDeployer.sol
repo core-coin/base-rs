@@ -1278,7 +1278,7 @@ library Position {
         int24 tickLower,
         int24 tickUpper
     ) internal view returns (Position.Info storage position) {
-        position = self[keccak256(abi.encodePacked(owner, tickLower, tickUpper))];
+        position = self[sha3(abi.encodePacked(owner, tickLower, tickUpper))];
     }
 
     /// @notice Credits accumulated fees to a user's position
@@ -3053,7 +3053,7 @@ contract UniswapV3PoolDeployer is IUniswapV3PoolDeployer {
         int24 tickSpacing
     ) internal returns (address pool) {
         parameters = Parameters({factory: factory, token0: token0, token1: token1, fee: fee, tickSpacing: tickSpacing});
-        pool = address(new UniswapV3Pool{salt: keccak256(abi.encode(token0, token1, fee))}());
+        pool = address(new UniswapV3Pool{salt: sha3(abi.encode(token0, token1, fee))}());
         delete parameters;
     }
 }

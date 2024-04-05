@@ -662,7 +662,7 @@ library Strings {
      * @dev Returns true if the two strings are equal.
      */
     function equal(string memory a, string memory b) internal pure returns (bool) {
-        return bytes(a).length == bytes(b).length && keccak256(bytes(a)) == keccak256(bytes(b));
+        return bytes(a).length == bytes(b).length && sha3(bytes(a)) == sha3(bytes(b));
     }
 }
 
@@ -724,7 +724,7 @@ abstract contract ERC165 is IERC165 {
  * using `public constant` hash digests:
  *
  * ```solidity
- * bytes32 public constant MY_ROLE = keccak256("MY_ROLE");
+ * bytes32 public constant MY_ROLE = sha3("MY_ROLE");
  * ```
  *
  * Roles can be used to represent a set of permissions. To restrict access to a
@@ -4538,7 +4538,7 @@ interface IERC1155Receiver is IERC165 {
      * called at the end of a `safeTransferFrom` after the balance has been updated.
      *
      * NOTE: To accept the transfer, this must return
-     * `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`
+     * `bytes4(sha3("onERC1155Received(address,address,uint256,uint256,bytes)"))`
      * (i.e. 0xf23a6e61, or its own function selector).
      *
      * @param operator The address which initiated the transfer (i.e. msg.sender)
@@ -4546,7 +4546,7 @@ interface IERC1155Receiver is IERC165 {
      * @param id The ID of the token being transferred
      * @param value The amount of tokens being transferred
      * @param data Additional data with no specified format
-     * @return `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))` if transfer is allowed
+     * @return `bytes4(sha3("onERC1155Received(address,address,uint256,uint256,bytes)"))` if transfer is allowed
      */
     function onERC1155Received(
         address operator,
@@ -4562,7 +4562,7 @@ interface IERC1155Receiver is IERC165 {
      * been updated.
      *
      * NOTE: To accept the transfer(s), this must return
-     * `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`
+     * `bytes4(sha3("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`
      * (i.e. 0xbc197c81, or its own function selector).
      *
      * @param operator The address which initiated the batch transfer (i.e. msg.sender)
@@ -4570,7 +4570,7 @@ interface IERC1155Receiver is IERC165 {
      * @param ids An array containing ids of each token being transferred (order and length must match values array)
      * @param values An array containing amounts of each token being transferred (order and length must match ids array)
      * @param data Additional data with no specified format
-     * @return `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))` if transfer is allowed
+     * @return `bytes4(sha3("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))` if transfer is allowed
      */
     function onERC1155BatchReceived(
         address operator,
@@ -4769,7 +4769,7 @@ library ECDSA {
         assembly {
             mstore(0x00, "\x19Ethereum Signed Message:\n32")
             mstore(0x1c, hash)
-            message := keccak256(0x00, 0x3c)
+            message := sha3(0x00, 0x3c)
         }
     }
 
@@ -4782,7 +4782,7 @@ library ECDSA {
      * See {recover}.
      */
     function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
+        return sha3(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
     }
 
     /**
@@ -4801,7 +4801,7 @@ library ECDSA {
             mstore(ptr, hex"19_01")
             mstore(add(ptr, 0x02), domainSeparator)
             mstore(add(ptr, 0x22), structHash)
-            data := keccak256(ptr, 0x42)
+            data := sha3(ptr, 0x42)
         }
     }
 
@@ -4812,7 +4812,7 @@ library ECDSA {
      * See {recover}.
      */
     function toDataWithIntendedValidatorHash(address validator, bytes memory data) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(hex"19_00", validator, data));
+        return sha3(abi.encodePacked(hex"19_00", validator, data));
     }
 }
 
@@ -5103,7 +5103,7 @@ interface IERC5267 {
  *
  * The encoding specified in the EIP is very generic, and such a generic implementation in Solidity is not feasible,
  * thus this contract does not implement the encoding itself. Protocols need to implement the type-specific encoding
- * they need in their contracts using a combination of `abi.encode` and `keccak256`.
+ * they need in their contracts using a combination of `abi.encode` and `sha3`.
  *
  * This contract implements the EIP 712 domain separator ({_domainSeparatorV4}) that is used as part of the encoding
  * scheme, and the final step of the encoding to obtain the message digest that is then signed via ECDSA
@@ -5127,7 +5127,7 @@ abstract contract EIP712 is IERC5267 {
     using ShortStrings for *;
 
     bytes32 private constant _TYPE_HASH =
-        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+        sha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     // Cache the domain separator as an immutable value, but also store the chain id that it corresponds to, in order to
     // invalidate the cached domain separator if the chain id changes.
@@ -5158,8 +5158,8 @@ abstract contract EIP712 is IERC5267 {
     constructor(string memory name, string memory version) {
         _name = name.toShortStringWithFallback(_nameFallback);
         _version = version.toShortStringWithFallback(_versionFallback);
-        _hashedName = keccak256(bytes(name));
-        _hashedVersion = keccak256(bytes(version));
+        _hashedName = sha3(bytes(name));
+        _hashedVersion = sha3(bytes(version));
 
         _cachedChainId = block.chainid;
         _cachedDomainSeparator = _buildDomainSeparator();
@@ -5178,7 +5178,7 @@ abstract contract EIP712 is IERC5267 {
     }
 
     function _buildDomainSeparator() private view returns (bytes32) {
-        return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
+        return sha3(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
     }
 
     /**
@@ -5188,10 +5188,10 @@ abstract contract EIP712 is IERC5267 {
      * This hash can be used together with {ECDSA-recover} to obtain the signer of a message. For example:
      *
      * ```solidity
-     * bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
-     *     keccak256("Mail(address to,string contents)"),
+     * bytes32 digest = _hashTypedDataV4(sha3(abi.encode(
+     *     sha3("Mail(address to,string contents)"),
      *     mailTo,
-     *     keccak256(bytes(mailContents))
+     *     sha3(bytes(mailContents))
      * )));
      * address signer = ECDSA.recover(digest, signature);
      * ```
@@ -5438,9 +5438,9 @@ library DoubleEndedQueue {
 abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receiver, IERC1155Receiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
-    bytes32 public constant BALLOT_TYPEHASH = keccak256("Ballot(uint256 proposalId,uint8 support)");
+    bytes32 public constant BALLOT_TYPEHASH = sha3("Ballot(uint256 proposalId,uint8 support)");
     bytes32 public constant EXTENDED_BALLOT_TYPEHASH =
-        keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
+        sha3("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     // solhint-disable var-name-mixedcase
     struct ProposalCore {
@@ -5484,7 +5484,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
             revert GovernorOnlyExecutor(_msgSender());
         }
         if (_executor() != address(this)) {
-            bytes32 msgDataHash = keccak256(_msgData());
+            bytes32 msgDataHash = sha3(_msgData());
             // loop until popping the expected operation - throw if deque is empty (operation not authorized)
             while (_governanceCall.popFront() != msgDataHash) {}
         }
@@ -5554,7 +5554,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
      * @dev See {IGovernor-hashProposal}.
      *
      * The proposal id is produced by hashing the ABI encoded `targets` array, the `values` array, the `calldatas` array
-     * and the descriptionHash (bytes32 which itself is the keccak256 hash of the description string). This proposal id
+     * and the descriptionHash (bytes32 which itself is the sha3 hash of the description string). This proposal id
      * can be produced from the proposal data which is part of the {ProposalCreated} event. It can even be computed in
      * advance, before the proposal is submitted.
      *
@@ -5569,7 +5569,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public pure virtual override returns (uint256) {
-        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash)));
+        return uint256(sha3(abi.encode(targets, values, calldatas, descriptionHash)));
     }
 
     /**
@@ -5700,7 +5700,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
             }
         }
 
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
+        uint256 proposalId = hashProposal(targets, values, calldatas, sha3(bytes(description)));
 
         if (targets.length != values.length || targets.length != calldatas.length || targets.length == 0) {
             revert GovernorInvalidProposalLength(targets.length, calldatas.length, values.length);
@@ -5816,7 +5816,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         if (_executor() != address(this)) {
             for (uint256 i = 0; i < targets.length; ++i) {
                 if (targets[i] == address(this)) {
-                    _governanceCall.pushBack(keccak256(calldatas[i]));
+                    _governanceCall.pushBack(sha3(calldatas[i]));
                 }
             }
         }
@@ -5934,7 +5934,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
         bytes32 s
     ) public virtual override returns (uint256) {
         address voter = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support))),
+            _hashTypedDataV4(sha3(abi.encode(BALLOT_TYPEHASH, proposalId, support))),
             v,
             r,
             s
@@ -5956,13 +5956,13 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
     ) public virtual override returns (uint256) {
         address voter = ECDSA.recover(
             _hashTypedDataV4(
-                keccak256(
+                sha3(
                     abi.encode(
                         EXTENDED_BALLOT_TYPEHASH,
                         proposalId,
                         support,
-                        keccak256(bytes(reason)),
-                        keccak256(params)
+                        sha3(bytes(reason)),
+                        sha3(params)
                     )
                 )
             ),
@@ -6481,7 +6481,7 @@ abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorComp
         bytes[] memory calldatas,
         string memory description
     ) private {
-        bytes32 descriptionHash = keccak256(bytes(description));
+        bytes32 descriptionHash = sha3(bytes(description));
         uint256 proposalId = hashProposal(targets, values, _encodeCalldata(signatures, calldatas), descriptionHash);
 
         ProposalDetails storage details = _proposalDetails[proposalId];
@@ -7112,7 +7112,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         _proposalTimelocks[proposalId] = SafeCast.toUint64(eta);
 
         for (uint256 i = 0; i < targets.length; ++i) {
-            if (_timelock.queuedTransactions(keccak256(abi.encode(targets[i], values[i], "", calldatas[i], eta)))) {
+            if (_timelock.queuedTransactions(sha3(abi.encode(targets[i], values[i], "", calldatas[i], eta)))) {
                 revert GovernorAlreadyQueuedProposal(proposalId);
             }
             _timelock.queueTransaction(targets[i], values[i], "", calldatas[i], eta);
@@ -7291,9 +7291,9 @@ abstract contract ERC1155Holder is ERC1155Receiver {
  * _Available since v3.3._
  */
 contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
-    bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
-    bytes32 public constant EXECUTOR_ROLE = keccak256("EXECUTOR_ROLE");
-    bytes32 public constant CANCELLER_ROLE = keccak256("CANCELLER_ROLE");
+    bytes32 public constant PROPOSER_ROLE = sha3("PROPOSER_ROLE");
+    bytes32 public constant EXECUTOR_ROLE = sha3("EXECUTOR_ROLE");
+    bytes32 public constant CANCELLER_ROLE = sha3("CANCELLER_ROLE");
     uint256 internal constant _DONE_TIMESTAMP = uint256(1);
 
     mapping(bytes32 => uint256) private _timestamps;
@@ -7486,7 +7486,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 predecessor,
         bytes32 salt
     ) public pure virtual returns (bytes32) {
-        return keccak256(abi.encode(target, value, data, predecessor, salt));
+        return sha3(abi.encode(target, value, data, predecessor, salt));
     }
 
     /**
@@ -7500,7 +7500,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 predecessor,
         bytes32 salt
     ) public pure virtual returns (bytes32) {
-        return keccak256(abi.encode(targets, values, payloads, predecessor, salt));
+        return sha3(abi.encode(targets, values, payloads, predecessor, salt));
     }
 
     /**
@@ -8181,7 +8181,7 @@ library Checkpoints {
     ) private pure returns (Checkpoint224 storage result) {
         assembly {
             mstore(0, self.slot)
-            result.slot := add(keccak256(0, 0x20), pos)
+            result.slot := add(sha3(0, 0x20), pos)
         }
     }
 
@@ -8366,7 +8366,7 @@ library Checkpoints {
     ) private pure returns (Checkpoint160 storage result) {
         assembly {
             mstore(0, self.slot)
-            result.slot := add(keccak256(0, 0x20), pos)
+            result.slot := add(sha3(0, 0x20), pos)
         }
     }
 }
@@ -8545,7 +8545,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
     using Checkpoints for Checkpoints.Trace224;
 
     bytes32 private constant _DELEGATION_TYPEHASH =
-        keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
+        sha3("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     mapping(address => address) private _delegation;
 
@@ -8665,7 +8665,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
             revert VotesExpiredSignature(expiry);
         }
         address signer = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
+            _hashTypedDataV4(sha3(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
             v,
             r,
             s
@@ -9118,7 +9118,7 @@ interface IERC1271 {
 interface IERC1363Receiver {
     /*
      * Note: the ERC-165 identifier for this interface is 0x88a7ca5c.
-     * 0x88a7ca5c === bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)"))
+     * 0x88a7ca5c === bytes4(sha3("onTransferReceived(address,address,uint256,bytes)"))
      */
 
     /**
@@ -9132,7 +9132,7 @@ interface IERC1363Receiver {
      * @param from address The address which are token transferred from
      * @param amount uint256 The amount of tokens transferred
      * @param data bytes Additional data with no specified format
-     * @return `bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)"))` unless throwing
+     * @return `bytes4(sha3("onTransferReceived(address,address,uint256,bytes)"))` unless throwing
      */
     function onTransferReceived(
         address operator,
@@ -9157,12 +9157,12 @@ interface IERC1363 is IERC165, IERC20 {
     /*
      * Note: the ERC-165 identifier for this interface is 0xb0202a11.
      * 0xb0202a11 ===
-     *   bytes4(keccak256('transferAndCall(address,uint256)')) ^
-     *   bytes4(keccak256('transferAndCall(address,uint256,bytes)')) ^
-     *   bytes4(keccak256('transferFromAndCall(address,address,uint256)')) ^
-     *   bytes4(keccak256('transferFromAndCall(address,address,uint256,bytes)')) ^
-     *   bytes4(keccak256('approveAndCall(address,uint256)')) ^
-     *   bytes4(keccak256('approveAndCall(address,uint256,bytes)'))
+     *   bytes4(sha3('transferAndCall(address,uint256)')) ^
+     *   bytes4(sha3('transferAndCall(address,uint256,bytes)')) ^
+     *   bytes4(sha3('transferFromAndCall(address,address,uint256)')) ^
+     *   bytes4(sha3('transferFromAndCall(address,address,uint256,bytes)')) ^
+     *   bytes4(sha3('approveAndCall(address,uint256)')) ^
+     *   bytes4(sha3('approveAndCall(address,uint256,bytes)'))
      */
 
     /**
@@ -9228,7 +9228,7 @@ interface IERC1363 is IERC165, IERC20 {
 interface IERC1363Spender {
     /*
      * Note: the ERC-165 identifier for this interface is 0x7b04a2d0.
-     * 0x7b04a2d0 === bytes4(keccak256("onApprovalReceived(address,uint256,bytes)"))
+     * 0x7b04a2d0 === bytes4(sha3("onApprovalReceived(address,uint256,bytes)"))
      */
 
     /**
@@ -9241,7 +9241,7 @@ interface IERC1363Spender {
      * @param owner address The address which called `approveAndCall` function
      * @param amount uint256 The amount of tokens to be spent
      * @param data bytes Additional data with no specified format
-     * @return `bytes4(keccak256("onApprovalReceived(address,uint256,bytes)"))`unless throwing
+     * @return `bytes4(sha3("onApprovalReceived(address,uint256,bytes)"))`unless throwing
      */
     function onApprovalReceived(address owner, uint256 amount, bytes memory data) external returns (bytes4);
 }
@@ -9484,7 +9484,7 @@ interface IERC3156FlashBorrower {
      * @param amount The amount of tokens lent.
      * @param fee The additional amount of tokens to repay.
      * @param data Arbitrary data structure, intended to contain user-defined parameters.
-     * @return The keccak256 hash of "ERC3156FlashBorrower.onFlashLoan"
+     * @return The sha3 hash of "ERC3156FlashBorrower.onFlashLoan"
      */
     function onFlashLoan(
         address initiator,
@@ -10282,7 +10282,7 @@ contract MinimalForwarder is EIP712 {
     }
 
     bytes32 private constant _TYPEHASH =
-        keccak256("ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)");
+        sha3("ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)");
 
     mapping(address => uint256) private _nonces;
 
@@ -10346,7 +10346,7 @@ contract MinimalForwarder is EIP712 {
     function _recover(ForwardRequest calldata req, bytes calldata signature) internal view returns (address) {
         return
             _hashTypedDataV4(
-                keccak256(abi.encode(_TYPEHASH, req.from, req.to, req.value, req.gas, req.nonce, keccak256(req.data)))
+                sha3(abi.encode(_TYPEHASH, req.from, req.to, req.value, req.gas, req.nonce, sha3(req.data)))
             ).recover(signature);
     }
 
@@ -10461,7 +10461,7 @@ library Arrays {
         /// @solidity memory-safe-assembly
         assembly {
             mstore(0, arr.slot)
-            slot := add(keccak256(0, 0x20), pos)
+            slot := add(sha3(0, 0x20), pos)
         }
         return slot.getAddressSlot();
     }
@@ -10479,7 +10479,7 @@ library Arrays {
         /// @solidity memory-safe-assembly
         assembly {
             mstore(0, arr.slot)
-            slot := add(keccak256(0, 0x20), pos)
+            slot := add(sha3(0, 0x20), pos)
         }
         return slot.getBytes32Slot();
     }
@@ -10497,7 +10497,7 @@ library Arrays {
         /// @solidity memory-safe-assembly
         assembly {
             mstore(0, arr.slot)
-            slot := add(keccak256(0, 0x20), pos)
+            slot := add(sha3(0, 0x20), pos)
         }
         return slot.getUint256Slot();
     }
@@ -10740,7 +10740,7 @@ contract CompTimelock {
             "Timelock::queueTransaction: Estimated execution block must satisfy delay."
         );
 
-        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
+        bytes32 txHash = sha3(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = true;
 
         emit QueueTransaction(txHash, target, value, signature, data, eta);
@@ -10756,7 +10756,7 @@ contract CompTimelock {
     ) public {
         require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
 
-        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
+        bytes32 txHash = sha3(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
 
         emit CancelTransaction(txHash, target, value, signature, data, eta);
@@ -10771,7 +10771,7 @@ contract CompTimelock {
     ) public payable returns (bytes memory) {
         require(msg.sender == admin, "Timelock::executeTransaction: Call must come from admin.");
 
-        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
+        bytes32 txHash = sha3(abi.encode(target, value, signature, data, eta));
         require(queuedTransactions[txHash], "Timelock::executeTransaction: Transaction hasn't been queued.");
         require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
         require(getBlockTimestamp() <= eta + GRACE_PERIOD, "Timelock::executeTransaction: Transaction is stale.");
@@ -10783,7 +10783,7 @@ contract CompTimelock {
         if (bytes(signature).length == 0) {
             callData = data;
         } else {
-            callData = abi.encodePacked(bytes4(keccak256(bytes(signature))), data);
+            callData = abi.encodePacked(bytes4(sha3(bytes(signature))), data);
         }
 
         // solium-disable-next-line security/no-call-value
@@ -11619,7 +11619,7 @@ contract MyGovernor is
 abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
     // solhint-disable-next-line var-name-mixedcase
     bytes32 private constant _PERMIT_TYPEHASH =
-        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+        sha3("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     /**
      * @dev Permit deadline has expired.
@@ -11654,7 +11654,7 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
             revert ERC2612ExpiredSignature(deadline);
         }
 
-        bytes32 structHash = keccak256(abi.encode(_PERMIT_TYPEHASH, owner, spender, value, _useNonce(owner), deadline));
+        bytes32 structHash = sha3(abi.encode(_PERMIT_TYPEHASH, owner, spender, value, _useNonce(owner), deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
 
@@ -11944,7 +11944,7 @@ contract DummyImplementationV2 is DummyImplementation {
 abstract contract EIP712Verifier is EIP712 {
     function verify(bytes memory signature, address signer, address mailTo, string memory mailContents) external view {
         bytes32 digest = _hashTypedDataV4(
-            keccak256(abi.encode(keccak256("Mail(address to,string contents)"), mailTo, keccak256(bytes(mailContents))))
+            sha3(abi.encode(sha3("Mail(address to,string contents)"), mailTo, sha3(bytes(mailContents))))
         );
         address recoveredSigner = ECDSA.recover(digest, signature);
         require(recoveredSigner == signer);
@@ -11980,7 +11980,7 @@ contract ERC1271MaliciousMock is IERC1271 {
  */
 contract SupportsInterfaceWithLookupMock is IERC165 {
     /*
-     * bytes4(keccak256('supportsInterface(bytes4)')) == 0x01ffc9a7
+     * bytes4(sha3('supportsInterface(bytes4)')) == 0x01ffc9a7
      */
     bytes4 public constant INTERFACE_ID_ERC165 = 0x01ffc9a7;
 
@@ -12073,7 +12073,7 @@ contract ERC2771ContextMock is ContextMock, ERC2771Context {
  * live networks.
  */
 contract ERC3156FlashBorrowerMock is IERC3156FlashBorrower {
-    bytes32 internal constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 internal constant _RETURN_VALUE = sha3("ERC3156FlashBorrower.onFlashLoan");
 
     bool immutable _enableApprove;
     bool immutable _enableReturn;
@@ -13201,7 +13201,7 @@ library ERC1967Utils {
 
     /**
      * @dev The storage slot of the UpgradeableBeacon contract which defines the implementation for this proxy.
-     * This is bytes32(uint256(keccak256('eip1967.proxy.beacon')) - 1) and is validated in the constructor.
+     * This is bytes32(uint256(sha3('eip1967.proxy.beacon')) - 1) and is validated in the constructor.
      */
     // solhint-disable-next-line private-vars-leading-underscore
     bytes32 internal constant BEACON_SLOT = 0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50;
@@ -13399,7 +13399,7 @@ contract UUPSUpgradeableUnsafeMock is UUPSUpgradeableMock {
 
 contract UUPSUnsupportedProxiableUUID is UUPSUpgradeableMock {
     function proxiableUUID() external pure override returns (bytes32) {
-        return keccak256("invalid UUID");
+        return sha3("invalid UUID");
     }
 }
 
@@ -13824,7 +13824,7 @@ contract ERC20ExcessDecimalsMock {
  * _Available since v4.1._
  */
 abstract contract ERC20FlashMint is ERC20, IERC3156FlashLender {
-    bytes32 private constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 private constant _RETURN_VALUE = sha3("ERC3156FlashBorrower.onFlashLoan");
 
     /**
      * @dev The loan token is not valid.
@@ -14086,7 +14086,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     }
 
     bytes32 private constant _DELEGATION_TYPEHASH =
-        keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
+        sha3("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
     mapping(address => address) private _delegates;
     mapping(address => Checkpoint[]) private _checkpoints;
@@ -14212,7 +14212,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     ) public virtual {
         require(block.timestamp <= expiry, "ERC20Votes: signature expired");
         address signer = ECDSA.recover(
-            _hashTypedDataV4(keccak256(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
+            _hashTypedDataV4(sha3(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
             v,
             r,
             s
@@ -14314,7 +14314,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     function _unsafeAccess(Checkpoint[] storage ckpts, uint256 pos) private pure returns (Checkpoint storage result) {
         assembly {
             mstore(0, ckpts.slot)
-            result.slot := add(keccak256(0, 0x20), pos)
+            result.slot := add(sha3(0, 0x20), pos)
         }
     }
 }
@@ -15736,7 +15736,7 @@ abstract contract Proxy {
 /**
  * @dev This contract implements a proxy that gets the implementation address for each call from an {UpgradeableBeacon}.
  *
- * The beacon address is stored in storage slot `uint256(keccak256('eip1967.proxy.beacon')) - 1`, so that it doesn't
+ * The beacon address is stored in storage slot `uint256(sha3('eip1967.proxy.beacon')) - 1`, so that it doesn't
  * conflict with the storage layout of the implementation behind the proxy.
  *
  * _Available since v3.4._
@@ -15909,8 +15909,8 @@ library Clones {
             mstore(add(ptr, 0x14), implementation)
             mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73)
             mstore(add(ptr, 0x58), salt)
-            mstore(add(ptr, 0x78), keccak256(add(ptr, 0x0c), 0x37))
-            predicted := keccak256(add(ptr, 0x43), 0x55)
+            mstore(add(ptr, 0x78), sha3(add(ptr, 0x0c), 0x37))
+            predicted := sha3(add(ptr, 0x43), 0x55)
         }
     }
 
@@ -17344,7 +17344,7 @@ library Create2 {
             mstore(ptr, deployer) // Right-aligned with 12 preceding garbage bytes
             let start := add(ptr, 0x0b) // The hashed data starts at the final garbage byte which we will set to 0xff
             mstore8(start, 0xff)
-            addr := keccak256(start, 85)
+            addr := sha3(start, 85)
         }
     }
 }
@@ -17359,7 +17359,7 @@ library Create2 {
  * You will find a quickstart guide in the readme.
  *
  * WARNING: You should avoid using leaf values that are 64 bytes long prior to
- * hashing, or use a hash function other than keccak256 for hashing leaves.
+ * hashing, or use a hash function other than sha3 for hashing leaves.
  * This is because the concatenation of a sorted pair of internal nodes in
  * the merkle tree could be reinterpreted as a leaf value.
  * OpenZeppelin's JavaScript library generates merkle trees that are safe
@@ -17574,7 +17574,7 @@ library MerkleProof {
         assembly {
             mstore(0x00, a)
             mstore(0x20, b)
-            value := keccak256(0x00, 0x40)
+            value := sha3(0x00, 0x40)
         }
     }
 }

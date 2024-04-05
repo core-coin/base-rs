@@ -1,6 +1,6 @@
 #![allow(unknown_lints, clippy::incompatible_msrv)]
 
-use alloy_primitives::{keccak256, Address, B256};
+use alloy_primitives::{sha3, Address, B256};
 use criterion::{criterion_group, criterion_main, Criterion};
 use std::hint::black_box;
 
@@ -14,10 +14,10 @@ fn primitives(c: &mut Criterion) {
             black_box(x);
         })
     });
-    g.bench_function("keccak256/32", |b| {
+    g.bench_function("sha3/32", |b| {
         let mut out = B256::random();
         b.iter(|| {
-            out = keccak256(out.as_slice());
+            out = sha3(out.as_slice());
             black_box(&out);
         });
     });

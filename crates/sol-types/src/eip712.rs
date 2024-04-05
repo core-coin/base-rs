@@ -1,6 +1,6 @@
 use crate::SolValue;
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{keccak256, Address, FixedBytes, B256, U256};
+use alloy_primitives::{sha3, Address, FixedBytes, B256, U256};
 
 /// EIP-712 domain attributes used in determining the domain separator.
 ///
@@ -103,7 +103,7 @@ impl Eip712Domain {
     /// [`encodeType`](Self::encode_type) string.
     #[inline]
     pub fn type_hash(&self) -> B256 {
-        keccak256(self.encode_type().as_bytes())
+        sha3(self.encode_type().as_bytes())
     }
 
     /// Returns the number of ABI words (32 bytes) that will be used to encode
@@ -137,13 +137,13 @@ impl Eip712Domain {
 
         #[inline]
         #[allow(clippy::ptr_arg)]
-        fn cow_keccak256(s: &Cow<'_, str>) -> FixedBytes<32> {
-            keccak256(s.as_bytes())
+        fn cow_sha3(s: &Cow<'_, str>) -> FixedBytes<32> {
+            sha3(s.as_bytes())
         }
 
         out.reserve(self.abi_encoded_size());
-        encode_opt!(self.name.as_ref().map(cow_keccak256));
-        encode_opt!(self.version.as_ref().map(cow_keccak256));
+        encode_opt!(self.name.as_ref().map(cow_sha3));
+        encode_opt!(self.version.as_ref().map(cow_sha3));
         encode_opt!(&self.chain_id);
         encode_opt!(&self.verifying_contract);
         encode_opt!(&self.salt);
@@ -159,7 +159,7 @@ impl Eip712Domain {
     /// Hashes this domain according to [EIP-712 `hashStruct`](https://eips.ethereum.org/EIPS/eip-712#definition-of-hashstruct).
     #[inline]
     pub fn hash_struct(&self) -> B256 {
-        let mut hasher = alloy_primitives::Keccak256::new();
+        let mut hasher = alloy_primitives::Sha3::new();
         hasher.update(self.type_hash());
         hasher.update(self.encode_data());
         hasher.finalize()
@@ -184,7 +184,7 @@ impl Eip712Domain {
 ///
 /// ```
 /// # use alloy_sol_types::{Eip712Domain, eip712_domain};
-/// # use alloy_primitives::keccak256;
+/// # use alloy_primitives::sha3;
 /// const MY_DOMAIN: Eip712Domain = eip712_domain! {
 ///     name: "MyCoolProtocol",
 /// };
@@ -193,7 +193,7 @@ impl Eip712Domain {
 /// let my_other_domain: Eip712Domain = eip712_domain! {
 ///     name: dynamic_name,
 ///     version: "1.0.0",
-///     salt: keccak256("my domain salt"),
+///     salt: sha3("my domain salt"),
 /// };
 /// ```
 #[macro_export]

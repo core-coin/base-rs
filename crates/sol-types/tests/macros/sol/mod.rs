@@ -1,4 +1,4 @@
-use alloy_primitives::{b256, bytes, hex, keccak256, Address, I256, U256};
+use alloy_primitives::{b256, bytes, hex, sha3, Address, I256, U256};
 use alloy_sol_types::{sol, SolCall, SolError, SolEvent, SolStruct, SolType};
 use serde::Serialize;
 use serde_json::Value;
@@ -88,7 +88,7 @@ fn function() {
     let sig =
         "someFunction(uint256,string,bytes,address[],bool[2],(address,uint64),(address,uint64)[])";
     assert_eq!(someFunctionCall::SIGNATURE, sig);
-    assert_eq!(someFunctionCall::SELECTOR, keccak256(sig)[..4]);
+    assert_eq!(someFunctionCall::SELECTOR, sha3(sig)[..4]);
 
     let call = someFunctionCall {
         basic: U256::from(1),
@@ -163,7 +163,7 @@ fn error() {
 
     let sig = "SomeError(int256,bool)";
     assert_eq!(SomeError::SIGNATURE, sig);
-    assert_eq!(SomeError::SELECTOR, keccak256(sig)[..4]);
+    assert_eq!(SomeError::SELECTOR, sha3(sig)[..4]);
 
     let e = SomeError { a: I256::ZERO, b: false };
     assert_eq!(e.abi_encoded_size(), 64);

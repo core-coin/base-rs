@@ -209,7 +209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [primitives] Add a buffer type for address checksums ([#472](https://github.com/alloy-rs/core/issues/472))
 - [dyn-abi] Improve hex error messages ([#474](https://github.com/alloy-rs/core/issues/474))
 - [sol-type-parser] Improve error message for bad array size ([#470](https://github.com/alloy-rs/core/issues/470))
-- [primitives] Add Keccak256 hasher struct ([#469](https://github.com/alloy-rs/core/issues/469))
+- [primitives] Add Sha3 hasher struct ([#469](https://github.com/alloy-rs/core/issues/469))
 
 ### Miscellaneous Tasks
 

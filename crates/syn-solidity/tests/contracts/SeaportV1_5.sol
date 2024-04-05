@@ -418,7 +418,7 @@ library MemoryPointerLib {
         uint256 length
     ) internal pure returns (bytes32 _hash) {
         assembly {
-            _hash := keccak256(ptr, length)
+            _hash := sha3(ptr, length)
         }
     }
 
@@ -6613,8 +6613,8 @@ uint256 constant BasicOrder_offerItem_endAmount_ptr = 0x120;
  *   - 0x80:   Order EIP-712 typehash (constant)
  *   - 0xa0:   orderParameters.offerer
  *   - 0xc0:   orderParameters.zone
- *   - 0xe0:   keccak256(abi.encodePacked(offerHashes))
- *   - 0x100:  keccak256(abi.encodePacked(considerationHashes))
+ *   - 0xe0:   sha3(abi.encodePacked(offerHashes))
+ *   - 0x100:  sha3(abi.encodePacked(considerationHashes))
  *   - 0x120:  orderType
  *   - 0x140:  startTime
  *   - 0x160:  endTime
@@ -8610,7 +8610,7 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
             mstore(EIP712_domainData_verifyingContract_offset, address())
 
             // Hash relevant region of memory to derive the domain separator.
-            domainSeparator := keccak256(0, EIP712_domainData_size)
+            domainSeparator := sha3(0, EIP712_domainData_size)
 
             // Restore the free memory pointer.
             mstore(FreeMemoryPointerSlot, freeMemoryPointer)
@@ -8687,10 +8687,10 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
         )
     {
         // Derive hash of the name of the contract.
-        nameHash = keccak256(bytes(_nameString()));
+        nameHash = sha3(bytes(_nameString()));
 
         // Derive hash of the version string of the contract.
-        versionHash = keccak256(bytes("1.5"));
+        versionHash = sha3(bytes("1.5"));
 
         // Construct the OfferItem type string.
         bytes memory offerItemTypeString = bytes(
@@ -8712,21 +8712,21 @@ contract ConsiderationBase is ConsiderationDecoder, ConsiderationEncoder, Consid
         );
 
         // Construct the primary EIP-712 domain type string.
-        eip712DomainTypehash = keccak256(
+        eip712DomainTypehash = sha3(
             bytes("EIP712Domain(" "string name," "string version," "uint256 chainId," "address verifyingContract" ")")
         );
 
         // Derive the OfferItem type hash using the corresponding type string.
-        offerItemTypehash = keccak256(offerItemTypeString);
+        offerItemTypehash = sha3(offerItemTypeString);
 
         // Derive ConsiderationItem type hash using corresponding type string.
-        considerationItemTypehash = keccak256(considerationItemTypeString);
+        considerationItemTypehash = sha3(considerationItemTypeString);
 
         bytes memory orderTypeString =
             bytes.concat(orderComponentsPartialTypeString, considerationItemTypeString, offerItemTypeString);
 
         // Derive OrderItem type hash via combination of relevant type strings.
-        orderTypehash = keccak256(orderTypeString);
+        orderTypehash = sha3(orderTypeString);
     }
 
     /**
@@ -8957,7 +8957,7 @@ contract GettersAndDerivers is ConsiderationBase {
                 mstore(ptr, typeHash)
 
                 // Take the EIP712 hash and store it in the hash array.
-                mstore(hashArrPtr, keccak256(ptr, EIP712_OfferItem_size))
+                mstore(hashArrPtr, sha3(ptr, EIP712_OfferItem_size))
 
                 // Restore the previous word.
                 mstore(ptr, value)
@@ -8968,7 +8968,7 @@ contract GettersAndDerivers is ConsiderationBase {
             }
 
             // Derive the offer hash using the hashes of each item.
-            offerHash := keccak256(mload(FreeMemoryPointerSlot), shl(OneWordShift, offerLength))
+            offerHash := sha3(mload(FreeMemoryPointerSlot), shl(OneWordShift, offerLength))
         }
 
         // Declare a variable for the derived hash of the consideration array.
@@ -8999,7 +8999,7 @@ contract GettersAndDerivers is ConsiderationBase {
                 mstore(ptr, typeHash)
 
                 // Take the EIP712 hash and store it in the hash array.
-                mstore(hashArrPtr, keccak256(ptr, EIP712_ConsiderationItem_size))
+                mstore(hashArrPtr, sha3(ptr, EIP712_ConsiderationItem_size))
 
                 // Restore the previous word.
                 mstore(ptr, value)
@@ -9010,7 +9010,7 @@ contract GettersAndDerivers is ConsiderationBase {
             }
 
             // Derive the consideration hash using the hashes of each item.
-            considerationHash := keccak256(mload(FreeMemoryPointerSlot), shl(OneWordShift, originalConsiderationLength))
+            considerationHash := sha3(mload(FreeMemoryPointerSlot), shl(OneWordShift, originalConsiderationLength))
         }
 
         // Read order item EIP-712 typehash from runtime code & place on stack.
@@ -9052,7 +9052,7 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(counterPtr, counter)
 
             // Derive the order hash using the full range of order parameters.
-            orderHash := keccak256(typeHashPtr, EIP712_Order_size)
+            orderHash := sha3(typeHashPtr, EIP712_Order_size)
 
             // Restore the value previously held at typehash pointer location.
             mstore(typeHashPtr, previousValue)
@@ -9106,7 +9106,7 @@ contract GettersAndDerivers is ConsiderationBase {
             conduit :=
                 and(
                     // Hash the relevant region.
-                    keccak256(
+                    sha3(
                         // The region starts at memory pointer 11.
                         Create2AddressDerivation_ptr,
                         // The region is 85 bytes long (1 + 20 + 32 + 32).
@@ -9187,7 +9187,7 @@ contract GettersAndDerivers is ConsiderationBase {
             mstore(EIP712_OrderHash_offset, orderHash)
 
             // Hash the relevant region (65 bytes).
-            value := keccak256(0, EIP712_DigestPayload_size)
+            value := sha3(0, EIP712_DigestPayload_size)
 
             // Clear out the dirtied bits in the memory pointer.
             mstore(EIP712_OrderHash_offset, 0)
@@ -9501,7 +9501,7 @@ contract CounterManager is ConsiderationEventsAndErrors, ReentrancyGuard {
             mstore(OneWord, _counters.slot)
 
             // Derive the storage pointer for the counter value.
-            let storagePointer := keccak256(0, TwoWords)
+            let storagePointer := sha3(0, TwoWords)
 
             // Derive new counter value using random number and original value.
             newCounter := add(quasiRandomNumber, sload(storagePointer))
@@ -10140,12 +10140,12 @@ contract Verifiers is Assertions, SignatureVerification {
             for { let i := 1 } lt(i, height) { i := add(i, 1) } {
                 proof := add(proof, OneWord)
                 let scratchPtr := shl(OneWordShift, and(shr(i, key), 1))
-                mstore(scratchPtr, keccak256(0, TwoWords))
+                mstore(scratchPtr, sha3(0, TwoWords))
                 mstore(xor(scratchPtr, OneWord), mload(proof))
             }
 
             // Compute root hash.
-            root := keccak256(0, TwoWords)
+            root := sha3(0, TwoWords)
         }
 
         // Retrieve appropriate typehash constant based on height.
@@ -10155,7 +10155,7 @@ contract Verifiers is Assertions, SignatureVerification {
         assembly {
             mstore(0, rootTypeHash)
             mstore(OneWord, root)
-            bulkOrderHash := keccak256(0, TwoWords)
+            bulkOrderHash := sha3(0, TwoWords)
         }
     }
 
@@ -12847,7 +12847,7 @@ contract BasicOrderFulfiller is OrderValidator {
                 // array of EIP712 consideration hashes.
                 mstore(
                     BasicOrder_considerationHashesArray_ptr,
-                    keccak256(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
+                    sha3(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
                 )
 
                 /*
@@ -12941,7 +12941,7 @@ contract BasicOrderFulfiller is OrderValidator {
                     // the array of consideration hashes.
                     mstore(
                         considerationHashesPtr,
-                        keccak256(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
+                        sha3(BasicOrder_considerationItem_typeHash_ptr, EIP712_ConsiderationItem_size)
                     )
 
                     /*
@@ -12968,14 +12968,14 @@ contract BasicOrderFulfiller is OrderValidator {
 
                 /*
                  * 4. Hash packed array of ConsiderationItem EIP712 hashes:
-                 *   `keccak256(abi.encodePacked(receivedItemHashes))`
+                 *   `sha3(abi.encodePacked(receivedItemHashes))`
                  * Note that it is set at 0x60 — all other memory begins at
                  * 0x80. 0x60 is the "zero slot" and will be restored at the end
                  * of the assembly section and before required by the compiler.
                  */
                 mstore(
                     receivedItemsHash_ptr,
-                    keccak256(
+                    sha3(
                         BasicOrder_considerationHashesArray_ptr, shl(OneWordShift, add(totalAdditionalRecipients, 1))
                     )
                 )
@@ -13070,15 +13070,15 @@ contract BasicOrderFulfiller is OrderValidator {
                 calldatacopy(BasicOrder_offerItem_endAmount_ptr, BasicOrder_offerAmount_cdPtr, OneWord)
 
                 // Compute EIP712 OfferItem hash, write result to scratch space:
-                //   `keccak256(abi.encode(offeredItem))`
-                mstore(0, keccak256(BasicOrder_offerItem_typeHash_ptr, EIP712_OfferItem_size))
+                //   `sha3(abi.encode(offeredItem))`
+                mstore(0, sha3(BasicOrder_offerItem_typeHash_ptr, EIP712_OfferItem_size))
 
                 /*
                  * 2. Calculate hash of array of EIP712 hashes and write the
                  * result to the corresponding OfferItem struct:
-                 *   `keccak256(abi.encodePacked(offerItemHashes))`
+                 *   `sha3(abi.encodePacked(offerItemHashes))`
                  */
-                mstore(BasicOrder_order_offerHashes_ptr, keccak256(0, OneWord))
+                mstore(BasicOrder_order_offerHashes_ptr, sha3(0, OneWord))
 
                 /*
                  * 3. Write SpentItem to offer array in OrderFulfilled event.
@@ -13112,8 +13112,8 @@ contract BasicOrderFulfiller is OrderValidator {
              *   - 0x80:   Order EIP-712 typehash (constant)
              *   - 0xa0:   orderParameters.offerer
              *   - 0xc0:   orderParameters.zone
-             *   - 0xe0:   keccak256(abi.encodePacked(offerHashes))
-             *   - 0x100:  keccak256(abi.encodePacked(considerationHashes))
+             *   - 0xe0:   sha3(abi.encodePacked(offerHashes))
+             *   - 0x100:  sha3(abi.encodePacked(considerationHashes))
              *   - 0x120:  orderParameters.basicOrderType (% 4 = orderType)
              *   - 0x140:  orderParameters.startTime
              *   - 0x160:  orderParameters.endTime
@@ -13157,7 +13157,7 @@ contract BasicOrderFulfiller is OrderValidator {
                 mstore(BasicOrder_order_counter_ptr, counter)
 
                 // Compute the EIP712 Order hash.
-                orderHash := keccak256(BasicOrder_order_typeHash_ptr, EIP712_Order_size)
+                orderHash := sha3(BasicOrder_order_typeHash_ptr, EIP712_Order_size)
             }
         }
 
@@ -13821,7 +13821,7 @@ contract CriteriaResolution is CriteriaResolutionErrors {
             mstore(0, leaf)
 
             // Derive the hash of the leaf to use as the initial proof element.
-            let computedHash := keccak256(0, OneWord)
+            let computedHash := sha3(0, OneWord)
 
             // Get memory start location of the first element in proof array.
             let data := add(proof, OneWord)
@@ -13848,7 +13848,7 @@ contract CriteriaResolution is CriteriaResolutionErrors {
                 mstore(xor(scratch, OneWord), loadedData)
 
                 // Derive the updated hash.
-                computedHash := keccak256(0, TwoWords)
+                computedHash := sha3(0, TwoWords)
             }
 
             // Compare the final hash to the supplied root.
@@ -14736,7 +14736,7 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     )
 
                     // Calculate the hash of (itemType, token, identifier).
-                    dataHash := keccak256(receivedItem, ReceivedItem_CommonParams_size)
+                    dataHash := sha3(receivedItem, ReceivedItem_CommonParams_size)
 
                     // If component index > 0, swap component pointer with
                     // pointer to first component so that any remainder after
@@ -14761,7 +14761,7 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                             )
                         ),
                         // The itemType, token, and identifier must match.
-                        xor(dataHash, keccak256(offerItemPtr, ReceivedItem_CommonParams_size))
+                        xor(dataHash, sha3(offerItemPtr, ReceivedItem_CommonParams_size))
                     ) {
                         // Throw if any of the requirements are not met.
                         throwInvalidFulfillmentComponentData()
@@ -14958,7 +14958,7 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                     // recipient). This is run after amount is set to zero, so
                     // there will be one blank word after identifier included in
                     // the hash buffer.
-                    dataHash := keccak256(considerationItemPtr, ReceivedItem_size)
+                    dataHash := sha3(considerationItemPtr, ReceivedItem_size)
 
                     // If component index > 0, swap component pointer with
                     // pointer to first component so that any remainder after
@@ -14979,7 +14979,7 @@ contract FulfillmentApplier is FulfillmentApplicationErrors {
                         // recipient). This is run after amount is set to zero,
                         // so there will be one blank word after identifier
                         // included in the hash buffer.
-                        keccak256(considerationItemPtr, ReceivedItem_size)
+                        sha3(considerationItemPtr, ReceivedItem_size)
                     ) {
                         // Throw if any of the requirements are not met.
                         throwInvalidFulfillmentComponentData()

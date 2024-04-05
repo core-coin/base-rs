@@ -1,4 +1,4 @@
-use alloy_primitives::{hex, keccak256, U256};
+use alloy_primitives::{hex, sha3, U256};
 use alloy_sol_types::{sol, SolCall, SolError};
 
 sol! {
@@ -56,10 +56,10 @@ fn error() {
 
 fn assert_call_signature<T: SolCall>(expected: &str) {
     assert_eq!(T::SIGNATURE, expected);
-    assert_eq!(T::SELECTOR, keccak256(expected)[..4]);
+    assert_eq!(T::SELECTOR, sha3(expected)[..4]);
 }
 
 fn assert_error_signature<T: SolError>(expected: &str) {
     assert_eq!(T::SIGNATURE, expected);
-    assert_eq!(T::SELECTOR, keccak256(expected)[..4]);
+    assert_eq!(T::SELECTOR, sha3(expected)[..4]);
 }

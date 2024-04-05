@@ -1,6 +1,6 @@
 use crate::{abi::token::WordToken, sol_data::*, SolType};
 use alloc::vec::Vec;
-use alloy_primitives::keccak256;
+use alloy_primitives::sha3;
 
 /// A Solidity event topic.
 ///
@@ -113,7 +113,7 @@ macro_rules! bytes_impl {
 
         #[inline]
         fn encode_topic(rust: &Self::RustType) -> WordToken {
-            WordToken(keccak256(rust))
+            WordToken(sha3(rust))
         }
     };
 }
@@ -146,7 +146,7 @@ macro_rules! array_impl {
         fn encode_topic(rust: &Self::RustType) -> WordToken {
             let mut out = Vec::new();
             Self::encode_topic_preimage(rust, &mut out);
-            WordToken(keccak256(out))
+            WordToken(sha3(out))
         }
     };
 }
@@ -182,7 +182,7 @@ macro_rules! tuple_impls {
             fn encode_topic(rust: &Self::RustType) -> WordToken {
                 let mut out = Vec::new();
                 Self::encode_topic_preimage(rust, &mut out);
-                WordToken(keccak256(out))
+                WordToken(sha3(out))
             }
         }
     };

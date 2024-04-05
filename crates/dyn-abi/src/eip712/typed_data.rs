@@ -3,7 +3,7 @@ use crate::{
     DynSolType, DynSolValue, Result,
 };
 use alloc::{collections::BTreeMap, string::String, vec::Vec};
-use alloy_primitives::{keccak256, B256};
+use alloy_primitives::{sha3, B256};
 use alloy_sol_types::{Eip712Domain, SolStruct};
 use derive_more::{Deref, DerefMut, From, Into, IntoIterator};
 use parser::TypeSpecifier;
@@ -166,7 +166,7 @@ impl TypedData {
     ///
     /// [`encodeType`]: https://eips.ethereum.org/EIPS/eip-712#definition-of-encodetype
     pub fn type_hash(&self) -> Result<B256> {
-        self.encode_type().map(keccak256)
+        self.encode_type().map(sha3)
     }
 
     /// Calculate the [`hashStruct`] for this value.
@@ -177,7 +177,7 @@ impl TypedData {
     pub fn hash_struct(&self) -> Result<B256> {
         let mut type_hash = self.type_hash()?.to_vec();
         type_hash.extend(self.encode_data()?);
-        Ok(keccak256(type_hash))
+        Ok(sha3(type_hash))
     }
 
     /// Calculate the [`encodeData`] for this value.
@@ -217,7 +217,7 @@ impl TypedData {
             34
         };
 
-        Ok(keccak256(&buf[..len]))
+        Ok(sha3(&buf[..len]))
     }
 }
 

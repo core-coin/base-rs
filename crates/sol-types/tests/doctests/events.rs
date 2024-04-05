@@ -1,6 +1,6 @@
 #![allow(clippy::assertions_on_constants)]
 
-use alloy_primitives::{hex, keccak256, Bytes, Log, B256, U256};
+use alloy_primitives::{hex, sha3, Bytes, Log, B256, U256};
 use alloy_rlp::{Decodable, Encodable};
 use alloy_sol_types::{abi::token::WordToken, sol, SolEvent};
 
@@ -30,16 +30,16 @@ fn event() {
     let event = MyEvent {
         a: [0x11; 32].into(),
         b: U256::from(1u64),
-        c: keccak256("Hello World"),
+        c: sha3("Hello World"),
         d: Bytes::default(),
     };
-    // topics are `(SELECTOR, a, keccak256(c))`
+    // topics are `(SELECTOR, a, sha3(c))`
     assert_eq!(
         event.encode_topics_array::<3>(),
         [
             WordToken(MyEvent::SIGNATURE_HASH),
             WordToken(B256::repeat_byte(0x11)),
-            WordToken(keccak256("Hello World"))
+            WordToken(sha3("Hello World"))
         ]
     );
     // dynamic data is `abi.abi_encode(b, d)`
@@ -67,7 +67,7 @@ fn event_rlp_roundtrip() {
     let event = MyEvent {
         a: [0x11; 32].into(),
         b: U256::from(1u64),
-        c: keccak256("Hello World"),
+        c: sha3("Hello World"),
         d: Vec::new().into(),
     };
 
@@ -87,5 +87,5 @@ fn event_rlp_roundtrip() {
 
 fn assert_event_signature<T: SolEvent>(expected: &str) {
     assert_eq!(T::SIGNATURE, expected);
-    assert_eq!(T::SIGNATURE_HASH, keccak256(expected));
+    assert_eq!(T::SIGNATURE_HASH, sha3(expected));
 }

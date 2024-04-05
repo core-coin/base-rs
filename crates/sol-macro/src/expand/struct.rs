@@ -164,7 +164,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, s: &ItemStruct) -> Result<TokenStream> {
                     let mut out = alloy_sol_types::private::Vec::new();
                     <Self as alloy_sol_types::EventTopic>::encode_topic_preimage(rust, &mut out);
                     alloy_sol_types::abi::token::WordToken(
-                        alloy_sol_types::private::keccak256(out)
+                        alloy_sol_types::private::sha3(out)
                     )
                 }
             }

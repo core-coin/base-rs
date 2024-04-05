@@ -1,4 +1,4 @@
-use crate::{keccak256, Address, FixedBytes};
+use crate::{sha3, Address, FixedBytes};
 use core::{borrow::Borrow, fmt, str};
 use ruint::aliases::U176;
 
@@ -92,7 +92,7 @@ impl ChecksumAddress {
 
     /// Computes the `create` address for this address and nonce:
     ///
-    /// `keccak256(rlp([sender, nonce]))[12:]`
+    /// `sha3(rlp([sender, nonce]))[12:]`
     ///
     /// # Examples
     ///
@@ -112,7 +112,7 @@ impl ChecksumAddress {
     pub fn create(&self, nonce: u64) -> Self {
         use alloy_rlp::{Encodable, EMPTY_LIST_CODE, EMPTY_STRING_CODE};
 
-        use crate::keccak256;
+        use crate::sha3;
 
         // max u64 encoded length is `1 + u64::BYTES`
         const MAX_LEN: usize = 1 + (1 + 20) + 9;
@@ -133,14 +133,14 @@ impl ChecksumAddress {
         // nonce
         nonce.encode(&mut &mut out[22..]);
 
-        let hash = keccak256(&out[..len]);
+        let hash = sha3(&out[..len]);
         Self::from_word(hash)
     }
 
     /// Computes the `CREATE2` address of a smart contract as specified in
     /// [EIP-1014]:
     ///
-    /// `keccak256(0xff ++ address ++ salt ++ keccak256(init_code))[12:]`
+    /// `sha3(0xff ++ address ++ salt ++ sha3(init_code))[12:]`
     ///
     /// The `init_code` is the code that, when executed, produces the runtime
     /// bytecode that will be placed into the state, and which typically is used
@@ -165,13 +165,13 @@ impl ChecksumAddress {
         S: Borrow<[u8; 32]>,
         C: AsRef<[u8]>,
     {
-        self._create2(salt.borrow(), &keccak256(init_code.as_ref()).0)
+        self._create2(salt.borrow(), &sha3(init_code.as_ref()).0)
     }
 
     /// Computes the `CREATE2` address of a smart contract as specified in
     /// [EIP-1014], taking the pre-computed hash of the init code as input:
     ///
-    /// `keccak256(0xff ++ address ++ salt ++ init_code_hash)[12:]`
+    /// `sha3(0xff ++ address ++ salt ++ init_code_hash)[12:]`
     ///
     /// The `init_code` is the code that, when executed, produces the runtime
     /// bytecode that will be placed into the state, and which typically is used
@@ -208,7 +208,7 @@ impl ChecksumAddress {
         bytes[1..21].copy_from_slice(self.as_slice());
         bytes[21..53].copy_from_slice(salt);
         bytes[53..85].copy_from_slice(init_code_hash);
-        let hash = keccak256(bytes);
+        let hash = sha3(bytes);
         Self::from_word(hash)
     }
 
@@ -219,7 +219,7 @@ impl ChecksumAddress {
     /// If the input is not exactly 64 bytes
     pub fn from_raw_public_key(pubkey: &[u8]) -> Self {
         assert_eq!(pubkey.len(), 64, "raw public key must be 64 bytes");
-        let digest = keccak256(pubkey);
+        let digest = sha3(pubkey);
         Self::from_slice(&digest[12..])
     }
 
@@ -281,7 +281,7 @@ mod tests {
     //         address.encode(&mut out);
     //         nonce.encode(&mut out);
     //
-    //         Address::from_word(keccak256(out))
+    //         Address::from_word(sha3(out))
     //     }
     //
     //     proptest::proptest!(|(address: Address, nonce: u64)| {
@@ -326,7 +326,7 @@ mod tests {
     //         (
     //             "00000000000000000000000000000000deadbeef",
     //             "00000000000000000000000000000000000000000000000000000000cafebabe",
-    //             
+    //
     // "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
     //             "1d8bfDC5D46DC4f61D6b6115972536eBE6A8854C",
     //         ),
@@ -344,7 +344,7 @@ mod tests {
     //         let salt: [u8; 32] = salt.try_into().unwrap();
     //
     //         let init_code = hex::decode(init_code).unwrap();
-    //         let init_code_hash = keccak256(&init_code);
+    //         let init_code_hash = sha3(&init_code);
     //
     //         let expected = expected.parse::<Address>().unwrap();
     //

@@ -72,7 +72,7 @@ yul_evm_builtin_enum_builder!(
     Addmod(kw::addmod),
     Mulmod(kw::mulmod),
     Signextend(kw::signextend),
-    Keccak256(kw::keccak256),
+    Sha3(kw::sha3),
     Pop(kw::pop),
     Mload(kw::mload),
     Mstore(kw::mstore),

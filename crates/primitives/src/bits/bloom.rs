@@ -2,7 +2,7 @@
 //!
 //! Adapted from <https://github.com/paritytech/parity-common/blob/2fb72eea96b6de4a085144ce239feb49da0cd39e/ethbloom/src/lib.rs>
 
-use crate::{keccak256, Address, Log, LogData, B256};
+use crate::{sha3, Address, Log, LogData, B256};
 
 /// Number of bits to set per input in Ethereum bloom filter.
 pub const BLOOM_BITS_PER_ITEM: usize = 3;
@@ -35,7 +35,7 @@ impl BloomInput<'_> {
     #[inline]
     pub fn into_hash(self) -> B256 {
         match self {
-            BloomInput::Raw(raw) => keccak256(raw),
+            BloomInput::Raw(raw) => sha3(raw),
             BloomInput::Hash(hash) => hash,
         }
     }
@@ -177,7 +177,7 @@ impl Bloom {
     ///
     /// [ref]: https://ethereum.github.io/yellowpaper/paper.pdf
     pub fn m3_2048(&mut self, bytes: &[u8]) {
-        self.m3_2048_hashed(&keccak256(bytes));
+        self.m3_2048_hashed(&sha3(bytes));
     }
 
     /// [`m3_2048`](Self::m3_2048) but with a pre-hashed input.

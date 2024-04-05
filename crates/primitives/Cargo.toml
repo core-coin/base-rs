@@ -23,8 +23,7 @@ hex-literal.workspace = true
 hex.workspace = true
 itoa.workspace = true
 ruint.workspace = true
-tiny-keccak = { workspace = true, features = ["keccak"] }
-keccak-asm = { workspace = true, optional = true }
+tiny-keccak = { workspace = true, features = ["sha3"] }
 
 # macros
 derive_more.workspace = true
@@ -72,7 +71,6 @@ std = [
     "hex/std",
     "ruint/std",
     "alloy-rlp?/std",
-    "keccak-asm?/std",
     "proptest?/std",
     "rand?/std",
     "serde?/std",
@@ -81,7 +79,6 @@ std = [
 
 tiny-keccak = []
 native-keccak = []
-asm-keccak = ["dep:keccak-asm"]
 
 postgres = ["std", "dep:postgres-types", "ruint/postgres"]
 getrandom = ["dep:getrandom"]

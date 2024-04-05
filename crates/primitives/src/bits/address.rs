@@ -1,4 +1,4 @@
-use crate::{aliases::U160, utils::keccak256, ChecksumAddress, FixedBytes};
+use crate::{aliases::U160, utils::sha3, ChecksumAddress, FixedBytes};
 use core::{fmt, str};
 use ruint::aliases::U256;
 
@@ -195,7 +195,7 @@ impl Address {
     /// If the input is not exactly 64 bytes
     pub fn from_raw_public_key(pubkey: &[u8]) -> Self {
         assert_eq!(pubkey.len(), 114, "raw public key must be 64 bytes");
-        let digest = keccak256(pubkey);
+        let digest = sha3(pubkey);
         Self::from_slice(&digest[12..])
     }
 

@@ -2,21 +2,14 @@
 
 use crate::B256;
 use alloc::{boxed::Box, collections::TryReserveError, vec::Vec};
-use cfg_if::cfg_if;
 use core::{fmt, mem::MaybeUninit};
 
 mod units;
 pub use units::{
     format_ether, format_units, parse_ether, parse_units, ParseUnits, Unit, UnitsError,
 };
+use tiny_keccak::Hasher as _;
 
-cfg_if! {
-    if #[cfg(all(feature = "asm-keccak", not(miri)))] {
-        use keccak_asm::Digest as _;
-    } else {
-        use tiny_keccak::Hasher as _;
-    }
-}
 
 #[doc(hidden)]
 #[deprecated(since = "0.5.0", note = "use `Unit::ETHER.wei()` instead")]
@@ -27,7 +20,7 @@ pub const WEI_IN_ETHER: crate::U256 = Unit::ETHER.wei_const();
 pub type Units = Unit;
 
 /// The prefix used for hashing messages according to EIP-191.
-pub const EIP191_PREFIX: &str = "\x19Ethereum Signed Message:\n";
+pub const EIP191_PREFIX: &str = "\x19CoreSigned Message:\n";
 
 /// Tries to create a `Vec` of `n` elements, each initialized to `elem`.
 #[macro_export]
@@ -113,11 +106,11 @@ pub fn vec_try_from_elem<T: Clone>(elem: T, n: usize) -> Result<Vec<T>, TryReser
 /// The final message is a UTF-8 string, encoded as follows:
 /// `"\x19Ethereum Signed Message:\n" + message.length + message`
 ///
-/// This message is then hashed using [Keccak-256](keccak256).
+/// This message is then hashed using [Keccak-256](sha3).
 ///
 /// [EIP-191]: https://eips.ethereum.org/EIPS/eip-191
 pub fn eip191_hash_message<T: AsRef<[u8]>>(message: T) -> B256 {
-    keccak256(eip191_message(message))
+    sha3(eip191_message(message))
 }
 
 /// Constructs a message according to [EIP-191] (version `0x01`).
@@ -145,46 +138,19 @@ pub fn eip191_message<T: AsRef<[u8]>>(message: T) -> Vec<u8> {
 /// Simple interface to the [`Keccak-256`] hash function.
 ///
 /// [`Keccak-256`]: https://en.wikipedia.org/wiki/SHA-3
-pub fn keccak256<T: AsRef<[u8]>>(bytes: T) -> B256 {
-    fn keccak256(bytes: &[u8]) -> B256 {
+pub fn sha3<T: AsRef<[u8]>>(bytes: T) -> B256 {
+    fn sha3(bytes: &[u8]) -> B256 {
         let mut output = MaybeUninit::<B256>::uninit();
-
-        cfg_if! {
-            if #[cfg(all(feature = "native-keccak", not(feature = "tiny-keccak"), not(miri)))] {
-                #[link(wasm_import_module = "vm_hooks")]
-                extern "C" {
-                    /// When targeting VMs with native keccak hooks, the `native-keccak` feature
-                    /// can be enabled to import and use the host environment's implementation
-                    /// of [`keccak256`] in place of [`tiny_keccak`]. This is overridden when
-                    /// the `tiny-keccak` feature is enabled.
-                    ///
-                    /// # Safety
-                    ///
-                    /// The VM accepts the preimage by pointer and length, and writes the
-                    /// 32-byte hash.
-                    /// - `bytes` must point to an input buffer at least `len` long.
-                    /// - `output` must point to a buffer that is at least 32-bytes long.
-                    ///
-                    /// [`keccak256`]: https://en.wikipedia.org/wiki/SHA-3
-                    /// [`tiny_keccak`]: https://docs.rs/tiny-keccak/latest/tiny_keccak/
-                    fn native_keccak256(bytes: *const u8, len: usize, output: *mut u8);
-                }
-
-                // SAFETY: The output is 32-bytes, and the input comes from a slice.
-                unsafe { native_keccak256(bytes.as_ptr(), bytes.len(), output.as_mut_ptr().cast::<u8>()) };
-            } else {
-                let mut hasher = Keccak256::new();
-                hasher.update(bytes);
-                // SAFETY: Never reads from `output`.
-                unsafe { hasher.finalize_into_raw(output.as_mut_ptr().cast()) };
-            }
-        }
+        let mut hasher = Sha3::new();
+        hasher.update(bytes);
+        // SAFETY: Never reads from `output`.
+        unsafe { hasher.finalize_into_raw(output.as_mut_ptr().cast()) };
 
         // SAFETY: Initialized above.
         unsafe { output.assume_init() }
     }
 
-    keccak256(bytes.as_ref())
+    sha3(bytes.as_ref())
 }
 
 /// Simple [`Keccak-256`] hasher.
@@ -194,39 +160,29 @@ pub fn keccak256<T: AsRef<[u8]>>(bytes: T) -> B256 {
 ///
 /// [`Keccak-256`]: https://en.wikipedia.org/wiki/SHA-3
 #[derive(Clone)]
-pub struct Keccak256 {
-    #[cfg(all(feature = "asm-keccak", not(miri)))]
-    hasher: keccak_asm::Keccak256,
-    #[cfg(not(all(feature = "asm-keccak", not(miri))))]
-    hasher: tiny_keccak::Keccak,
+pub struct Sha3 {
+    hasher: tiny_keccak::Sha3,
 }
 
-impl Default for Keccak256 {
+impl Default for Sha3 {
     #[inline]
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl fmt::Debug for Keccak256 {
+impl fmt::Debug for Sha3 {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Keccak256").finish_non_exhaustive()
+        f.debug_struct("Sha3").finish_non_exhaustive()
     }
 }
 
-impl Keccak256 {
-    /// Creates a new [`Keccak256`] hasher.
+impl Sha3 {
+    /// Creates a new [`Sha3`] hasher.
     #[inline]
     pub fn new() -> Self {
-        cfg_if! {
-            if #[cfg(all(feature = "asm-keccak", not(miri)))] {
-                let hasher = keccak_asm::Keccak256::new();
-            } else {
-                let hasher = tiny_keccak::Keccak::v256();
-            }
-        }
-        Self { hasher }
+        Self { hasher: tiny_keccak::Sha3::v256() }
     }
 
     /// Absorbs additional input. Can be called multiple times.
@@ -259,13 +215,7 @@ impl Keccak256 {
     /// Pad and squeeze the state into `output`.
     #[inline]
     pub fn finalize_into_array(self, output: &mut [u8; 32]) {
-        cfg_if! {
-            if #[cfg(all(feature = "asm-keccak", not(miri)))] {
-                self.hasher.finalize_into(output.into());
-            } else {
-                self.hasher.finalize(output);
-            }
-        }
+        self.hasher.finalize(output);
     }
 
     /// Pad and squeeze the state into `output`.
@@ -289,7 +239,7 @@ mod tests {
     fn test_hash_message() {
         let msg = "Hello World";
         let eip191_msg = eip191_message(msg);
-        let hash = keccak256(&eip191_msg);
+        let hash = sha3(&eip191_msg);
         assert_eq!(
             eip191_msg,
             [EIP191_PREFIX.as_bytes(), msg.len().to_string().as_bytes(), msg.as_bytes()].concat()
@@ -299,11 +249,11 @@ mod tests {
     }
 
     #[test]
-    fn keccak256_hasher() {
+    fn sha3_hasher() {
         let expected = b256!("47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad");
-        assert_eq!(keccak256("hello world"), expected);
+        assert_eq!(sha3("hello world"), expected);
 
-        let mut hasher = Keccak256::new();
+        let mut hasher = Sha3::new();
         hasher.update(b"hello");
         hasher.update(b" world");
 

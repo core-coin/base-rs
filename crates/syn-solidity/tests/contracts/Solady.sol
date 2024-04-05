@@ -69,15 +69,15 @@ abstract contract Ownable {
     /// @dev The ownership handover to `pendingOwner` has been canceled.
     event OwnershipHandoverCanceled(address indexed pendingOwner);
 
-    /// @dev `keccak256(bytes("OwnershipTransferred(address,address)"))`.
+    /// @dev `sha3(bytes("OwnershipTransferred(address,address)"))`.
     uint256 private constant _OWNERSHIP_TRANSFERRED_EVENT_SIGNATURE =
         0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0;
 
-    /// @dev `keccak256(bytes("OwnershipHandoverRequested(address)"))`.
+    /// @dev `sha3(bytes("OwnershipHandoverRequested(address)"))`.
     uint256 private constant _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE =
         0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d;
 
-    /// @dev `keccak256(bytes("OwnershipHandoverCanceled(address)"))`.
+    /// @dev `sha3(bytes("OwnershipHandoverCanceled(address)"))`.
     uint256 private constant _OWNERSHIP_HANDOVER_CANCELED_EVENT_SIGNATURE =
         0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92;
 
@@ -95,7 +95,7 @@ abstract contract Ownable {
     /// The ownership handover slot of `newOwner` is given by:
     /// ```
     ///     mstore(0x00, or(shl(96, user), _HANDOVER_SLOT_SEED))
-    ///     let handoverSlot := keccak256(0x00, 0x20)
+    ///     let handoverSlot := sha3(0x00, 0x20)
     /// ```
     /// It stores the expiry timestamp of the two-step ownership handover.
     uint256 private constant _HANDOVER_SLOT_SEED = 0x389a75e1;
@@ -180,7 +180,7 @@ abstract contract Ownable {
                 // Compute and set the handover slot to `expires`.
                 mstore(0x0c, _HANDOVER_SLOT_SEED)
                 mstore(0x00, caller())
-                sstore(keccak256(0x0c, 0x20), expires)
+                sstore(sha3(0x0c, 0x20), expires)
                 // Emit the {OwnershipHandoverRequested} event.
                 log2(0, 0, _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE, caller())
             }
@@ -194,7 +194,7 @@ abstract contract Ownable {
             // Compute and set the handover slot to 0.
             mstore(0x0c, _HANDOVER_SLOT_SEED)
             mstore(0x00, caller())
-            sstore(keccak256(0x0c, 0x20), 0)
+            sstore(sha3(0x0c, 0x20), 0)
             // Emit the {OwnershipHandoverCanceled} event.
             log2(0, 0, _OWNERSHIP_HANDOVER_CANCELED_EVENT_SIGNATURE, caller())
         }
@@ -208,7 +208,7 @@ abstract contract Ownable {
             // Compute and set the handover slot to 0.
             mstore(0x0c, _HANDOVER_SLOT_SEED)
             mstore(0x00, pendingOwner)
-            let handoverSlot := keccak256(0x0c, 0x20)
+            let handoverSlot := sha3(0x0c, 0x20)
             // If the handover does not exist, or has expired.
             if gt(timestamp(), sload(handoverSlot)) {
                 mstore(0x00, 0x6f5e8818) // `NoHandoverRequest()`.
@@ -245,7 +245,7 @@ abstract contract Ownable {
             mstore(0x0c, _HANDOVER_SLOT_SEED)
             mstore(0x00, pendingOwner)
             // Load the handover slot.
-            result := sload(keccak256(0x0c, 0x20))
+            result := sload(sha3(0x0c, 0x20))
         }
     }
 
@@ -279,7 +279,7 @@ abstract contract OwnableRoles is Ownable {
     /// Each bit of `roles` represents whether the role is set.
     event RolesUpdated(address indexed user, uint256 indexed roles);
 
-    /// @dev `keccak256(bytes("RolesUpdated(address,uint256)"))`.
+    /// @dev `sha3(bytes("RolesUpdated(address,uint256)"))`.
     uint256 private constant _ROLES_UPDATED_EVENT_SIGNATURE =
         0x715ad5ce61fc9595c7b415289d59cf203f23a94fa06f04af7e489a0a76e1fe26;
 
@@ -290,10 +290,10 @@ abstract contract OwnableRoles is Ownable {
     /// @dev The role slot of `user` is given by:
     /// ```
     ///     mstore(0x00, or(shl(96, user), _ROLE_SLOT_SEED))
-    ///     let roleSlot := keccak256(0x00, 0x20)
+    ///     let roleSlot := sha3(0x00, 0x20)
     /// ```
     /// This automatically ignores the upper bits of the `user` in case
-    /// they are not clean, as well as keep the `keccak256` under 32-bytes.
+    /// they are not clean, as well as keep the `sha3` under 32-bytes.
     ///
     /// Note: This is equal to `_OWNER_SLOT_NOT` in for gas efficiency.
     uint256 private constant _ROLE_SLOT_SEED = 0x8b78c6d8;
@@ -310,7 +310,7 @@ abstract contract OwnableRoles is Ownable {
             // Compute the role slot.
             mstore(0x0c, _ROLE_SLOT_SEED)
             mstore(0x00, user)
-            let roleSlot := keccak256(0x0c, 0x20)
+            let roleSlot := sha3(0x0c, 0x20)
             // Load the current value and `or` it with `roles`.
             roles := or(sload(roleSlot), roles)
             // Store the new value.
@@ -328,7 +328,7 @@ abstract contract OwnableRoles is Ownable {
             // Compute the role slot.
             mstore(0x0c, _ROLE_SLOT_SEED)
             mstore(0x00, user)
-            let roleSlot := keccak256(0x0c, 0x20)
+            let roleSlot := sha3(0x0c, 0x20)
             // Load the current value.
             let currentRoles := sload(roleSlot)
             // Use `and` to compute the intersection of `currentRoles` and `roles`,
@@ -350,7 +350,7 @@ abstract contract OwnableRoles is Ownable {
             mstore(0x00, caller())
             // Load the stored value, and if the `and` intersection
             // of the value and `roles` is zero, revert.
-            if iszero(and(sload(keccak256(0x0c, 0x20)), roles)) {
+            if iszero(and(sload(sha3(0x0c, 0x20)), roles)) {
                 mstore(0x00, 0x82b42900) // `Unauthorized()`.
                 revert(0x1c, 0x04)
             }
@@ -371,7 +371,7 @@ abstract contract OwnableRoles is Ownable {
                 mstore(0x00, caller())
                 // Load the stored value, and if the `and` intersection
                 // of the value and `roles` is zero, revert.
-                if iszero(and(sload(keccak256(0x0c, 0x20)), roles)) {
+                if iszero(and(sload(sha3(0x0c, 0x20)), roles)) {
                     mstore(0x00, 0x82b42900) // `Unauthorized()`.
                     revert(0x1c, 0x04)
                 }
@@ -390,7 +390,7 @@ abstract contract OwnableRoles is Ownable {
             mstore(0x00, caller())
             // Load the stored value, and if the `and` intersection
             // of the value and `roles` is zero, revert.
-            if iszero(and(sload(keccak256(0x0c, 0x20)), roles)) {
+            if iszero(and(sload(sha3(0x0c, 0x20)), roles)) {
                 // If the caller is not the stored owner.
                 // Note: `_ROLE_SLOT_SEED` is equal to `_OWNER_SLOT_NOT`.
                 if iszero(eq(caller(), sload(not(_ROLE_SLOT_SEED)))) {
@@ -436,7 +436,7 @@ abstract contract OwnableRoles is Ownable {
             mstore(0x00, user)
             // Load the stored value, and set the result to whether the
             // `and` intersection of the value and `roles` is not zero.
-            result := iszero(iszero(and(sload(keccak256(0x0c, 0x20)), roles)))
+            result := iszero(iszero(and(sload(sha3(0x0c, 0x20)), roles)))
         }
     }
 
@@ -448,7 +448,7 @@ abstract contract OwnableRoles is Ownable {
             mstore(0x0c, _ROLE_SLOT_SEED)
             mstore(0x00, user)
             // Whether the stored value is contains all the set bits in `roles`.
-            result := eq(and(sload(keccak256(0x0c, 0x20)), roles), roles)
+            result := eq(and(sload(sha3(0x0c, 0x20)), roles), roles)
         }
     }
 
@@ -460,7 +460,7 @@ abstract contract OwnableRoles is Ownable {
             mstore(0x0c, _ROLE_SLOT_SEED)
             mstore(0x00, user)
             // Load the stored value.
-            roles := sload(keccak256(0x0c, 0x20))
+            roles := sload(sha3(0x0c, 0x20))
         }
     }
 
@@ -839,11 +839,11 @@ abstract contract ERC20 {
     /// @dev Emitted when `amount` tokens is approved by `owner` to be used by `spender`.
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 
-    /// @dev `keccak256(bytes("Transfer(address,address,uint256)"))`.
+    /// @dev `sha3(bytes("Transfer(address,address,uint256)"))`.
     uint256 private constant _TRANSFER_EVENT_SIGNATURE =
         0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
 
-    /// @dev `keccak256(bytes("Approval(address,address,uint256)"))`.
+    /// @dev `sha3(bytes("Approval(address,address,uint256)"))`.
     uint256 private constant _APPROVAL_EVENT_SIGNATURE =
         0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925;
 
@@ -858,7 +858,7 @@ abstract contract ERC20 {
     /// ```
     ///     mstore(0x0c, _BALANCE_SLOT_SEED)
     ///     mstore(0x00, owner)
-    ///     let balanceSlot := keccak256(0x0c, 0x20)
+    ///     let balanceSlot := sha3(0x0c, 0x20)
     /// ```
     uint256 private constant _BALANCE_SLOT_SEED = 0x87a211a2;
 
@@ -867,7 +867,7 @@ abstract contract ERC20 {
     ///     mstore(0x20, spender)
     ///     mstore(0x0c, _ALLOWANCE_SLOT_SEED)
     ///     mstore(0x00, owner)
-    ///     let allowanceSlot := keccak256(0x0c, 0x34)
+    ///     let allowanceSlot := sha3(0x0c, 0x34)
     /// ```
     uint256 private constant _ALLOWANCE_SLOT_SEED = 0x7f5e9f20;
 
@@ -875,7 +875,7 @@ abstract contract ERC20 {
     /// ```
     ///     mstore(0x0c, _NONCES_SLOT_SEED)
     ///     mstore(0x00, owner)
-    ///     let nonceSlot := keccak256(0x0c, 0x20)
+    ///     let nonceSlot := sha3(0x0c, 0x20)
     /// ```
     uint256 private constant _NONCES_SLOT_SEED = 0x38377508;
 
@@ -912,7 +912,7 @@ abstract contract ERC20 {
         assembly {
             mstore(0x0c, _BALANCE_SLOT_SEED)
             mstore(0x00, owner)
-            result := sload(keccak256(0x0c, 0x20))
+            result := sload(sha3(0x0c, 0x20))
         }
     }
 
@@ -928,7 +928,7 @@ abstract contract ERC20 {
             mstore(0x20, spender)
             mstore(0x0c, _ALLOWANCE_SLOT_SEED)
             mstore(0x00, owner)
-            result := sload(keccak256(0x0c, 0x34))
+            result := sload(sha3(0x0c, 0x34))
         }
     }
 
@@ -942,7 +942,7 @@ abstract contract ERC20 {
             mstore(0x20, spender)
             mstore(0x0c, _ALLOWANCE_SLOT_SEED)
             mstore(0x00, caller())
-            sstore(keccak256(0x0c, 0x34), amount)
+            sstore(sha3(0x0c, 0x34), amount)
             // Emit the {Approval} event.
             mstore(0x00, amount)
             log3(0x00, 0x20, _APPROVAL_EVENT_SIGNATURE, caller(), shr(96, mload(0x2c)))
@@ -960,7 +960,7 @@ abstract contract ERC20 {
             mstore(0x20, spender)
             mstore(0x0c, _ALLOWANCE_SLOT_SEED)
             mstore(0x00, caller())
-            let allowanceSlot := keccak256(0x0c, 0x34)
+            let allowanceSlot := sha3(0x0c, 0x34)
             let allowanceBefore := sload(allowanceSlot)
             // Add to the allowance.
             let allowanceAfter := add(allowanceBefore, difference)
@@ -988,7 +988,7 @@ abstract contract ERC20 {
             mstore(0x20, spender)
             mstore(0x0c, _ALLOWANCE_SLOT_SEED)
             mstore(0x00, caller())
-            let allowanceSlot := keccak256(0x0c, 0x34)
+            let allowanceSlot := sha3(0x0c, 0x34)
             let allowanceBefore := sload(allowanceSlot)
             // Revert if will underflow.
             if lt(allowanceBefore, difference) {
@@ -1018,7 +1018,7 @@ abstract contract ERC20 {
             // Compute the balance slot and load its value.
             mstore(0x0c, _BALANCE_SLOT_SEED)
             mstore(0x00, caller())
-            let fromBalanceSlot := keccak256(0x0c, 0x20)
+            let fromBalanceSlot := sha3(0x0c, 0x20)
             let fromBalance := sload(fromBalanceSlot)
             // Revert if insufficient balance.
             if gt(amount, fromBalance) {
@@ -1029,7 +1029,7 @@ abstract contract ERC20 {
             sstore(fromBalanceSlot, sub(fromBalance, amount))
             // Compute the balance slot of `to`.
             mstore(0x00, to)
-            let toBalanceSlot := keccak256(0x0c, 0x20)
+            let toBalanceSlot := sha3(0x0c, 0x20)
             // Add and store the updated balance of `to`.
             // Will not overflow because the sum of all user balances
             // cannot exceed the maximum uint256 value.
@@ -1059,7 +1059,7 @@ abstract contract ERC20 {
             // Compute the allowance slot and load its value.
             mstore(0x20, caller())
             mstore(0x0c, or(from_, _ALLOWANCE_SLOT_SEED))
-            let allowanceSlot := keccak256(0x0c, 0x34)
+            let allowanceSlot := sha3(0x0c, 0x34)
             let allowance_ := sload(allowanceSlot)
             // If the allowance is not the maximum uint256 value.
             if iszero(eq(allowance_, not(0))) {
@@ -1073,7 +1073,7 @@ abstract contract ERC20 {
             }
             // Compute the balance slot and load its value.
             mstore(0x0c, or(from_, _BALANCE_SLOT_SEED))
-            let fromBalanceSlot := keccak256(0x0c, 0x20)
+            let fromBalanceSlot := sha3(0x0c, 0x20)
             let fromBalance := sload(fromBalanceSlot)
             // Revert if insufficient balance.
             if gt(amount, fromBalance) {
@@ -1084,7 +1084,7 @@ abstract contract ERC20 {
             sstore(fromBalanceSlot, sub(fromBalance, amount))
             // Compute the balance slot of `to`.
             mstore(0x00, to)
-            let toBalanceSlot := keccak256(0x0c, 0x20)
+            let toBalanceSlot := sha3(0x0c, 0x20)
             // Add and store the updated balance of `to`.
             // Will not overflow because the sum of all user balances
             // cannot exceed the maximum uint256 value.
@@ -1109,7 +1109,7 @@ abstract contract ERC20 {
             // Compute the nonce slot and load its value.
             mstore(0x0c, _NONCES_SLOT_SEED)
             mstore(0x00, owner)
-            result := sload(keccak256(0x0c, 0x20))
+            result := sload(sha3(0x0c, 0x20))
         }
     }
 
@@ -1142,12 +1142,12 @@ abstract contract ERC20 {
             // Compute the nonce slot and load its value.
             mstore(0x0c, _NONCES_SLOT_SEED)
             mstore(0x00, owner)
-            let nonceSlot := keccak256(0x0c, 0x20)
+            let nonceSlot := sha3(0x0c, 0x20)
             let nonceValue := sload(nonceSlot)
             // Increment and store the updated nonce.
             sstore(nonceSlot, add(nonceValue, 1))
             // Prepare the inner hash.
-            // `keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)")`.
+            // `sha3("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)")`.
             // forgefmt: disable-next-item
             mstore(m, 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9)
             mstore(add(m, 0x20), owner)
@@ -1158,9 +1158,9 @@ abstract contract ERC20 {
             // Prepare the outer hash.
             mstore(0, 0x1901)
             mstore(0x20, domainSeparator)
-            mstore(0x40, keccak256(m, 0xc0))
+            mstore(0x40, sha3(m, 0xc0))
             // Prepare the ecrecover calldata.
-            mstore(0, keccak256(0x1e, 0x42))
+            mstore(0, sha3(0x1e, 0x42))
             mstore(0x20, and(0xff, v))
             mstore(0x40, r)
             mstore(0x60, s)
@@ -1177,7 +1177,7 @@ abstract contract ERC20 {
             // Compute the allowance slot and store the value.
             // The `owner` is already at slot 0x20.
             mstore(0x40, or(shl(160, _ALLOWANCE_SLOT_SEED), spender))
-            sstore(keccak256(0x2c, 0x34), value)
+            sstore(sha3(0x2c, 0x34), value)
             // Emit the {Approval} event.
             log3(add(m, 0x60), 0x20, _APPROVAL_EVENT_SIGNATURE, owner, spender)
             mstore(0x40, m) // Restore the free memory pointer.
@@ -1192,20 +1192,20 @@ abstract contract ERC20 {
             result := mload(0x40) // Grab the free memory pointer.
         }
         //  We simply calculate it on-the-fly to allow for cases where the `name` may change.
-        bytes32 nameHash = keccak256(bytes(name()));
+        bytes32 nameHash = sha3(bytes(name()));
         /// @solidity memory-safe-assembly
         assembly {
             let m := result
-            // `keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")`.
+            // `sha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")`.
             // forgefmt: disable-next-item
             mstore(m, 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f)
             mstore(add(m, 0x20), nameHash)
-            // `keccak256("1")`.
+            // `sha3("1")`.
             // forgefmt: disable-next-item
             mstore(add(m, 0x40), 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6)
             mstore(add(m, 0x60), chainid())
             mstore(add(m, 0x80), address())
-            result := keccak256(m, 0xa0)
+            result := sha3(m, 0xa0)
         }
     }
 
@@ -1232,7 +1232,7 @@ abstract contract ERC20 {
             // Compute the balance slot and load its value.
             mstore(0x0c, _BALANCE_SLOT_SEED)
             mstore(0x00, to)
-            let toBalanceSlot := keccak256(0x0c, 0x20)
+            let toBalanceSlot := sha3(0x0c, 0x20)
             // Add and store the updated balance.
             sstore(toBalanceSlot, add(sload(toBalanceSlot), amount))
             // Emit the {Transfer} event.
@@ -1256,7 +1256,7 @@ abstract contract ERC20 {
             // Compute the balance slot and load its value.
             mstore(0x0c, _BALANCE_SLOT_SEED)
             mstore(0x00, from)
-            let fromBalanceSlot := keccak256(0x0c, 0x20)
+            let fromBalanceSlot := sha3(0x0c, 0x20)
             let fromBalance := sload(fromBalanceSlot)
             // Revert if insufficient balance.
             if gt(amount, fromBalance) {
@@ -1286,7 +1286,7 @@ abstract contract ERC20 {
             let from_ := shl(96, from)
             // Compute the balance slot and load its value.
             mstore(0x0c, or(from_, _BALANCE_SLOT_SEED))
-            let fromBalanceSlot := keccak256(0x0c, 0x20)
+            let fromBalanceSlot := sha3(0x0c, 0x20)
             let fromBalance := sload(fromBalanceSlot)
             // Revert if insufficient balance.
             if gt(amount, fromBalance) {
@@ -1297,7 +1297,7 @@ abstract contract ERC20 {
             sstore(fromBalanceSlot, sub(fromBalance, amount))
             // Compute the balance slot of `to`.
             mstore(0x00, to)
-            let toBalanceSlot := keccak256(0x0c, 0x20)
+            let toBalanceSlot := sha3(0x0c, 0x20)
             // Add and store the updated balance of `to`.
             // Will not overflow because the sum of all user balances
             // cannot exceed the maximum uint256 value.
@@ -1321,7 +1321,7 @@ abstract contract ERC20 {
             mstore(0x20, spender)
             mstore(0x0c, _ALLOWANCE_SLOT_SEED)
             mstore(0x00, owner)
-            let allowanceSlot := keccak256(0x0c, 0x34)
+            let allowanceSlot := sha3(0x0c, 0x34)
             let allowance_ := sload(allowanceSlot)
             // If the allowance is not the maximum uint256 value.
             if iszero(eq(allowance_, not(0))) {
@@ -1346,7 +1346,7 @@ abstract contract ERC20 {
             // Compute the allowance slot and store the amount.
             mstore(0x20, spender)
             mstore(0x0c, or(owner_, _ALLOWANCE_SLOT_SEED))
-            sstore(keccak256(0x0c, 0x34), amount)
+            sstore(sha3(0x0c, 0x34), amount)
             // Emit the {Approval} event.
             mstore(0x00, amount)
             log3(0x00, 0x20, _APPROVAL_EVENT_SIGNATURE, shr(96, owner_), shr(96, mload(0x2c)))
@@ -1388,11 +1388,11 @@ contract WETH is ERC20 {
     /// @dev Emitted when `amount` is withdrawn to `to`.
     event Withdrawal(address indexed to, uint256 amount);
 
-    /// @dev `keccak256(bytes("Deposit(address,uint256)"))`.
+    /// @dev `sha3(bytes("Deposit(address,uint256)"))`.
     uint256 private constant _DEPOSIT_EVENT_SIGNATURE =
         0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c;
 
-    /// @dev `keccak256(bytes("Withdrawal(address,uint256)"))`.
+    /// @dev `sha3(bytes("Withdrawal(address,uint256)"))`.
     uint256 private constant _WITHDRAWAL_EVENT_SIGNATURE =
         0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65;
 
@@ -2620,11 +2620,11 @@ abstract contract ERC4626 is ERC20 {
         uint256 shares
     );
 
-    /// @dev `keccak256(bytes("Deposit(address,address,uint256,uint256)"))`.
+    /// @dev `sha3(bytes("Deposit(address,address,uint256,uint256)"))`.
     uint256 private constant _DEPOSIT_EVENT_SIGNATURE =
         0xdcbc1c05240f31ff3ad067ef1ee35ce4997762752e3a095284754544f4c709d7;
 
-    /// @dev `keccak256(bytes("Withdraw(address,address,address,uint256,uint256)"))`.
+    /// @dev `sha3(bytes("Withdraw(address,address,address,uint256,uint256)"))`.
     uint256 private constant _WITHDRAW_EVENT_SIGNATURE =
         0xfbde797d201c681b91056529119e0b02407c7bb96a4a2c75c01fc9667232c8db;
 
@@ -3149,15 +3149,15 @@ abstract contract ERC721 {
     /// @dev Emitted when `owner` enables or disables `operator` to manage all of their tokens.
     event ApprovalForAll(address indexed owner, address indexed operator, bool isApproved);
 
-    /// @dev `keccak256(bytes("Transfer(address,address,uint256)"))`.
+    /// @dev `sha3(bytes("Transfer(address,address,uint256)"))`.
     uint256 private constant _TRANSFER_EVENT_SIGNATURE =
         0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
 
-    /// @dev `keccak256(bytes("Approval(address,address,uint256)"))`.
+    /// @dev `sha3(bytes("Approval(address,address,uint256)"))`.
     uint256 private constant _APPROVAL_EVENT_SIGNATURE =
         0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925;
 
-    /// @dev `keccak256(bytes("ApprovalForAll(address,address,bool)"))`.
+    /// @dev `sha3(bytes("ApprovalForAll(address,address,bool)"))`.
     uint256 private constant _APPROVAL_FOR_ALL_EVENT_SIGNATURE =
         0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31;
 
@@ -3169,7 +3169,7 @@ abstract contract ERC721 {
     /// ```
     ///     mstore(0x00, id)
     ///     mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-    ///     let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+    ///     let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
     /// ```
     /// Bits Layout:
     // - [0..159]   `addr`
@@ -3183,7 +3183,7 @@ abstract contract ERC721 {
     /// ```
     ///     mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
     ///     mstore(0x00, owner)
-    ///     let balanceSlot := keccak256(0x0c, 0x1c)
+    ///     let balanceSlot := sha3(0x0c, 0x1c)
     /// ```
     /// Bits Layout:
     /// - [0..31]   `balance`
@@ -3193,7 +3193,7 @@ abstract contract ERC721 {
     /// ```
     ///     mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, operator))
     ///     mstore(0x00, owner)
-    ///     let operatorApprovalSlot := keccak256(0x0c, 0x30)
+    ///     let operatorApprovalSlot := sha3(0x0c, 0x30)
     /// ```
     uint256 private constant _ERC721_MASTER_SLOT_SEED = 0x7d8825530a5a2e7a << 192;
 
@@ -3246,7 +3246,7 @@ abstract contract ERC721 {
             }
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
             mstore(0x00, owner)
-            result := and(sload(keccak256(0x0c, 0x1c)), _MAX_ACCOUNT_BALANCE)
+            result := and(sload(sha3(0x0c, 0x1c)), _MAX_ACCOUNT_BALANCE)
         }
     }
 
@@ -3259,7 +3259,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             if iszero(shr(96, shl(96, sload(ownershipSlot)))) {
                 mstore(0x00, 0xceea21b6) // `TokenDoesNotExist()`.
                 revert(0x1c, 0x04)
@@ -3292,7 +3292,7 @@ abstract contract ERC721 {
             mstore(0x1c, operator)
             mstore(0x08, _ERC721_MASTER_SLOT_SEED_MASKED)
             mstore(0x00, owner)
-            result := sload(keccak256(0x0c, 0x30))
+            result := sload(sha3(0x0c, 0x30))
         }
     }
 
@@ -3308,7 +3308,7 @@ abstract contract ERC721 {
             mstore(0x1c, operator)
             mstore(0x08, _ERC721_MASTER_SLOT_SEED_MASKED)
             mstore(0x00, caller())
-            sstore(keccak256(0x0c, 0x30), isApproved)
+            sstore(sha3(0x0c, 0x30), isApproved)
             // Emit the {ApprovalForAll} event.
             mstore(0x00, isApproved)
             log3(
@@ -3338,7 +3338,7 @@ abstract contract ERC721 {
             // Load the ownership data.
             mstore(0x00, id)
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, caller()))
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let ownershipPacked := sload(ownershipSlot)
             let owner := and(bitmaskAddress, ownershipPacked)
             // Revert if `from` is not the owner, or does not exist.
@@ -3361,7 +3361,7 @@ abstract contract ERC721 {
                 let approvedAddress := sload(add(1, ownershipSlot))
                 // Revert if the caller is not the owner, nor approved.
                 if iszero(or(eq(caller(), from), eq(caller(), approvedAddress))) {
-                    if iszero(sload(keccak256(0x0c, 0x30))) {
+                    if iszero(sload(sha3(0x0c, 0x30))) {
                         mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                         revert(0x1c, 0x04)
                     }
@@ -3373,13 +3373,13 @@ abstract contract ERC721 {
             sstore(ownershipSlot, xor(ownershipPacked, xor(from, to)))
             // Decrement the balance of `from`.
             {
-                let fromBalanceSlot := keccak256(0x0c, 0x1c)
+                let fromBalanceSlot := sha3(0x0c, 0x1c)
                 sstore(fromBalanceSlot, sub(sload(fromBalanceSlot), 1))
             }
             // Increment the balance of `to`.
             {
                 mstore(0x00, to)
-                let toBalanceSlot := keccak256(0x0c, 0x1c)
+                let toBalanceSlot := sha3(0x0c, 0x1c)
                 let toBalanceSlotPacked := add(sload(toBalanceSlot), 1)
                 if iszero(and(toBalanceSlotPacked, _MAX_ACCOUNT_BALANCE)) {
                     mstore(0x00, 0x01336cea) // `AccountBalanceOverflow()`.
@@ -3442,7 +3442,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            result := shl(96, sload(add(id, add(id, keccak256(0x00, 0x20)))))
+            result := shl(96, sload(add(id, add(id, sha3(0x00, 0x20)))))
         }
     }
 
@@ -3453,7 +3453,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            result := shr(96, shl(96, sload(add(id, add(id, keccak256(0x00, 0x20))))))
+            result := shr(96, shl(96, sload(add(id, add(id, sha3(0x00, 0x20))))))
         }
     }
 
@@ -3469,7 +3469,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
             mstore(0x00, owner)
-            result := shr(32, sload(keccak256(0x0c, 0x1c)))
+            result := shr(32, sload(sha3(0x0c, 0x1c)))
         }
     }
 
@@ -3481,7 +3481,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
             mstore(0x00, owner)
-            let balanceSlot := keccak256(0x0c, 0x1c)
+            let balanceSlot := sha3(0x0c, 0x1c)
             let packed := sload(balanceSlot)
             sstore(balanceSlot, xor(packed, shl(32, xor(value, shr(32, packed)))))
         }
@@ -3495,7 +3495,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            result := shr(160, sload(add(id, add(id, keccak256(0x00, 0x20)))))
+            result := shr(160, sload(add(id, add(id, sha3(0x00, 0x20)))))
         }
     }
 
@@ -3507,7 +3507,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let packed := sload(ownershipSlot)
             sstore(ownershipSlot, xor(packed, shl(160, xor(value, shr(160, packed)))))
         }
@@ -3539,7 +3539,7 @@ abstract contract ERC721 {
             // Load the ownership data.
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let ownershipPacked := sload(ownershipSlot)
             // Revert if the token already exists.
             if shl(96, ownershipPacked) {
@@ -3551,7 +3551,7 @@ abstract contract ERC721 {
             // Increment the balance of the owner.
             {
                 mstore(0x00, to)
-                let balanceSlot := keccak256(0x0c, 0x1c)
+                let balanceSlot := sha3(0x0c, 0x1c)
                 let balanceSlotPacked := add(sload(balanceSlot), 1)
                 if iszero(and(balanceSlotPacked, _MAX_ACCOUNT_BALANCE)) {
                     mstore(0x00, 0x01336cea) // `AccountBalanceOverflow()`.
@@ -3613,7 +3613,7 @@ abstract contract ERC721 {
             // Load the ownership data.
             mstore(0x00, id)
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, by))
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let ownershipPacked := sload(ownershipSlot)
             // Reload the owner in case it is changed in `_beforeTokenTransfer`.
             owner := shr(96, shl(96, ownershipPacked))
@@ -3629,7 +3629,7 @@ abstract contract ERC721 {
                 // If `by` is not the zero address, do the authorization check.
                 // Revert if the `by` is not the owner, nor approved.
                 if iszero(or(iszero(by), or(eq(by, owner), eq(by, approvedAddress)))) {
-                    if iszero(sload(keccak256(0x0c, 0x30))) {
+                    if iszero(sload(sha3(0x0c, 0x30))) {
                         mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                         revert(0x1c, 0x04)
                     }
@@ -3641,7 +3641,7 @@ abstract contract ERC721 {
             sstore(ownershipSlot, xor(ownershipPacked, owner))
             // Decrement the balance of `owner`.
             {
-                let balanceSlot := keccak256(0x0c, 0x1c)
+                let balanceSlot := sha3(0x0c, 0x1c)
                 sstore(balanceSlot, sub(sload(balanceSlot), 1))
             }
             // Emit the {Transfer} event.
@@ -3672,7 +3672,7 @@ abstract contract ERC721 {
             // Load the ownership data.
             mstore(0x00, id)
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, account))
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let owner := shr(96, shl(96, sload(ownershipSlot)))
             // Revert if the token does not exist.
             if iszero(owner) {
@@ -3683,7 +3683,7 @@ abstract contract ERC721 {
             if iszero(eq(account, owner)) {
                 mstore(0x00, owner)
                 // Check if `account` is approved to
-                if iszero(sload(keccak256(0x0c, 0x30))) {
+                if iszero(sload(sha3(0x0c, 0x30))) {
                     result := eq(account, sload(add(1, ownershipSlot)))
                 }
             }
@@ -3697,7 +3697,7 @@ abstract contract ERC721 {
         assembly {
             mstore(0x00, id)
             mstore(0x1c, _ERC721_MASTER_SLOT_SEED)
-            result := sload(add(1, add(id, add(id, keccak256(0x00, 0x20)))))
+            result := sload(add(1, add(id, add(id, sha3(0x00, 0x20)))))
         }
     }
 
@@ -3723,7 +3723,7 @@ abstract contract ERC721 {
             // Load the owner of the token.
             mstore(0x00, id)
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, by))
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let owner := and(bitmaskAddress, sload(ownershipSlot))
             // Revert if the token does not exist.
             if iszero(owner) {
@@ -3734,7 +3734,7 @@ abstract contract ERC721 {
             // Revert if `by` is not the owner, nor approved.
             if iszero(or(iszero(by), eq(by, owner))) {
                 mstore(0x00, owner)
-                if iszero(sload(keccak256(0x0c, 0x30))) {
+                if iszero(sload(sha3(0x0c, 0x30))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -3761,7 +3761,7 @@ abstract contract ERC721 {
             // Update the `isApproved` for (`by`, `operator`).
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, operator))
             mstore(0x00, by)
-            sstore(keccak256(0x0c, 0x30), isApproved)
+            sstore(sha3(0x0c, 0x30), isApproved)
             // Emit the {ApprovalForAll} event.
             mstore(0x00, isApproved)
             log3(0x00, 0x20, _APPROVAL_FOR_ALL_EVENT_SIGNATURE, by, operator)
@@ -3800,7 +3800,7 @@ abstract contract ERC721 {
             // Load the ownership data.
             mstore(0x00, id)
             mstore(0x1c, or(_ERC721_MASTER_SLOT_SEED, by))
-            let ownershipSlot := add(id, add(id, keccak256(0x00, 0x20)))
+            let ownershipSlot := add(id, add(id, sha3(0x00, 0x20)))
             let ownershipPacked := sload(ownershipSlot)
             let owner := and(bitmaskAddress, ownershipPacked)
             // Revert if `from` is not the owner, or does not exist.
@@ -3824,7 +3824,7 @@ abstract contract ERC721 {
                 // If `by` is not the zero address, do the authorization check.
                 // Revert if the `by` is not the owner, nor approved.
                 if iszero(or(iszero(by), or(eq(by, from), eq(by, approvedAddress)))) {
-                    if iszero(sload(keccak256(0x0c, 0x30))) {
+                    if iszero(sload(sha3(0x0c, 0x30))) {
                         mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                         revert(0x1c, 0x04)
                     }
@@ -3836,13 +3836,13 @@ abstract contract ERC721 {
             sstore(ownershipSlot, xor(ownershipPacked, xor(from, to)))
             // Decrement the balance of `from`.
             {
-                let fromBalanceSlot := keccak256(0x0c, 0x1c)
+                let fromBalanceSlot := sha3(0x0c, 0x1c)
                 sstore(fromBalanceSlot, sub(sload(fromBalanceSlot), 1))
             }
             // Increment the balance of `to`.
             {
                 mstore(0x00, to)
-                let toBalanceSlot := keccak256(0x0c, 0x1c)
+                let toBalanceSlot := sha3(0x0c, 0x1c)
                 let toBalanceSlotPacked := add(sload(toBalanceSlot), 1)
                 if iszero(and(toBalanceSlotPacked, _MAX_ACCOUNT_BALANCE)) {
                     mstore(0x00, 0x01336cea) // `AccountBalanceOverflow()`.
@@ -3994,7 +3994,7 @@ abstract contract ERC2981 {
     /// ```
     ///     mstore(0x00, tokenId)
     ///     mstore(0x20, _ERC2981_MASTER_SLOT_SEED)
-    ///     let packed := sload(keccak256(0x00, 0x40))
+    ///     let packed := sload(sha3(0x00, 0x40))
     ///     let receiver := shr(96, packed)
     ///     let royaltyFraction := xor(packed, shl(96, receiver))
     /// ```
@@ -4040,7 +4040,7 @@ abstract contract ERC2981 {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _ERC2981_MASTER_SLOT_SEED)
-            let packed := sload(keccak256(0x00, 0x40))
+            let packed := sload(sha3(0x00, 0x40))
             receiver := shr(96, packed)
             if iszero(receiver) {
                 packed := sload(mload(0x20))
@@ -4110,7 +4110,7 @@ abstract contract ERC2981 {
             }
             mstore(0x00, tokenId)
             mstore(0x20, _ERC2981_MASTER_SLOT_SEED)
-            sstore(keccak256(0x00, 0x40), or(packed, feeNumerator))
+            sstore(sha3(0x00, 0x40), or(packed, feeNumerator))
         }
     }
 
@@ -4120,7 +4120,7 @@ abstract contract ERC2981 {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _ERC2981_MASTER_SLOT_SEED)
-            sstore(keccak256(0x00, 0x40), 0)
+            sstore(sha3(0x00, 0x40), 0)
         }
     }
 }
@@ -4191,15 +4191,15 @@ abstract contract ERC1155 {
     /// See: https://eips.ethereum.org/EIPS/eip-1155#metadata
     event URI(string value, uint256 indexed id);
 
-    /// @dev `keccak256(bytes("TransferSingle(address,address,address,uint256,uint256)"))`.
+    /// @dev `sha3(bytes("TransferSingle(address,address,address,uint256,uint256)"))`.
     uint256 private constant _TRANSFER_SINGLE_EVENT_SIGNATURE =
         0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62;
 
-    /// @dev `keccak256(bytes("TransferBatch(address,address,address,uint256[],uint256[])"))`.
+    /// @dev `sha3(bytes("TransferBatch(address,address,address,uint256[],uint256[])"))`.
     uint256 private constant _TRANSFER_BATCH_EVENT_SIGNATURE =
         0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb;
 
-    /// @dev `keccak256(bytes("ApprovalForAll(address,address,bool)"))`.
+    /// @dev `sha3(bytes("ApprovalForAll(address,address,bool)"))`.
     uint256 private constant _APPROVAL_FOR_ALL_EVENT_SIGNATURE =
         0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31;
 
@@ -4216,14 +4216,14 @@ abstract contract ERC1155 {
     /// ```
     ///     mstore(0x20, ownerSlotSeed)
     ///     mstore(0x00, id)
-    ///     let balanceSlot := keccak256(0x00, 0x40)
+    ///     let balanceSlot := sha3(0x00, 0x40)
     /// ```
     ///
     /// The operator approval slot of `owner` is given by.
     /// ```
     ///     mstore(0x20, ownerSlotSeed)
     ///     mstore(0x00, operator)
-    ///     let operatorApprovalSlot := keccak256(0x0c, 0x34)
+    ///     let operatorApprovalSlot := sha3(0x0c, 0x34)
     /// ```
     uint256 private constant _ERC1155_MASTER_SLOT_SEED = 0x9a31110384e0b0c9;
 
@@ -4251,7 +4251,7 @@ abstract contract ERC1155 {
             mstore(0x20, _ERC1155_MASTER_SLOT_SEED)
             mstore(0x14, owner)
             mstore(0x00, id)
-            result := sload(keccak256(0x00, 0x40))
+            result := sload(sha3(0x00, 0x40))
         }
     }
 
@@ -4267,7 +4267,7 @@ abstract contract ERC1155 {
             mstore(0x20, _ERC1155_MASTER_SLOT_SEED)
             mstore(0x14, owner)
             mstore(0x00, operator)
-            result := sload(keccak256(0x0c, 0x34))
+            result := sload(sha3(0x0c, 0x34))
         }
     }
 
@@ -4283,7 +4283,7 @@ abstract contract ERC1155 {
             mstore(0x20, _ERC1155_MASTER_SLOT_SEED)
             mstore(0x14, caller())
             mstore(0x00, operator)
-            sstore(keccak256(0x0c, 0x34), isApproved)
+            sstore(sha3(0x0c, 0x34), isApproved)
             // Emit the {ApprovalForAll} event.
             mstore(0x00, isApproved)
             // forgefmt: disable-next-line
@@ -4328,7 +4328,7 @@ abstract contract ERC1155 {
             // If the caller is not `from`, do the authorization check.
             if iszero(eq(caller(), from)) {
                 mstore(0x00, caller())
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -4336,7 +4336,7 @@ abstract contract ERC1155 {
             // Subtract and store the updated balance of `from`.
             {
                 mstore(0x00, id)
-                let fromBalanceSlot := keccak256(0x00, 0x40)
+                let fromBalanceSlot := sha3(0x00, 0x40)
                 let fromBalance := sload(fromBalanceSlot)
                 if gt(amount, fromBalance) {
                     mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -4347,7 +4347,7 @@ abstract contract ERC1155 {
             // Increase and store the updated balance of `to`.
             {
                 mstore(0x20, toSlotSeed)
-                let toBalanceSlot := keccak256(0x00, 0x40)
+                let toBalanceSlot := sha3(0x00, 0x40)
                 let toBalanceBefore := sload(toBalanceSlot)
                 let toBalanceAfter := add(toBalanceBefore, amount)
                 if lt(toBalanceAfter, toBalanceBefore) {
@@ -4437,7 +4437,7 @@ abstract contract ERC1155 {
             // If the caller is not `from`, do the authorization check.
             if iszero(eq(caller(), from)) {
                 mstore(0x00, caller())
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -4451,7 +4451,7 @@ abstract contract ERC1155 {
                     {
                         mstore(0x20, fromSlotSeed)
                         mstore(0x00, calldataload(add(ids.offset, i)))
-                        let fromBalanceSlot := keccak256(0x00, 0x40)
+                        let fromBalanceSlot := sha3(0x00, 0x40)
                         let fromBalance := sload(fromBalanceSlot)
                         if gt(amount, fromBalance) {
                             mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -4462,7 +4462,7 @@ abstract contract ERC1155 {
                     // Increase and store the updated balance of `to`.
                     {
                         mstore(0x20, toSlotSeed)
-                        let toBalanceSlot := keccak256(0x00, 0x40)
+                        let toBalanceSlot := sha3(0x00, 0x40)
                         let toBalanceBefore := sload(toBalanceSlot)
                         let toBalanceAfter := add(toBalanceBefore, amount)
                         if lt(toBalanceAfter, toBalanceBefore) {
@@ -4565,7 +4565,7 @@ abstract contract ERC1155 {
                 let owner := calldataload(add(owners.offset, i))
                 mstore(0x20, or(_ERC1155_MASTER_SLOT_SEED, shl(96, owner)))
                 mstore(0x00, calldataload(add(ids.offset, i)))
-                mstore(add(o, i), sload(keccak256(0x00, 0x40)))
+                mstore(add(o, i), sload(sha3(0x00, 0x40)))
             }
         }
     }
@@ -4611,7 +4611,7 @@ abstract contract ERC1155 {
                 mstore(0x20, _ERC1155_MASTER_SLOT_SEED)
                 mstore(0x14, to)
                 mstore(0x00, id)
-                let toBalanceSlot := keccak256(0x00, 0x40)
+                let toBalanceSlot := sha3(0x00, 0x40)
                 let toBalanceBefore := sload(toBalanceSlot)
                 let toBalanceAfter := add(toBalanceBefore, amount)
                 if lt(toBalanceAfter, toBalanceBefore) {
@@ -4671,7 +4671,7 @@ abstract contract ERC1155 {
                     // Increase and store the updated balance of `to`.
                     {
                         mstore(0x00, mload(add(ids, i)))
-                        let toBalanceSlot := keccak256(0x00, 0x40)
+                        let toBalanceSlot := sha3(0x00, 0x40)
                         let toBalanceBefore := sload(toBalanceSlot)
                         let toBalanceAfter := add(toBalanceBefore, amount)
                         if lt(toBalanceAfter, toBalanceBefore) {
@@ -4735,7 +4735,7 @@ abstract contract ERC1155 {
             // check if it is approved to manage all the tokens of `from`.
             if iszero(or(iszero(shl(96, by)), eq(shl(96, by), from_))) {
                 mstore(0x00, by)
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -4743,7 +4743,7 @@ abstract contract ERC1155 {
             // Decrease and store the updated balance of `from`.
             {
                 mstore(0x00, id)
-                let fromBalanceSlot := keccak256(0x00, 0x40)
+                let fromBalanceSlot := sha3(0x00, 0x40)
                 let fromBalance := sload(fromBalanceSlot)
                 if gt(amount, fromBalance) {
                     mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -4798,7 +4798,7 @@ abstract contract ERC1155 {
             let by_ := shl(96, by)
             if iszero(or(iszero(by_), eq(by_, from_))) {
                 mstore(0x00, by)
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -4812,7 +4812,7 @@ abstract contract ERC1155 {
                     // Decrease and store the updated balance of `to`.
                     {
                         mstore(0x00, mload(add(ids, i)))
-                        let fromBalanceSlot := keccak256(0x00, 0x40)
+                        let fromBalanceSlot := sha3(0x00, 0x40)
                         let fromBalance := sload(fromBalanceSlot)
                         if gt(amount, fromBalance) {
                             mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -4862,7 +4862,7 @@ abstract contract ERC1155 {
             mstore(0x20, _ERC1155_MASTER_SLOT_SEED)
             mstore(0x14, by)
             mstore(0x00, operator)
-            sstore(keccak256(0x0c, 0x34), isApproved)
+            sstore(sha3(0x0c, 0x34), isApproved)
             // Emit the {ApprovalForAll} event.
             mstore(0x00, isApproved)
             let m := shr(96, not(0))
@@ -4919,7 +4919,7 @@ abstract contract ERC1155 {
             let by_ := shl(96, by)
             if iszero(or(iszero(by_), eq(by_, from_))) {
                 mstore(0x00, by)
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -4927,7 +4927,7 @@ abstract contract ERC1155 {
             // Subtract and store the updated balance of `from`.
             {
                 mstore(0x00, id)
-                let fromBalanceSlot := keccak256(0x00, 0x40)
+                let fromBalanceSlot := sha3(0x00, 0x40)
                 let fromBalance := sload(fromBalanceSlot)
                 if gt(amount, fromBalance) {
                     mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -4938,7 +4938,7 @@ abstract contract ERC1155 {
             // Increase and store the updated balance of `to`.
             {
                 mstore(0x20, or(_ERC1155_MASTER_SLOT_SEED, to_))
-                let toBalanceSlot := keccak256(0x00, 0x40)
+                let toBalanceSlot := sha3(0x00, 0x40)
                 let toBalanceBefore := sload(toBalanceSlot)
                 let toBalanceAfter := add(toBalanceBefore, amount)
                 if lt(toBalanceAfter, toBalanceBefore) {
@@ -5013,7 +5013,7 @@ abstract contract ERC1155 {
             let by_ := shl(96, by)
             if iszero(or(iszero(by_), eq(by_, from_))) {
                 mstore(0x00, by)
-                if iszero(sload(keccak256(0x0c, 0x34))) {
+                if iszero(sload(sha3(0x0c, 0x34))) {
                     mstore(0x00, 0x4b6e7f18) // `NotOwnerNorApproved()`.
                     revert(0x1c, 0x04)
                 }
@@ -5028,7 +5028,7 @@ abstract contract ERC1155 {
                     {
                         mstore(0x20, fromSlotSeed)
                         mstore(0x00, mload(add(ids, i)))
-                        let fromBalanceSlot := keccak256(0x00, 0x40)
+                        let fromBalanceSlot := sha3(0x00, 0x40)
                         let fromBalance := sload(fromBalanceSlot)
                         if gt(amount, fromBalance) {
                             mstore(0x00, 0xf4d678b8) // `InsufficientBalance()`.
@@ -5039,7 +5039,7 @@ abstract contract ERC1155 {
                     // Increase and store the updated balance of `to`.
                     {
                         mstore(0x20, toSlotSeed)
-                        let toBalanceSlot := keccak256(0x00, 0x40)
+                        let toBalanceSlot := sha3(0x00, 0x40)
                         let toBalanceBefore := sload(toBalanceSlot)
                         let toBalanceAfter := add(toBalanceBefore, amount)
                         if lt(toBalanceAfter, toBalanceBefore) {
@@ -5455,7 +5455,7 @@ library CREATE3 {
     uint256 private constant _PROXY_BYTECODE = 0x67363d3d37363d34f03d5260086018f3;
 
     /// @dev Hash of the `_PROXY_BYTECODE`.
-    /// Equivalent to `keccak256(abi.encodePacked(hex"67363d3d37363d34f03d5260086018f3"))`.
+    /// Equivalent to `sha3(abi.encodePacked(hex"67363d3d37363d34f03d5260086018f3"))`.
     bytes32 private constant _PROXY_BYTECODE_HASH =
         0x21c35dbe1b344a2488cf3321d6ce542f8e9f305544ff09e4993a62319a497c1f;
 
@@ -5494,7 +5494,7 @@ library CREATE3 {
             // Nonce of the proxy contract (1).
             mstore8(0x34, 0x01)
 
-            deployed := keccak256(0x1e, 0x17)
+            deployed := sha3(0x1e, 0x17)
 
             // If the `call` fails, revert.
             if iszero(
@@ -5540,7 +5540,7 @@ library CREATE3 {
             mstore(0x40, _PROXY_BYTECODE_HASH)
 
             // Store the proxy's address.
-            mstore(0x14, keccak256(0x0b, 0x55))
+            mstore(0x14, sha3(0x0b, 0x55))
             // Restore the free memory pointer.
             mstore(0x40, m)
             // 0xd6 = 0xc0 (short RLP prefix) + 0x16 (length of: 0x94 ++ proxy ++ 0x01).
@@ -5549,7 +5549,7 @@ library CREATE3 {
             // Nonce of the proxy contract (1).
             mstore8(0x34, 0x01)
 
-            deployed := keccak256(0x1e, 0x17)
+            deployed := sha3(0x1e, 0x17)
         }
     }
 }
@@ -6980,11 +6980,11 @@ library ECDSA {
     function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 result) {
         /// @solidity memory-safe-assembly
         assembly {
-            // Store into scratch space for keccak256.
+            // Store into scratch space for sha3.
             mstore(0x20, hash)
             mstore(0x00, "\x00\x00\x00\x00\x19Ethereum Signed Message:\n32")
             // 0x40 - 0x04 = 0x3c
-            result := keccak256(0x04, 0x3c)
+            result := sha3(0x04, 0x3c)
         }
     }
 
@@ -7005,7 +7005,7 @@ library ECDSA {
             let sLength := mload(s)
             let ptr := add(s, 0x20)
             let w := not(0)
-            // `end` marks the end of the memory which we will compute the keccak256 of.
+            // `end` marks the end of the memory which we will compute the sha3 of.
             let end := add(ptr, sLength)
             // Convert the length of the bytes to ASCII decimal representation
             // and store it into the memory.
@@ -7017,8 +7017,8 @@ library ECDSA {
             }
             // Copy the header over to the memory.
             mstore(sub(ptr, 0x20), "\x00\x00\x00\x00\x00\x00\x19Ethereum Signed Message:\n")
-            // Compute the keccak256 of the memory.
-            result := keccak256(sub(ptr, 0x1a), sub(end, sub(ptr, 0x1a)))
+            // Compute the sha3 of the memory.
+            result := sha3(sub(ptr, 0x1a), sub(end, sub(ptr, 0x1a)))
             // Restore the previous memory.
             mstore(s, sLength)
             mstore(sub(s, 0x20), m)
@@ -7053,7 +7053,7 @@ abstract contract EIP712 {
     /*                  CONSTANTS AND IMMUTABLES                  */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    /// @dev `keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")`.
+    /// @dev `sha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")`.
     bytes32 internal constant _DOMAIN_TYPEHASH =
         0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
@@ -7076,8 +7076,8 @@ abstract contract EIP712 {
         _cachedChainId = block.chainid;
 
         (string memory name, string memory version) = _domainNameAndVersion();
-        bytes32 nameHash = keccak256(bytes(name));
-        bytes32 versionHash = keccak256(bytes(version));
+        bytes32 nameHash = sha3(bytes(name));
+        bytes32 versionHash = sha3(bytes(version));
         _cachedNameHash = nameHash;
         _cachedVersionHash = versionHash;
 
@@ -7090,7 +7090,7 @@ abstract contract EIP712 {
             mstore(add(m, 0x40), versionHash)
             mstore(add(m, 0x60), chainid())
             mstore(add(m, 0x80), address())
-            separator := keccak256(m, 0xa0)
+            separator := sha3(m, 0xa0)
         }
         _cachedDomainSeparator = separator;
     }
@@ -7135,10 +7135,10 @@ abstract contract EIP712 {
     ///
     /// The hash can be used together with {ECDSA-recover} to obtain the signer of a message:
     /// ```
-    ///     bytes32 digest = _hashTypedData(keccak256(abi.encode(
-    ///         keccak256("Mail(address to,string contents)"),
+    ///     bytes32 digest = _hashTypedData(sha3(abi.encode(
+    ///         sha3("Mail(address to,string contents)"),
     ///         mailTo,
-    ///         keccak256(bytes(mailContents))
+    ///         sha3(bytes(mailContents))
     ///     )));
     ///     address signer = ECDSA.recover(digest, signature);
     /// ```
@@ -7153,7 +7153,7 @@ abstract contract EIP712 {
             mstore(0x00, 0x1901000000000000) // Store "\x19\x01".
             mstore(0x1a, separator) // Store the domain separator.
             mstore(0x3a, structHash) // Store the struct hash.
-            digest := keccak256(0x18, 0x42)
+            digest := sha3(0x18, 0x42)
             // Restore the part of the free memory slot that was overwritten.
             mstore(0x3a, 0)
         }
@@ -7202,7 +7202,7 @@ abstract contract EIP712 {
             mstore(add(m, 0x40), versionHash)
             mstore(add(m, 0x60), chainid())
             mstore(add(m, 0x80), address())
-            separator := keccak256(m, 0xa0)
+            separator := sha3(m, 0xa0)
         }
     }
 
@@ -7237,16 +7237,16 @@ contract ERC1967Factory {
     /// @dev The salt does not start with the caller.
     error SaltDoesNotStartWithCaller();
 
-    /// @dev `bytes4(keccak256(bytes("Unauthorized()")))`.
+    /// @dev `bytes4(sha3(bytes("Unauthorized()")))`.
     uint256 internal constant _UNAUTHORIZED_ERROR_SELECTOR = 0x82b42900;
 
-    /// @dev `bytes4(keccak256(bytes("DeploymentFailed()")))`.
+    /// @dev `bytes4(sha3(bytes("DeploymentFailed()")))`.
     uint256 internal constant _DEPLOYMENT_FAILED_ERROR_SELECTOR = 0x30116425;
 
-    /// @dev `bytes4(keccak256(bytes("UpgradeFailed()")))`.
+    /// @dev `bytes4(sha3(bytes("UpgradeFailed()")))`.
     uint256 internal constant _UPGRADE_FAILED_ERROR_SELECTOR = 0x55299b49;
 
-    /// @dev `bytes4(keccak256(bytes("SaltDoesNotStartWithCaller()")))`.
+    /// @dev `bytes4(sha3(bytes("SaltDoesNotStartWithCaller()")))`.
     uint256 internal constant _SALT_DOES_NOT_START_WITH_CALLER_ERROR_SELECTOR = 0x2f634836;
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
@@ -7262,15 +7262,15 @@ contract ERC1967Factory {
     /// @dev A proxy has been deployed.
     event Deployed(address indexed proxy, address indexed implementation, address indexed admin);
 
-    /// @dev `keccak256(bytes("AdminChanged(address,address)"))`.
+    /// @dev `sha3(bytes("AdminChanged(address,address)"))`.
     uint256 internal constant _ADMIN_CHANGED_EVENT_SIGNATURE =
         0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f;
 
-    /// @dev `keccak256(bytes("Upgraded(address,address)"))`.
+    /// @dev `sha3(bytes("Upgraded(address,address)"))`.
     uint256 internal constant _UPGRADED_EVENT_SIGNATURE =
         0x5d611f318680d00598bb735d61bacf0c514c6b50e1e5ad30040a4df2b12791c7;
 
-    /// @dev `keccak256(bytes("Deployed(address,address,address)"))`.
+    /// @dev `sha3(bytes("Deployed(address,address,address)"))`.
     uint256 internal constant _DEPLOYED_EVENT_SIGNATURE =
         0xc95935a66d15e0da5e412aca0ad27ae891d20b2fb91cf3994b6a3bf2b8178082;
 
@@ -7282,11 +7282,11 @@ contract ERC1967Factory {
     // ```
     //     mstore(0x0c, address())
     //     mstore(0x00, proxy)
-    //     let adminSlot := keccak256(0x0c, 0x20)
+    //     let adminSlot := sha3(0x0c, 0x20)
     // ```
 
     /// @dev The ERC-1967 storage slot for the implementation in the proxy.
-    /// `uint256(keccak256("eip1967.proxy.implementation")) - 1`.
+    /// `uint256(sha3("eip1967.proxy.implementation")) - 1`.
     uint256 internal constant _IMPLEMENTATION_SLOT =
         0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
@@ -7300,7 +7300,7 @@ contract ERC1967Factory {
         assembly {
             mstore(0x0c, address())
             mstore(0x00, proxy)
-            admin := sload(keccak256(0x0c, 0x20))
+            admin := sload(sha3(0x0c, 0x20))
         }
     }
 
@@ -7312,7 +7312,7 @@ contract ERC1967Factory {
             // Check if the caller is the admin of the proxy.
             mstore(0x0c, address())
             mstore(0x00, proxy)
-            let adminSlot := keccak256(0x0c, 0x20)
+            let adminSlot := sha3(0x0c, 0x20)
             if iszero(eq(sload(adminSlot), caller())) {
                 mstore(0x00, _UNAUTHORIZED_ERROR_SELECTOR)
                 revert(0x1c, 0x04)
@@ -7346,7 +7346,7 @@ contract ERC1967Factory {
             // Check if the caller is the admin of the proxy.
             mstore(0x0c, address())
             mstore(0x00, proxy)
-            if iszero(eq(sload(keccak256(0x0c, 0x20)), caller())) {
+            if iszero(eq(sload(sha3(0x0c, 0x20)), caller())) {
                 mstore(0x00, _UNAUTHORIZED_ERROR_SELECTOR)
                 revert(0x1c, 0x04)
             }
@@ -7466,7 +7466,7 @@ contract ERC1967Factory {
             // Store the admin for the proxy.
             mstore(0x0c, address())
             mstore(0x00, proxy)
-            sstore(keccak256(0x0c, 0x20), admin)
+            sstore(sha3(0x0c, 0x20), admin)
 
             // Emit the {Deployed} event.
             log4(0, 0, _DEPLOYED_EVENT_SIGNATURE, proxy, implementation, admin)
@@ -7483,7 +7483,7 @@ contract ERC1967Factory {
             mstore(0x35, hash)
             mstore(0x01, shl(96, address()))
             mstore(0x15, salt)
-            predicted := keccak256(0x00, 0x55)
+            predicted := sha3(0x00, 0x55)
             // Restore the part of the free memory pointer that has been overwritten.
             mstore(0x35, 0)
         }
@@ -7495,7 +7495,7 @@ contract ERC1967Factory {
         bytes memory m = _initCode();
         /// @solidity memory-safe-assembly
         assembly {
-            result := keccak256(add(m, 0x13), 0x89)
+            result := sha3(add(m, 0x13), 0x89)
         }
     }
 
@@ -7917,7 +7917,7 @@ library LibBitmap {
         assembly {
             mstore(0x00, shr(8, index))
             mstore(0x20, bitmap.slot)
-            let storageSlot := keccak256(0x00, 0x40)
+            let storageSlot := sha3(0x00, 0x40)
             let shift := and(index, 0xff)
             let storageValue := sload(storageSlot)
 
@@ -7938,7 +7938,7 @@ library LibBitmap {
         assembly {
             mstore(0x20, bitmap.slot)
             mstore(0x00, shr(8, index))
-            let storageSlot := keccak256(0x00, 0x40)
+            let storageSlot := sha3(0x00, 0x40)
             let storageValue := sload(storageSlot)
             let shift := and(index, 0xff)
 
@@ -7959,7 +7959,7 @@ library LibBitmap {
             mstore(0x20, bitmap.slot)
             mstore(0x00, shr(8, start))
             if iszero(lt(add(shift, amount), 257)) {
-                let storageSlot := keccak256(0x00, 0x40)
+                let storageSlot := sha3(0x00, 0x40)
                 sstore(storageSlot, or(sload(storageSlot), shl(shift, max)))
                 let bucket := add(mload(0x00), 1)
                 let bucketEnd := add(mload(0x00), shr(8, add(amount, shift)))
@@ -7967,11 +7967,11 @@ library LibBitmap {
                 shift := 0
                 for {} iszero(eq(bucket, bucketEnd)) { bucket := add(bucket, 1) } {
                     mstore(0x00, bucket)
-                    sstore(keccak256(0x00, 0x40), max)
+                    sstore(sha3(0x00, 0x40), max)
                 }
                 mstore(0x00, bucket)
             }
-            let storageSlot := keccak256(0x00, 0x40)
+            let storageSlot := sha3(0x00, 0x40)
             sstore(storageSlot, or(sload(storageSlot), shl(shift, shr(sub(256, amount), max))))
         }
     }
@@ -7984,7 +7984,7 @@ library LibBitmap {
             mstore(0x20, bitmap.slot)
             mstore(0x00, shr(8, start))
             if iszero(lt(add(shift, amount), 257)) {
-                let storageSlot := keccak256(0x00, 0x40)
+                let storageSlot := sha3(0x00, 0x40)
                 sstore(storageSlot, and(sload(storageSlot), not(shl(shift, not(0)))))
                 let bucket := add(mload(0x00), 1)
                 let bucketEnd := add(mload(0x00), shr(8, add(amount, shift)))
@@ -7992,11 +7992,11 @@ library LibBitmap {
                 shift := 0
                 for {} iszero(eq(bucket, bucketEnd)) { bucket := add(bucket, 1) } {
                     mstore(0x00, bucket)
-                    sstore(keccak256(0x00, 0x40), 0)
+                    sstore(sha3(0x00, 0x40), 0)
                 }
                 mstore(0x00, bucket)
             }
-            let storageSlot := keccak256(0x00, 0x40)
+            let storageSlot := sha3(0x00, 0x40)
             sstore(
                 storageSlot, and(sload(storageSlot), not(shl(shift, shr(sub(256, amount), not(0)))))
             )
@@ -8042,12 +8042,12 @@ library LibBitmap {
             mstore(0x00, bucket)
             mstore(0x20, bitmap.slot)
             let offset := and(0xff, not(before)) // `256 - (255 & before) - 1`.
-            bucketBits := shr(offset, shl(offset, sload(keccak256(0x00, 0x40))))
+            bucketBits := shr(offset, shl(offset, sload(sha3(0x00, 0x40))))
             if iszero(bucketBits) {
                 for {} bucket {} {
                     bucket := add(bucket, setBitIndex) // `sub(bucket, 1)`.
                     mstore(0x00, bucket)
-                    bucketBits := sload(keccak256(0x00, 0x40))
+                    bucketBits := sload(sha3(0x00, 0x40))
                     if bucketBits { break }
                 }
             }
@@ -8109,7 +8109,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(5, index))
-            result := byte(and(31, not(index)), sload(keccak256(0x00, 0x40)))
+            result := byte(and(31, not(index)), sload(sha3(0x00, 0x40)))
         }
     }
 
@@ -8119,7 +8119,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(5, index))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             mstore(0x00, sload(s))
             mstore8(and(31, not(index)), value)
             sstore(s, mload(0x00))
@@ -8137,7 +8137,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(4, index))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             let o := shl(4, and(index, 15)) // Storage slot offset (bits).
             let v := sload(s) // Storage slot value.
             let m := 0xffff // Value mask.
@@ -8156,7 +8156,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(3, index))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             let o := shl(5, and(index, 7)) // Storage slot offset (bits).
             let v := sload(s) // Storage slot value.
             let m := 0xffffffff // Value mask.
@@ -8177,7 +8177,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, div(index, 6))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             let o := mul(40, mod(index, 6)) // Storage slot offset (bits).
             let v := sload(s) // Storage slot value.
             let m := 0xffffffffff // Value mask.
@@ -8196,7 +8196,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(2, index))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             let o := shl(6, and(index, 3)) // Storage slot offset (bits).
             let v := sload(s) // Storage slot value.
             let m := 0xffffffffffffffff // Value mask.
@@ -8215,7 +8215,7 @@ library LibMap {
         assembly {
             mstore(0x20, map.slot)
             mstore(0x00, shr(1, index))
-            let s := keccak256(0x00, 0x40) // Storage slot.
+            let s := sha3(0x00, 0x40) // Storage slot.
             let o := shl(7, and(index, 1)) // Storage slot offset (bits).
             let v := sload(s) // Storage slot value.
             let m := 0xffffffffffffffffffffffffffffffff // Value mask.
@@ -8370,7 +8370,7 @@ library LibClone {
             mstore(0x21, 0x5af43d3d93803e602a57fd5bf3)
             mstore(0x14, implementation)
             mstore(0x00, 0x602c3d8160093d39f33d3d3d3d363d3d37363d73)
-            hash := keccak256(0x0c, 0x35)
+            hash := sha3(0x0c, 0x35)
             // Restore the part of the free memory pointer that has been overwritten.
             mstore(0x21, 0)
         }
@@ -8500,7 +8500,7 @@ library LibClone {
             mstore(0x24, 0x5af43d5f5f3e6029573d5ffd5b3d5ff3) // 16
             mstore(0x14, implementation) // 20
             mstore(0x00, 0x602d5f8160095f39f35f5f365f5f37365f73) // 9 + 9
-            hash := keccak256(0x0e, 0x36)
+            hash := sha3(0x0e, 0x36)
             // Restore the part of the free memory pointer that has been overwritten.
             mstore(0x24, 0)
         }
@@ -8625,7 +8625,7 @@ library LibClone {
                 sub(data, 0x21),
                 or(shl(0x48, extraLength), 0x593da1005b363d3d373d3d3d3d610000806062363936013d73)
             )
-            // `keccak256("ReceiveETH(uint256)")`
+            // `sha3("ReceiveETH(uint256)")`
             mstore(
                 sub(data, 0x3a), 0x9e4ac34f21c619cefc926c8bd93b54bf5a39c7ab2127a895af1cc0691d7e3dff
             )
@@ -8682,7 +8682,7 @@ library LibClone {
                 sub(data, 0x21),
                 or(shl(0x48, extraLength), 0x593da1005b363d3d373d3d3d3d610000806062363936013d73)
             )
-            // `keccak256("ReceiveETH(uint256)")`
+            // `sha3("ReceiveETH(uint256)")`
             mstore(
                 sub(data, 0x3a), 0x9e4ac34f21c619cefc926c8bd93b54bf5a39c7ab2127a895af1cc0691d7e3dff
             )
@@ -8741,7 +8741,7 @@ library LibClone {
                 sub(data, 0x21),
                 or(shl(0x48, extraLength), 0x593da1005b363d3d373d3d3d3d610000806062363936013d73)
             )
-            // `keccak256("ReceiveETH(uint256)")`
+            // `sha3("ReceiveETH(uint256)")`
             mstore(
                 sub(data, 0x3a), 0x9e4ac34f21c619cefc926c8bd93b54bf5a39c7ab2127a895af1cc0691d7e3dff
             )
@@ -8752,7 +8752,7 @@ library LibClone {
             mstore(dataEnd, shl(0xf0, extraLength))
 
             // Compute and store the bytecode hash.
-            hash := keccak256(sub(data, 0x4c), add(extraLength, 0x6c))
+            hash := sha3(sub(data, 0x4c), add(extraLength, 0x6c))
 
             // Restore the overwritten memory surrounding `data`.
             mstore(dataEnd, mAfter1)
@@ -8793,7 +8793,7 @@ library LibClone {
             mstore(0x35, hash)
             mstore(0x01, shl(96, deployer))
             mstore(0x15, salt)
-            predicted := keccak256(0x00, 0x55)
+            predicted := sha3(0x00, 0x55)
             // Restore the part of the free memory pointer that has been overwritten.
             mstore(0x35, 0)
         }
@@ -8841,7 +8841,7 @@ library LibPRNG {
     /// @dev Returns the next psuedorandom uint256.
     /// All bits of the returned uint256 pass the NIST Statistical Test Suite.
     function next(PRNG memory prng) internal pure returns (uint256 result) {
-        // We simply use `keccak256` for a great balance between
+        // We simply use `sha3` for a great balance between
         // runtime gas costs, bytecode size, and statistical properties.
         //
         // A high-quality LCG with a 32-byte state
@@ -8850,10 +8850,10 @@ library LibPRNG {
         // when this function is inlined.
         //
         // Using this method is about 2x more efficient than
-        // `nextRandomness = uint256(keccak256(abi.encode(randomness)))`.
+        // `nextRandomness = uint256(sha3(abi.encode(randomness)))`.
         /// @solidity memory-safe-assembly
         assembly {
-            result := keccak256(prng, 0x20)
+            result := sha3(prng, 0x20)
             mstore(prng, result)
         }
     }
@@ -8869,7 +8869,7 @@ library LibPRNG {
         /// @solidity memory-safe-assembly
         assembly {
             for {} 1 {} {
-                result := keccak256(prng, 0x20)
+                result := sha3(prng, 0x20)
                 mstore(prng, result)
                 if iszero(lt(result, mod(sub(0, upper), upper))) { break }
             }
@@ -8886,9 +8886,9 @@ library LibPRNG {
             let mask := shr(128, w)
             if n {
                 for { a := add(a, 0x20) } 1 {} {
-                    // We can just directly use `keccak256`, cuz
+                    // We can just directly use `sha3`, cuz
                     // the other approaches don't save much.
-                    let r := keccak256(prng, 0x20)
+                    let r := sha3(prng, 0x20)
                     mstore(prng, r)
 
                     // Note that there will be a very tiny modulo bias
@@ -8931,9 +8931,9 @@ library LibPRNG {
             if n {
                 let b := add(a, 0x01)
                 for { a := add(a, 0x20) } 1 {} {
-                    // We can just directly use `keccak256`, cuz
+                    // We can just directly use `sha3`, cuz
                     // the other approaches don't save much.
-                    let r := keccak256(prng, 0x20)
+                    let r := sha3(prng, 0x20)
                     mstore(prng, r)
 
                     // Note that there will be a very tiny modulo bias
@@ -9011,7 +9011,7 @@ library LibRLP {
                     mstore8(0x0a, 0xd6)
                     // `shl` 7 is equivalent to multiplying by 0x80.
                     mstore8(0x20, or(shl(7, iszero(nonce)), nonce))
-                    deployed := keccak256(0x0a, 0x17)
+                    deployed := sha3(0x0a, 0x17)
                     break
                 }
                 let i := 8
@@ -9025,7 +9025,7 @@ library LibRLP {
                 mstore8(0x1f, add(0x80, i))
                 mstore8(0x0a, 0x94)
                 mstore8(0x09, add(0xd6, i))
-                deployed := keccak256(0x09, add(0x17, i))
+                deployed := sha3(0x09, add(0x17, i))
                 break
             }
         }
@@ -9948,7 +9948,7 @@ library LibString {
         assembly {
             let mask := shl(6, div(not(0), 255)) // `0b010000000100000000 ...`
             let o := add(str, 0x22)
-            let hashed := and(keccak256(o, 40), mul(34, mask)) // `0b10001000 ... `
+            let hashed := and(sha3(o, 40), mul(34, mask)) // `0b10001000 ... `
             let t := shl(240, 136) // `0b10001000 << 240`
             for { let i := 0 } 1 {} {
                 mstore(add(i, i), mul(t, byte(i, hashed)))
@@ -10125,7 +10125,7 @@ library LibString {
             if iszero(gt(searchLength, subjectLength)) {
                 let subjectSearchEnd := add(sub(subjectEnd, searchLength), 1)
                 let h := 0
-                if iszero(lt(searchLength, 0x20)) { h := keccak256(search, searchLength) }
+                if iszero(lt(searchLength, 0x20)) { h := sha3(search, searchLength) }
                 let m := shl(3, sub(0x20, and(searchLength, 0x1f)))
                 let s := mload(search)
                 for {} 1 {} {
@@ -10134,7 +10134,7 @@ library LibString {
                     // `subject` and `search` matches.
                     if iszero(shr(m, xor(t, s))) {
                         if h {
-                            if iszero(eq(keccak256(subject, searchLength), h)) {
+                            if iszero(eq(sha3(subject, searchLength), h)) {
                                 mstore(result, t)
                                 result := add(result, 1)
                                 subject := add(subject, 1)
@@ -10212,9 +10212,9 @@ library LibString {
                 if iszero(and(lt(subject, end), lt(from, subjectLength))) { break }
 
                 if iszero(lt(searchLength, 0x20)) {
-                    for { let h := keccak256(add(search, 0x20), searchLength) } 1 {} {
+                    for { let h := sha3(add(search, 0x20), searchLength) } 1 {} {
                         if iszero(shr(m, xor(mload(subject), s))) {
-                            if eq(keccak256(subject, searchLength), h) {
+                            if eq(sha3(subject, searchLength), h) {
                                 result := sub(subject, subjectStart)
                                 break
                             }
@@ -10271,9 +10271,9 @@ library LibString {
                 subject := add(add(subject, 0x20), from)
                 if iszero(gt(subject, end)) { break }
                 // As this function is not too often used,
-                // we shall simply use keccak256 for smaller bytecode size.
-                for { let h := keccak256(add(search, 0x20), searchLength) } 1 {} {
-                    if eq(keccak256(subject, searchLength), h) {
+                // we shall simply use sha3 for smaller bytecode size.
+                for { let h := sha3(add(search, 0x20), searchLength) } 1 {} {
+                    if eq(sha3(subject, searchLength), h) {
                         result := sub(subject, add(end, 1))
                         break
                     }
@@ -10305,13 +10305,13 @@ library LibString {
         /// @solidity memory-safe-assembly
         assembly {
             let searchLength := mload(search)
-            // Just using keccak256 directly is actually cheaper.
+            // Just using sha3 directly is actually cheaper.
             // forgefmt: disable-next-item
             result := and(
                 iszero(gt(searchLength, mload(subject))),
                 eq(
-                    keccak256(add(subject, 0x20), searchLength),
-                    keccak256(add(search, 0x20), searchLength)
+                    sha3(add(subject, 0x20), searchLength),
+                    sha3(add(search, 0x20), searchLength)
                 )
             )
         }
@@ -10329,17 +10329,17 @@ library LibString {
             let subjectLength := mload(subject)
             // Whether `search` is not longer than `subject`.
             let withinRange := iszero(gt(searchLength, subjectLength))
-            // Just using keccak256 directly is actually cheaper.
+            // Just using sha3 directly is actually cheaper.
             // forgefmt: disable-next-item
             result := and(
                 withinRange,
                 eq(
-                    keccak256(
+                    sha3(
                         // `subject + 0x20 + max(subjectLength - searchLength, 0)`.
                         add(add(subject, 0x20), mul(withinRange, sub(subjectLength, searchLength))),
                         searchLength
                     ),
-                    keccak256(add(search, 0x20), searchLength)
+                    sha3(add(search, 0x20), searchLength)
                 )
             )
         }
@@ -10441,7 +10441,7 @@ library LibString {
                 let subjectStart := subject
                 let subjectSearchEnd := add(sub(add(subject, subjectLength), searchLength), 1)
                 let h := 0
-                if iszero(lt(searchLength, 0x20)) { h := keccak256(search, searchLength) }
+                if iszero(lt(searchLength, 0x20)) { h := sha3(search, searchLength) }
                 let m := shl(3, sub(0x20, and(searchLength, 0x1f)))
                 let s := mload(search)
                 for {} 1 {} {
@@ -10450,7 +10450,7 @@ library LibString {
                     // `subject` and `search` matches.
                     if iszero(shr(m, xor(t, s))) {
                         if h {
-                            if iszero(eq(keccak256(subject, searchLength), h)) {
+                            if iszero(eq(sha3(subject, searchLength), h)) {
                                 subject := add(subject, 1)
                                 if iszero(lt(subject, subjectSearchEnd)) { break }
                                 continue
@@ -10695,7 +10695,7 @@ library LibString {
     /// @dev Returns whether `a` equals `b`.
     function eq(string memory a, string memory b) internal pure returns (bool result) {
         assembly {
-            result := eq(keccak256(add(a, 0x20), mload(a)), keccak256(add(b, 0x20), mload(b)))
+            result := eq(sha3(add(a, 0x20), mload(a)), sha3(add(b, 0x20), mload(b)))
         }
     }
 
@@ -11111,7 +11111,7 @@ library MerkleProofLib {
                     mstore(scratch, leaf)
                     mstore(xor(scratch, 0x20), mload(offset))
                     // Reuse `leaf` to store the hash to reduce stack operations.
-                    leaf := keccak256(0x00, 0x40)
+                    leaf := sha3(0x00, 0x40)
                     offset := add(offset, 0x20)
                     if iszero(lt(offset, end)) { break }
                 }
@@ -11143,7 +11143,7 @@ library MerkleProofLib {
                     mstore(scratch, leaf)
                     mstore(xor(scratch, 0x20), calldataload(offset))
                     // Reuse `leaf` to store the hash to reduce stack operations.
-                    leaf := keccak256(0x00, 0x40)
+                    leaf := sha3(0x00, 0x40)
                     offset := add(offset, 0x20)
                     if iszero(lt(offset, end)) { break }
                 }
@@ -11233,7 +11233,7 @@ library MerkleProofLib {
                     // Hash the scratch space and push the result onto the queue.
                     mstore(scratch, a)
                     mstore(xor(scratch, 0x20), b)
-                    mstore(hashesBack, keccak256(0x00, 0x40))
+                    mstore(hashesBack, sha3(0x00, 0x40))
                     hashesBack := add(hashesBack, 0x20)
                     if iszero(lt(hashesBack, flagsLength)) { break }
                 }
@@ -11321,7 +11321,7 @@ library MerkleProofLib {
                     // Hash the scratch space and push the result onto the queue.
                     mstore(scratch, a)
                     mstore(xor(scratch, 0x20), b)
-                    mstore(hashesBack, keccak256(0x00, 0x40))
+                    mstore(hashesBack, sha3(0x00, 0x40))
                     hashesBack := add(hashesBack, 0x20)
                     if iszero(lt(hashesBack, flags.length)) { break }
                 }
@@ -11400,7 +11400,7 @@ library MinHeapLib {
                 revert(0x1c, 0x04) // Revert with (offset, size).
             }
             mstore(0x00, heap.slot)
-            result := sload(keccak256(0x00, 0x20))
+            result := sload(sha3(0x00, 0x20))
         }
     }
 
@@ -11466,7 +11466,7 @@ library MinHeapLib {
             let n := sload(heap.slot)
             // Compute the array storage slot offset.
             mstore(0x00, heap.slot)
-            let sOffset := keccak256(0x00, 0x20)
+            let sOffset := sha3(0x00, 0x20)
 
             let pos := 0
             let childPos := not(0)
@@ -11652,16 +11652,16 @@ library RedBlackTreeLib {
     /// @dev The tree is full.
     error TreeIsFull();
 
-    /// @dev `bytes4(keccak256(bytes("ValueAlreadyExists()")))`.
+    /// @dev `bytes4(sha3(bytes("ValueAlreadyExists()")))`.
     uint256 internal constant ERROR_VALUE_ALREADY_EXISTS = 0xbb33e6ac;
 
-    /// @dev `bytes4(keccak256(bytes("ValueDoesNotExist()")))`.
+    /// @dev `bytes4(sha3(bytes("ValueDoesNotExist()")))`.
     uint256 internal constant ERROR_VALUE_DOES_NOT_EXISTS = 0xb113638a;
 
-    /// @dev `bytes4(keccak256(bytes("PointerOutOfBounds()")))`.
+    /// @dev `bytes4(sha3(bytes("PointerOutOfBounds()")))`.
     uint256 internal constant ERROR_POINTER_OUT_OF_BOUNDS = 0xccd52fbc;
 
-    /// @dev `bytes4(keccak256(bytes("TreeIsFull()")))`.
+    /// @dev `bytes4(sha3(bytes("TreeIsFull()")))`.
     uint256 internal constant ERROR_TREE_IS_FULL = 0xed732d0c;
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
@@ -11677,7 +11677,7 @@ library RedBlackTreeLib {
     // ```
     // mstore(0x20, tree.slot)
     // mstore(0x00, _NODES_SLOT_SEED)
-    // let nodes := shl(_NODES_SLOT_SHIFT, keccak256(0x00, 0x40))
+    // let nodes := shl(_NODES_SLOT_SHIFT, sha3(0x00, 0x40))
     //
     // let root := shr(128, sload(nodes))
     // let totalNodes := and(sload(nodes), _BITMASK_KEY)
@@ -12310,7 +12310,7 @@ library RedBlackTreeLib {
         assembly {
             mstore(0x20, tree.slot)
             mstore(0x00, _NODES_SLOT_SEED)
-            nodes := shl(_NODES_SLOT_SHIFT, keccak256(0x00, 0x40))
+            nodes := shl(_NODES_SLOT_SHIFT, sha3(0x00, 0x40))
         }
     }
 
@@ -12325,7 +12325,7 @@ library RedBlackTreeLib {
         assembly {
             mstore(0x20, tree.slot)
             mstore(0x00, _NODES_SLOT_SEED)
-            nodes := shl(_NODES_SLOT_SHIFT, keccak256(0x00, 0x40))
+            nodes := shl(_NODES_SLOT_SHIFT, sha3(0x00, 0x40))
 
             mstore(0x01, _BITPOS_RIGHT)
             for { let probe := shr(128, sload(nodes)) } probe {} {
@@ -12474,7 +12474,7 @@ library SSTORE2 {
 
             mstore(data, or(0x61000080600a3d393df300, shl(0x40, dataSize)))
 
-            hash := keccak256(add(data, 0x15), add(dataSize, 0xa))
+            hash := sha3(add(data, 0x15), add(dataSize, 0xa))
 
             // Restore original length of the variable size `data`.
             mstore(data, originalDataLength)
@@ -12496,7 +12496,7 @@ library SSTORE2 {
             mstore(0x35, hash)
             mstore(0x01, shl(96, deployer))
             mstore(0x15, salt)
-            predicted := keccak256(0x00, 0x55)
+            predicted := sha3(0x00, 0x55)
             // Restore the part of the free memory pointer that has been overwritten.
             mstore(0x35, 0)
         }
@@ -13062,7 +13062,7 @@ library SignatureCheckerLib {
                     }
                 }
 
-                // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+                // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
                 let f := shl(224, 0x1626ba7e)
                 // Write the abi-encoded calldata into memory, beginning with the function selector.
                 mstore(m, f)
@@ -13147,7 +13147,7 @@ library SignatureCheckerLib {
                     }
                 }
 
-                // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+                // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
                 let f := shl(224, 0x1626ba7e)
                 // Write the abi-encoded calldata into memory, beginning with the function selector.
                 mstore(m, f)
@@ -13241,10 +13241,10 @@ library SignatureCheckerLib {
                     }
                 }
 
-                // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+                // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
                 let f := shl(224, 0x1626ba7e)
                 // Write the abi-encoded calldata into memory, beginning with the function selector.
-                mstore(m, f) // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+                mstore(m, f) // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
                 mstore(add(m, 0x04), hash)
                 mstore(add(m, 0x24), 0x40) // The offset of the `signature` in the calldata.
                 mstore(add(m, 0x44), 65) // Store the length of the signature.
@@ -13296,7 +13296,7 @@ library SignatureCheckerLib {
 
             let signatureLength := mload(signature)
 
-            // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+            // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
             let f := shl(224, 0x1626ba7e)
             // Write the abi-encoded calldata into memory, beginning with the function selector.
             mstore(m, f)
@@ -13349,7 +13349,7 @@ library SignatureCheckerLib {
             // Simply using the free memory usually costs less if many slots are needed.
             let m := mload(0x40)
 
-            // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+            // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
             let f := shl(224, 0x1626ba7e)
             // Write the abi-encoded calldata into memory, beginning with the function selector.
             mstore(m, f)
@@ -13412,10 +13412,10 @@ library SignatureCheckerLib {
             // Simply using the free memory usually costs less if many slots are needed.
             let m := mload(0x40)
 
-            // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+            // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
             let f := shl(224, 0x1626ba7e)
             // Write the abi-encoded calldata into memory, beginning with the function selector.
-            mstore(m, f) // `bytes4(keccak256("isValidSignature(bytes32,bytes)"))`.
+            mstore(m, f) // `bytes4(sha3("isValidSignature(bytes32,bytes)"))`.
             mstore(add(m, 0x04), hash)
             mstore(add(m, 0x24), 0x40) // The offset of the `signature` in the calldata.
             mstore(add(m, 0x44), 65) // Store the length of the signature.

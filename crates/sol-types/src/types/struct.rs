@@ -4,7 +4,7 @@
 use super::SolType;
 use crate::Eip712Domain;
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{keccak256, B256};
+use alloy_primitives::{sha3, B256};
 
 /// A Solidity struct.
 ///
@@ -78,7 +78,7 @@ pub trait SolStruct: SolType<RustType = Self> {
     /// [`encodeType`](Self::eip712_encode_type) string.
     #[inline]
     fn eip712_type_hash(&self) -> B256 {
-        keccak256(Self::eip712_encode_type().as_bytes())
+        sha3(Self::eip712_encode_type().as_bytes())
     }
 
     /// Encodes this domain using [EIP-712 `encodeData`](https://eips.ethereum.org/EIPS/eip-712#definition-of-encodedata).
@@ -87,7 +87,7 @@ pub trait SolStruct: SolType<RustType = Self> {
     /// Hashes this struct according to [EIP-712 `hashStruct`](https://eips.ethereum.org/EIPS/eip-712#definition-of-hashstruct).
     #[inline]
     fn eip712_hash_struct(&self) -> B256 {
-        let mut hasher = alloy_primitives::Keccak256::new();
+        let mut hasher = alloy_primitives::Sha3::new();
         hasher.update(self.eip712_type_hash());
         hasher.update(self.eip712_encode_data());
         hasher.finalize()
@@ -103,6 +103,6 @@ pub trait SolStruct: SolType<RustType = Self> {
         digest_input[1] = 0x01;
         digest_input[2..34].copy_from_slice(&domain.hash_struct()[..]);
         digest_input[34..66].copy_from_slice(&self.eip712_hash_struct()[..]);
-        keccak256(digest_input)
+        sha3(digest_input)
     }
 }

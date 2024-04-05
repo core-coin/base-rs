@@ -136,7 +136,7 @@ custom_keywords!(
     addmod,
     mulmod,
     signextend,
-    keccak256,
+    sha3,
     pop,
     mload,
     mstore,

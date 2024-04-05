@@ -1,7 +1,7 @@
 use crate::{DynSolError, Specifier};
 use alloc::vec::Vec;
 use alloy_json_abi::Error;
-use alloy_primitives::{keccak256, Selector};
+use alloy_primitives::{sha3, Selector};
 
 mod sealed {
     pub trait Sealed {}
@@ -12,7 +12,7 @@ use sealed::Sealed;
 impl Specifier<DynSolError> for Error {
     fn resolve(&self) -> crate::Result<DynSolError> {
         let signature = self.signature();
-        let selector = Selector::from_slice(&keccak256(signature)[0..4]);
+        let selector = Selector::from_slice(&sha3(signature)[0..4]);
 
         let mut body = Vec::with_capacity(self.inputs.len());
         for param in &self.inputs {

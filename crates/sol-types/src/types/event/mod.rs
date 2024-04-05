@@ -43,7 +43,7 @@ pub trait SolEvent: Sized {
     /// For anonymous events, this is unused, but is still present.
     const SIGNATURE: &'static str;
 
-    /// The event's ABI signature hash, or selector: `keccak256(SIGNATURE)`
+    /// The event's ABI signature hash, or selector: `sha3(SIGNATURE)`
     ///
     /// For non-anonymous events, this will be the first topic (`topic0`).
     /// For anonymous events, this is unused, but is still present.

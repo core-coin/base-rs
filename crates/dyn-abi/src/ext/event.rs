@@ -80,7 +80,7 @@ mod tests {
 
     use super::*;
     use alloy_json_abi::EventParam;
-    use alloy_primitives::{address, b256, bytes, hex, keccak256, Signed};
+    use alloy_primitives::{address, b256, bytes, hex, sha3, Signed};
 
     #[test]
     fn empty() {
@@ -95,7 +95,7 @@ mod tests {
         let err = event.decode_log_parts(None, &[], true).unwrap_err();
         assert_eq!(err, Error::TopicLengthMismatch { expected: 1, actual: 0 });
 
-        let values = event.decode_log_parts(Some(keccak256("MyEvent()")), &[], true).unwrap();
+        let values = event.decode_log_parts(Some(sha3("MyEvent()")), &[], true).unwrap();
         assert!(values.indexed.is_empty());
         assert!(values.body.is_empty());
         event.anonymous = true;

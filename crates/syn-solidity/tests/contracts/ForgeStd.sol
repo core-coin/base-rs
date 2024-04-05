@@ -3132,7 +3132,7 @@ contract DSTest {
     bool private _failed;
 
     address constant HEVM_ADDRESS =
-        address(bytes20(uint160(uint256(keccak256('hevm cheat code')))));
+        address(bytes20(uint160(uint256(sha3('hevm cheat code')))));
 
     modifier mayRevert() { _; }
     modifier testopts(string memory) { _; }
@@ -3145,7 +3145,7 @@ contract DSTest {
             if (hasHEVMContext()) {
                 (, bytes memory retdata) = HEVM_ADDRESS.call(
                     abi.encodePacked(
-                        bytes4(keccak256("load(address,bytes32)")),
+                        bytes4(sha3("load(address,bytes32)")),
                         abi.encode(HEVM_ADDRESS, bytes32("failed"))
                     )
                 );
@@ -3159,7 +3159,7 @@ contract DSTest {
         if (hasHEVMContext()) {
             (bool status, ) = HEVM_ADDRESS.call(
                 abi.encodePacked(
-                    bytes4(keccak256("store(address,bytes32,bytes32)")),
+                    bytes4(sha3("store(address,bytes32,bytes32)")),
                     abi.encode(HEVM_ADDRESS, bytes32("failed"), bytes32(uint256(0x01)))
                 )
             );
@@ -3612,7 +3612,7 @@ contract DSTest {
     }
 
     function assertEq(string memory a, string memory b) internal {
-        if (keccak256(abi.encodePacked(a)) != keccak256(abi.encodePacked(b))) {
+        if (sha3(abi.encodePacked(a)) != sha3(abi.encodePacked(b))) {
             emit log("Error: a == b not satisfied [string]");
             emit log_named_string("      Left", a);
             emit log_named_string("     Right", b);
@@ -3620,14 +3620,14 @@ contract DSTest {
         }
     }
     function assertEq(string memory a, string memory b, string memory err) internal {
-        if (keccak256(abi.encodePacked(a)) != keccak256(abi.encodePacked(b))) {
+        if (sha3(abi.encodePacked(a)) != sha3(abi.encodePacked(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
     }
 
     function assertNotEq(string memory a, string memory b) internal {
-        if (keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b))) {
+        if (sha3(abi.encodePacked(a)) == sha3(abi.encodePacked(b))) {
             emit log("Error: a != b not satisfied [string]");
             emit log_named_string("      Left", a);
             emit log_named_string("     Right", b);
@@ -3635,7 +3635,7 @@ contract DSTest {
         }
     }
     function assertNotEq(string memory a, string memory b, string memory err) internal {
-        if (keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b))) {
+        if (sha3(abi.encodePacked(a)) == sha3(abi.encodePacked(b))) {
             emit log_named_string("Error", err);
             assertNotEq(a, b);
         }
@@ -3771,7 +3771,7 @@ abstract contract StdAssertions is DSTest {
     }
 
     function assertEq(uint256[] memory a, uint256[] memory b) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log("Error: a == b not satisfied [uint[]]");
             emit log_named_array("      Left", a);
             emit log_named_array("     Right", b);
@@ -3780,7 +3780,7 @@ abstract contract StdAssertions is DSTest {
     }
 
     function assertEq(int256[] memory a, int256[] memory b) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log("Error: a == b not satisfied [int[]]");
             emit log_named_array("      Left", a);
             emit log_named_array("     Right", b);
@@ -3789,7 +3789,7 @@ abstract contract StdAssertions is DSTest {
     }
 
     function assertEq(address[] memory a, address[] memory b) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log("Error: a == b not satisfied [address[]]");
             emit log_named_array("      Left", a);
             emit log_named_array("     Right", b);
@@ -3798,21 +3798,21 @@ abstract contract StdAssertions is DSTest {
     }
 
     function assertEq(uint256[] memory a, uint256[] memory b, string memory err) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
     }
 
     function assertEq(int256[] memory a, int256[] memory b, string memory err) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
     }
 
     function assertEq(address[] memory a, address[] memory b, string memory err) internal virtual {
-        if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
+        if (sha3(abi.encode(a)) != sha3(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
@@ -4633,7 +4633,7 @@ interface Vm is VmSafe {
  * Summarizing the above, the prioritization hierarchy is `setChain` -> `foundry.toml` -> environment variable -> defaults.
  */
 abstract contract StdChains {
-    VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
+    VmSafe private constant vm = VmSafe(address(uint160(uint256(sha3("hevm cheat code")))));
 
     bool private stdChainsInitialized;
 
@@ -4708,7 +4708,7 @@ abstract contract StdChains {
         string memory foundAlias = idToAlias[chain.chainId];
 
         require(
-            bytes(foundAlias).length == 0 || keccak256(bytes(foundAlias)) == keccak256(bytes(chainAlias)),
+            bytes(foundAlias).length == 0 || sha3(bytes(foundAlias)) == sha3(bytes(chainAlias)),
             string(
                 abi.encodePacked(
                     "StdChains setChain(string,ChainData): Chain ID ",
@@ -4763,7 +4763,7 @@ abstract contract StdChains {
                 // distinguish 'not found' from 'cannot read'
                 bytes memory notFoundError =
                     abi.encodeWithSignature("CheatCodeError", string(abi.encodePacked("invalid rpc url ", chainAlias)));
-                if (keccak256(notFoundError) != keccak256(err) || bytes(chain.rpcUrl).length == 0) {
+                if (sha3(notFoundError) != sha3(err) || bytes(chain.rpcUrl).length == 0) {
                     /// @solidity memory-safe-assembly
                     assembly {
                         revert(add(32, err), mload(err))
@@ -4843,18 +4843,18 @@ library stdStorageSafe {
     event SlotFound(address who, bytes4 fsig, bytes32 keysHash, uint256 slot);
     event WARNING_UninitedSlot(address who, uint256 slot);
 
-    Vm private constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private constant vm = Vm(address(uint160(uint256(sha3("hevm cheat code")))));
 
     function sigs(string memory sigStr) internal pure returns (bytes4) {
-        return bytes4(keccak256(bytes(sigStr)));
+        return bytes4(sha3(bytes(sigStr)));
     }
 
     /// @notice find an arbitrary storage slot given a function sig, input data, address of the contract and a value to check against
     // slot complexity:
     //  if flat, will be bytes32(uint256(uint));
-    //  if map, will be keccak256(abi.encode(key, uint(slot)));
-    //  if deep map, will be keccak256(abi.encode(key1, keccak256(abi.encode(key0, uint(slot)))));
-    //  if map struct, will be bytes32(uint256(keccak256(abi.encode(key1, keccak256(abi.encode(key0, uint(slot)))))) + structFieldDepth);
+    //  if map, will be sha3(abi.encode(key, uint(slot)));
+    //  if deep map, will be sha3(abi.encode(key1, sha3(abi.encode(key0, uint(slot)))));
+    //  if map struct, will be bytes32(uint256(sha3(abi.encode(key1, sha3(abi.encode(key0, uint(slot)))))) + structFieldDepth);
     function find(StdStorage storage self) internal returns (uint256) {
         address who = self._target;
         bytes4 fsig = self._sig;
@@ -4862,8 +4862,8 @@ library stdStorageSafe {
         bytes32[] memory ins = self._keys;
 
         // calldata to test against
-        if (self.finds[who][fsig][keccak256(abi.encodePacked(ins, field_depth))]) {
-            return self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))];
+        if (self.finds[who][fsig][sha3(abi.encodePacked(ins, field_depth))]) {
+            return self.slots[who][fsig][sha3(abi.encodePacked(ins, field_depth))];
         }
         bytes memory cald = abi.encodePacked(fsig, flatten(ins));
         vm.record();
@@ -4885,9 +4885,9 @@ library stdStorageSafe {
                     "stdStorage find(StdStorage): Packed slot. This would cause dangerous overwriting and currently isn't supported."
                 );
             }
-            emit SlotFound(who, fsig, keccak256(abi.encodePacked(ins, field_depth)), uint256(reads[0]));
-            self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))] = uint256(reads[0]);
-            self.finds[who][fsig][keccak256(abi.encodePacked(ins, field_depth))] = true;
+            emit SlotFound(who, fsig, sha3(abi.encodePacked(ins, field_depth)), uint256(reads[0]));
+            self.slots[who][fsig][sha3(abi.encodePacked(ins, field_depth))] = uint256(reads[0]);
+            self.finds[who][fsig][sha3(abi.encodePacked(ins, field_depth))] = true;
         } else if (reads.length > 1) {
             for (uint256 i = 0; i < reads.length; i++) {
                 bytes32 prev = vm.load(who, reads[i]);
@@ -4905,9 +4905,9 @@ library stdStorageSafe {
 
                 if (success && fdat == bytes32(hex"1337")) {
                     // we found which of the slots is the actual one
-                    emit SlotFound(who, fsig, keccak256(abi.encodePacked(ins, field_depth)), uint256(reads[i]));
-                    self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))] = uint256(reads[i]);
-                    self.finds[who][fsig][keccak256(abi.encodePacked(ins, field_depth))] = true;
+                    emit SlotFound(who, fsig, sha3(abi.encodePacked(ins, field_depth)), uint256(reads[i]));
+                    self.slots[who][fsig][sha3(abi.encodePacked(ins, field_depth))] = uint256(reads[i]);
+                    self.finds[who][fsig][sha3(abi.encodePacked(ins, field_depth))] = true;
                     vm.store(who, reads[i], prev);
                     break;
                 }
@@ -4918,7 +4918,7 @@ library stdStorageSafe {
         }
 
         require(
-            self.finds[who][fsig][keccak256(abi.encodePacked(ins, field_depth))],
+            self.finds[who][fsig][sha3(abi.encodePacked(ins, field_depth))],
             "stdStorage find(StdStorage): Slot(s) not found."
         );
 
@@ -4927,7 +4927,7 @@ library stdStorageSafe {
         delete self._keys;
         delete self._depth;
 
-        return self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))];
+        return self.slots[who][fsig][sha3(abi.encodePacked(ins, field_depth))];
     }
 
     function target(StdStorage storage self, address _target) internal returns (StdStorage storage) {
@@ -5019,7 +5019,7 @@ library stdStorageSafe {
 }
 
 library stdStorage {
-    Vm private constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private constant vm = Vm(address(uint160(uint256(sha3("hevm cheat code")))));
 
     function sigs(string memory sigStr) internal pure returns (bytes4) {
         return stdStorageSafe.sigs(sigStr);
@@ -5081,10 +5081,10 @@ library stdStorage {
         bytes32[] memory ins = self._keys;
 
         bytes memory cald = abi.encodePacked(fsig, flatten(ins));
-        if (!self.finds[who][fsig][keccak256(abi.encodePacked(ins, field_depth))]) {
+        if (!self.finds[who][fsig][sha3(abi.encodePacked(ins, field_depth))]) {
             find(self);
         }
-        bytes32 slot = bytes32(self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))]);
+        bytes32 slot = bytes32(self.slots[who][fsig][sha3(abi.encodePacked(ins, field_depth))]);
 
         bytes32 fdat;
         {
@@ -5153,7 +5153,7 @@ library stdStorage {
 }
 
 abstract contract StdCheatsSafe {
-    Vm private constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private constant vm = Vm(address(uint160(uint256(sha3("hevm cheat code")))));
 
     bool private gasMeteringOff;
 
@@ -5573,7 +5573,7 @@ abstract contract StdCheatsSafe {
 
     // creates a labeled address and the corresponding private key
     function makeAddrAndKey(string memory name) internal virtual returns (address addr, uint256 privateKey) {
-        privateKey = uint256(keccak256(abi.encodePacked(name)));
+        privateKey = uint256(sha3(abi.encodePacked(name)));
         addr = vm.addr(privateKey);
         vm.label(addr, name);
     }
@@ -5668,7 +5668,7 @@ abstract contract StdCheats is StdCheatsSafe {
     using stdStorage for StdStorage;
 
     StdStorage private stdstore;
-    Vm private constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private constant vm = Vm(address(uint160(uint256(sha3("hevm cheat code")))));
 
     // Skip forward or rewind time by the specified number of seconds
     function skip(uint256 time) internal virtual {
@@ -5944,7 +5944,7 @@ contract StdInvariant {
 // ```
 
 library stdJson {
-    VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
+    VmSafe private constant vm = VmSafe(address(uint160(uint256(sha3("hevm cheat code")))));
 
     function parseRaw(string memory json, string memory key) internal pure returns (bytes memory) {
         return vm.parseJson(json, key);
@@ -6170,7 +6170,7 @@ abstract contract StdUtils {
     //////////////////////////////////////////////////////////////////////////*/
 
     IMulticall3 private constant multicall = IMulticall3(0xcA11bde05977b3631167028862bE2a173976CA11);
-    VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
+    VmSafe private constant vm = VmSafe(address(uint160(uint256(sha3("hevm cheat code")))));
     address private constant CONSOLE2_ADDRESS = 0x000000000000000000636F6e736F6c652e6c6f67;
     uint256 private constant INT256_MIN_ABS =
         57896044618658097711785492504343953926634992332820282019728792003956564819968;
@@ -6258,13 +6258,13 @@ abstract contract StdUtils {
         // forgefmt: disable-start
         // The integer zero is treated as an empty byte string, and as a result it only has a length prefix, 0x80, computed via 0x80 + 0.
         // A one byte integer uses its own value as its length prefix, there is no additional "0x80 + length" prefix that comes before it.
-        if (nonce == 0x00)      return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, bytes1(0x80))));
-        if (nonce <= 0x7f)      return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, uint8(nonce))));
+        if (nonce == 0x00)      return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, bytes1(0x80))));
+        if (nonce <= 0x7f)      return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd6), bytes1(0x94), deployer, uint8(nonce))));
 
         // Nonces greater than 1 byte all follow a consistent encoding scheme, where each value is preceded by a prefix of 0x80 + length.
-        if (nonce <= 2**8 - 1)  return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd7), bytes1(0x94), deployer, bytes1(0x81), uint8(nonce))));
-        if (nonce <= 2**16 - 1) return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd8), bytes1(0x94), deployer, bytes1(0x82), uint16(nonce))));
-        if (nonce <= 2**24 - 1) return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xd9), bytes1(0x94), deployer, bytes1(0x83), uint24(nonce))));
+        if (nonce <= 2**8 - 1)  return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd7), bytes1(0x94), deployer, bytes1(0x81), uint8(nonce))));
+        if (nonce <= 2**16 - 1) return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd8), bytes1(0x94), deployer, bytes1(0x82), uint16(nonce))));
+        if (nonce <= 2**24 - 1) return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xd9), bytes1(0x94), deployer, bytes1(0x83), uint24(nonce))));
         // forgefmt: disable-end
 
         // More details about RLP encoding can be found here: https://eth.wiki/fundamentals/rlp
@@ -6273,7 +6273,7 @@ abstract contract StdUtils {
         // 0x84 = 0x80 + 0x04 (0x04 = the bytes length of the nonce, 4 bytes, in hex)
         // We assume nobody can have a nonce large enough to require more than 32 bytes.
         return addressFromLast20Bytes(
-            keccak256(abi.encodePacked(bytes1(0xda), bytes1(0x94), deployer, bytes1(0x84), uint32(nonce)))
+            sha3(abi.encodePacked(bytes1(0xda), bytes1(0x94), deployer, bytes1(0x84), uint32(nonce)))
         );
     }
 
@@ -6283,7 +6283,7 @@ abstract contract StdUtils {
         virtual
         returns (address)
     {
-        return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xff), deployer, salt, initcodeHash)));
+        return addressFromLast20Bytes(sha3(abi.encodePacked(bytes1(0xff), deployer, salt, initcodeHash)));
     }
 
     /// @dev returns the address of a contract created with CREATE2 using the default CREATE2 deployer
@@ -6301,7 +6301,7 @@ abstract contract StdUtils {
     /// @param creationCode the creation code of a contract C, as returned by type(C).creationCode
     /// @param args the ABI-encoded arguments to the constructor of C
     function hashInitCode(bytes memory creationCode, bytes memory args) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(creationCode, args));
+        return sha3(abi.encodePacked(creationCode, args));
     }
 
     // Performs a single call with Multicall3 to query the ERC-20 token balances of the given addresses.
@@ -6356,7 +6356,7 @@ abstract contract StdUtils {
 }
 
 library StdStyle {
-    Vm private constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private constant vm = Vm(address(uint160(uint256(sha3("hevm cheat code")))));
 
     string constant RED = "\u001b[91m";
     string constant GREEN = "\u001b[92m";
@@ -6688,13 +6688,13 @@ library StdStyle {
 
 abstract contract CommonBase {
     // Cheat code address, 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D.
-    address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
+    address internal constant VM_ADDRESS = address(uint160(uint256(sha3("hevm cheat code"))));
     // console.sol and console2.sol work by executing a staticcall to this address.
     address internal constant CONSOLE = 0x000000000000000000636F6e736F6c652e6c6f67;
     // Used when deploying with create2, https://github.com/Arachnid/deterministic-deployment-proxy.
     address internal constant CREATE2_FACTORY = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
     // Default address for tx.origin and msg.sender, 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38.
-    address internal constant DEFAULT_SENDER = address(uint160(uint256(keccak256("foundry default caller"))));
+    address internal constant DEFAULT_SENDER = address(uint160(uint256(sha3("foundry default caller"))));
     // Address of the test contract, deployed by the DEFAULT_SENDER.
     address internal constant DEFAULT_TEST_CONTRACT = 0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f;
     // Deterministic deployment address of the Multicall3 contract.

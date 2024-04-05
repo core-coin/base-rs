@@ -1,6 +1,6 @@
 use crate::{param::Param, utils::*, EventParam, StateMutability};
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{keccak256, Selector, B256};
+use alloy_primitives::{sha3, Selector, B256};
 use core::str::FromStr;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -418,7 +418,7 @@ impl Error {
         signature(&self.name, &self.inputs, None)
     }
 
-    /// Computes this error's selector: `keccak256(self.signature())[..4]`
+    /// Computes this error's selector: `sha3(self.signature())[..4]`
     #[inline]
     pub fn selector(&self) -> Selector {
         selector(&self.signature())
@@ -519,7 +519,7 @@ impl Function {
         full_signature(&self.name, &self.inputs, Some(&self.outputs), self.state_mutability)
     }
 
-    /// Computes this error's selector: `keccak256(self.signature())[..4]`
+    /// Computes this error's selector: `sha3(self.signature())[..4]`
     #[inline]
     pub fn selector(&self) -> Selector {
         selector(&self.signature())
@@ -591,10 +591,10 @@ impl Event {
         event_full_signature(&self.name, &self.inputs)
     }
 
-    /// Computes this event's selector: `keccak256(self.signature())`
+    /// Computes this event's selector: `sha3(self.signature())`
     #[inline]
     pub fn selector(&self) -> B256 {
-        keccak256(self.signature().as_bytes())
+        sha3(self.signature().as_bytes())
     }
 
     /// Computes the number of this event's indexed topics.

@@ -1,25 +1,25 @@
 use ast::Spanned;
 use proc_macro2::{Span, TokenStream};
 use quote::ToTokens;
-use tiny_keccak::{Hasher, Keccak};
+use tiny_keccak::{Hasher, Sha3};
 
-/// Simple interface to the [`keccak256`] hash function.
+/// Simple interface to the [`sha3`] hash function.
 ///
-/// [`keccak256`]: https://en.wikipedia.org/wiki/SHA-3
-pub fn keccak256<T: AsRef<[u8]>>(bytes: T) -> [u8; 32] {
+/// [`sha3`]: https://en.wikipedia.org/wiki/SHA-3
+pub fn sha3<T: AsRef<[u8]>>(bytes: T) -> [u8; 32] {
     let mut output = [0u8; 32];
-    let mut hasher = Keccak::v256();
+    let mut hasher = Sha3::v256();
     hasher.update(bytes.as_ref());
     hasher.finalize(&mut output);
     output
 }
 
 pub fn selector<T: AsRef<[u8]>>(bytes: T) -> ExprArray<u8> {
-    ExprArray::new(keccak256(bytes)[..4].to_vec())
+    ExprArray::new(sha3(bytes)[..4].to_vec())
 }
 
 pub fn event_selector<T: AsRef<[u8]>>(bytes: T) -> ExprArray<u8> {
-    ExprArray::new(keccak256(bytes).to_vec())
+    ExprArray::new(sha3(bytes).to_vec())
 }
 
 pub fn combine_errors(v: impl IntoIterator<Item = syn::Error>) -> syn::Result<()> {

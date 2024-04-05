@@ -58,7 +58,7 @@ impl DynSolError {
         Some(Self::new_unchecked(selector, body))
     }
 
-    /// Error selector is the first 4 bytes of the keccak256 hash of the error
+    /// Error selector is the first 4 bytes of the sha3 hash of the error
     /// declaration.
     pub const fn selector(&self) -> Selector {
         self.selector

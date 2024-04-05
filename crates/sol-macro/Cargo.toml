@@ -32,7 +32,7 @@ heck = "0.4"
 hex.workspace = true
 indexmap = "2"
 proc-macro-error = "1.0"
-tiny-keccak = { workspace = true, features = ["keccak"] }
+tiny-keccak = { workspace = true, features = ["sha3"] }
 
 # json
 alloy-json-abi = { workspace = true, optional = true }

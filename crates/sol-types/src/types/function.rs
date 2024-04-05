@@ -35,7 +35,7 @@ pub trait SolCall: Sized {
     /// The function's ABI signature.
     const SIGNATURE: &'static str;
 
-    /// The function selector: `keccak256(SIGNATURE)[0..4]`
+    /// The function selector: `sha3(SIGNATURE)[0..4]`
     const SELECTOR: [u8; 4];
 
     /// Convert from the tuple type used for ABI encoding and decoding.

@@ -70,7 +70,7 @@ pub type Signature = signature::Signature<k256::ecdsa::Signature>;
 pub type Signature = signature::Signature<()>;
 
 pub mod utils;
-pub use utils::{eip191_hash_message, keccak256, Keccak256};
+pub use utils::{eip191_hash_message, sha3, Sha3};
 
 #[doc(no_inline)]
 pub use {
