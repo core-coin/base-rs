@@ -1,9 +1,6 @@
-use core::{borrow::Borrow, fmt, mem::MaybeUninit, str};
-
+use crate::{keccak256, Address, FixedBytes};
+use core::{borrow::Borrow, fmt, str};
 use ruint::aliases::U176;
-use crate::{keccak256, Address, AddressError, FixedBytes};
-
-
 
 wrap_fixed_bytes!(
     extra_derives: [],
@@ -40,7 +37,7 @@ impl fmt::Display for ChecksumAddress {
 }
 
 impl ChecksumAddress {
-        /// Creates an Ethereum address from an EVM word's upper 20 bytes
+    /// Creates an Ethereum address from an EVM word's upper 20 bytes
     /// (`word[12..]`).
     ///
     /// # Examples
@@ -77,15 +74,14 @@ impl ChecksumAddress {
 
     pub fn into_address(&self) -> Address {
         let mut address = [0; 20];
-        address.copy_from_slice(&self.0.0[2..]);
+        address.copy_from_slice(&self.0 .0[2..]);
         address.into()
     }
 
     /// Returns the checksum of a formatted address.
     #[inline]
     pub const fn as_str(&self) -> &str {
-        unsafe { 
-            str::from_utf8_unchecked(self.0.as_slice()) }
+        unsafe { str::from_utf8_unchecked(self.0.as_slice()) }
     }
 
     /// Returns the checksum of a formatted address.
@@ -245,7 +241,6 @@ impl ChecksumAddress {
     pub fn from_private_key(private_key: &k256::ecdsa::SigningKey) -> Self {
         Self::from_public_key(private_key.verifying_key())
     }
-
 }
 #[cfg(test)]
 mod tests {
@@ -331,7 +326,8 @@ mod tests {
     //         (
     //             "00000000000000000000000000000000deadbeef",
     //             "00000000000000000000000000000000000000000000000000000000cafebabe",
-    //             "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+    //             
+    // "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
     //             "1d8bfDC5D46DC4f61D6b6115972536eBE6A8854C",
     //         ),
     //         (

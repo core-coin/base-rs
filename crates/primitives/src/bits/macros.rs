@@ -764,6 +764,7 @@ macro_rules! fixed_bytes_macros {
 
 fixed_bytes_macros! { $
     macro address(Address);
+    macro cAddress(ChecksumAddress);
 
     macro b64(B64);
 

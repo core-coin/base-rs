@@ -38,7 +38,7 @@ pub use aliases::{
 #[macro_use]
 mod bits;
 pub use bits::{
-    ChecksumAddress, Address, AddressError, Bloom, BloomInput, FixedBytes, Function,
+    Address, AddressError, Bloom, BloomInput, ChecksumAddress, FixedBytes, Function,
     BLOOM_BITS_PER_ITEM, BLOOM_SIZE_BITS, BLOOM_SIZE_BYTES,
 };
 
