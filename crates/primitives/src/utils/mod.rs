@@ -135,9 +135,9 @@ pub fn eip191_message<T: AsRef<[u8]>>(message: T) -> Vec<u8> {
     eip191_message(message.as_ref())
 }
 
-/// Simple interface to the [`Keccak-256`] hash function.
+/// Simple interface to the [`Sha3-256`] hash function.
 ///
-/// [`Keccak-256`]: https://en.wikipedia.org/wiki/SHA-3
+/// [`Sha3`]: https://en.wikipedia.org/wiki/SHA-3
 pub fn sha3<T: AsRef<[u8]>>(bytes: T) -> B256 {
     fn sha3(bytes: &[u8]) -> B256 {
         let mut output = MaybeUninit::<B256>::uninit();

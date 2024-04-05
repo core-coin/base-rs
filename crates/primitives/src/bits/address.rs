@@ -1,5 +1,5 @@
 use crate::{aliases::U160, utils::sha3, ChecksumAddress, FixedBytes};
-use core::{borrow::Borrow, fmt, str};
+use core::{borrow::Borrow, fmt::{self, Display, Write}, str};
 use ruint::aliases::U256;
 
 const MAINNET: u64 = 203;
@@ -86,6 +86,12 @@ wrap_fixed_bytes!(
     /// ```
     pub struct Address<20>;
 );
+
+impl Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&format!("{:?}", self))
+    }
+}
 
 impl From<U160> for Address {
     #[inline]

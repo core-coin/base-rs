@@ -1,5 +1,5 @@
 use crate::{sha3, Address, FixedBytes};
-use core::{borrow::Borrow, fmt, str};
+use core::{borrow::Borrow, fmt, panic, str};
 use ruint::aliases::U176;
 
 wrap_fixed_bytes!(
@@ -134,7 +134,7 @@ impl ChecksumAddress {
         nonce.encode(&mut &mut out[24..]);
 
         let hash = sha3(&out[..len]);
-        Self::from_word(hash)
+        Address::from_word(hash).to_ican(self.network_id())
     }
 
     /// Computes the `CREATE2` address of a smart contract as specified in
@@ -209,7 +209,17 @@ impl ChecksumAddress {
         bytes[23..55].copy_from_slice(salt);
         bytes[55..87].copy_from_slice(init_code_hash);
         let hash = sha3(bytes);
-        Self::from_word(hash)
+        Address::from_word(hash).to_ican(self.network_id())
+    }
+
+    /// Gets the network_id from the address
+    pub fn network_id(&self) -> u64 {
+        match self.0 .0[0] {
+            203 => 1,
+            171 => 3,
+            206 => 1337,
+            _ => panic!("Invalid Checksum Address"),
+        }
     }
 
     /// Instantiate by hashing public key bytes.
@@ -217,10 +227,10 @@ impl ChecksumAddress {
     /// # Panics
     ///
     /// If the input is not exactly 64 bytes
-    pub fn from_raw_public_key(pubkey: &[u8]) -> Self {
+    pub fn from_raw_public_key(pubkey: &[u8], network_id: u64) -> Self {
         assert_eq!(pubkey.len(), 64, "raw public key must be 64 bytes");
         let digest = sha3(pubkey);
-        Self::from_slice(&digest[12..])
+        Address::from_slice(&digest[12..]).to_ican(network_id)
     }
 
     /// Converts an ECDSA verifying key to its corresponding Ethereum address.
@@ -244,28 +254,82 @@ impl ChecksumAddress {
 }
 #[cfg(test)]
 mod tests {
-    use crate::Address;
     use super::*;
+    use crate::Address;
 
     // https://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
     #[test]
     #[cfg(feature = "rlp")]
     fn create() {
-
-        let from = "0x6ac7ea33f8831ea9dcc53393aaa88b25a785dbf0".parse::<Address>().unwrap();
+        let from = "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<ChecksumAddress>().unwrap();
         for (nonce, expected) in [
-            "0xcb12cd234a471b72ba2f1ccf0a70fcaba648a5eecd8d",
-            "0xcb12343c43a37d37dff08ae8c4a11544c718abb4fcf8",
-            "0xcb12f778b86fa74e846c4f0a1fbd1335fe81c00a0c91",
-            "0xcb12fffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c",
+            "cb57718e2b338b99d2587a6dd6c01fc2b97a4296449f",
+            "cb812bae2e00797890802e8aa6c162aac5cac4d8990c",
         ]
         .into_iter()
         .enumerate()
         {
-            let address = from.create(nonce as u64, 1);
+            let address = from.create(nonce as u64);
             assert_eq!(address, expected.parse::<ChecksumAddress>().unwrap());
         }
     }
+
+    #[test]
+    fn create2_address() {
+        let tests = [
+            (
+                "cb45de3a1cc0c70e5e26ca00c0936ef3873c15ba94bb",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0x00",
+                "cb115daba0ebaef63278430b47561d6c85c08543862e",
+            ),
+            (
+                "cb6187e81b02756711a90ed2b9c295fdc5c6776faf4d",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0x00",
+                "cb30f34397c21261cf7b807aa2437e7aa6df0106ec8b",
+            ),
+            (
+                "cb950dae4e5fdff3e3ded206a331db829624d1f0a8e0",
+                "0x000000000000000000000000feed000000000000000000000000000000000000",
+                "0x00",
+                "cb752b9a56b5a380b87154ca1e5037c084e9744845bb",
+            ),
+            (
+                "cb08f86a1e1715653df219804cd57b16686ec95fc61a",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0xdeadbeef",
+                "cb89bfcdfe71e021a5fdfd29e7f5810c8352d48ea67f",
+            ),
+            (
+                "cb6234873c1b4dd5c683a10cee6419d70fbde8552772",
+                "0x00000000000000000000000000000000000000000000000000000000cafebabe",
+                "0xdeadbeef",
+                "cb7954b09a663ca9bbcdbc84e4224f45c9d265b865b3",
+            ),
+            (
+                "cb6234873c1b4dd5c683a10cee6419d70fbde8552772",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0x",
+                "cb88d6fe8ba337218b9b49f4f622dd71e321f445d2aa",
+            ),
+        ];
+        for (from, salt, init_code, expected) in tests {
+            let from = from.parse::<ChecksumAddress>().unwrap();
+
+            let salt = hex::decode(salt).unwrap();
+            let salt: [u8; 32] = salt.try_into().unwrap();
+
+            let init_code = hex::decode(init_code).unwrap();
+            let init_code_hash = sha3(&init_code);
+
+            let expected = expected.parse::<ChecksumAddress>().unwrap();
+
+            assert_eq!(expected, from.create2(salt, init_code_hash));
+            assert_eq!(expected, from.create2_from_code(salt, init_code));
+        }
+    }
+
     //
     // #[test]
     // #[cfg(all(feature = "rlp", feature = "arbitrary"))]
