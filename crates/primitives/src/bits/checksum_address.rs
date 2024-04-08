@@ -72,7 +72,10 @@ impl ChecksumAddress {
         FixedBytes(word)
     }
 
-    pub fn into_address(&self) -> Address {
+    /// Converts [ChecksumAddress] into [Address]
+    #[inline]
+    #[must_use]
+    pub fn to_address(&self) -> Address {
         let mut address = [0; 20];
         address.copy_from_slice(&self.0 .0[2..]);
         address.into()
