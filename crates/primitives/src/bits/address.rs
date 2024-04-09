@@ -218,9 +218,9 @@ impl Address {
     ///
     /// # Panics
     ///
-    /// If the input is not exactly 64 bytes
+    /// If the input is not exactly 57 bytes
     pub fn from_raw_public_key(pubkey: &[u8]) -> Self {
-        assert_eq!(pubkey.len(), 114, "raw public key must be 64 bytes");
+        assert_eq!(pubkey.len(), 57, "raw public key must be 57 bytes");
         let digest = sha3(pubkey);
         Self::from_slice(&digest[12..])
     }
