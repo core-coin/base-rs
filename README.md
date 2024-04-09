@@ -1,5 +1,18 @@
 # Alloy
 
+
+
+# TODO:
+
+- [x] primitives
+- [ ] alloy-sol-macro -> Needs 22 byte addresses
+- [ ] alloy-sol-types -> Needs 22 byte addresses
+- [ ] alloy-dyn-abi -> Needs 22 byte addresses 
+- [ ] alloy-json-abi -> Needs 22 byte addresses
+- [ ] alloy-sol-type-parse -> Needs 22 byte addresses
+- [ ] syn-solidity -> Needs 22 byte addresses
+
+
 Core libraries at the root of the Rust Ethereum ecosystem.
 
 Alloy is a rewrite of [`ethers-rs`] from the ground up, with exciting new

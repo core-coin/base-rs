@@ -774,6 +774,8 @@ fixed_bytes_macros! { $
 
     macro b512(B512);
 
+    macro b1368(B1368);
+
     macro bloom(Bloom);
 
     macro fixed_bytes(FixedBytes<0>); // <0> is just for the doctest
