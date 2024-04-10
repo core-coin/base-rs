@@ -4,23 +4,23 @@ use ruint::aliases::U176;
 
 wrap_fixed_bytes!(
     extra_derives: [],
-    pub struct ChecksumAddress<22>;
+    pub struct IcanAddress<22>;
 );
 
-impl From<U176> for ChecksumAddress {
+impl From<U176> for IcanAddress {
     #[inline]
     fn from(value: U176) -> Self {
         Self(FixedBytes(value.to_be_bytes()))
     }
 }
 
-impl From<ChecksumAddress> for U176 {
+impl From<IcanAddress> for U176 {
     #[inline]
-    fn from(value: ChecksumAddress) -> Self {
+    fn from(value: IcanAddress) -> Self {
         Self::from_be_bytes(value.0 .0)
     }
 }
-impl fmt::Display for ChecksumAddress {
+impl fmt::Display for IcanAddress {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         todo!()
         // let checksum = checksum.as_str();
@@ -36,7 +36,7 @@ impl fmt::Display for ChecksumAddress {
     }
 }
 
-impl ChecksumAddress {
+impl IcanAddress {
     /// Creates an Ethereum address from an EVM word's upper 20 bytes
     /// (`word[12..]`).
     ///
@@ -72,7 +72,7 @@ impl ChecksumAddress {
         FixedBytes(word)
     }
 
-    /// Converts [ChecksumAddress] into [Address]
+    /// Converts [IcanAddress] into [Address]
     #[inline]
     #[must_use]
     pub fn to_address(&self) -> Address {
@@ -264,7 +264,7 @@ mod tests {
     #[test]
     #[cfg(feature = "rlp")]
     fn create() {
-        let from = "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<ChecksumAddress>().unwrap();
+        let from = "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
         for (nonce, expected) in [
             "cb57718e2b338b99d2587a6dd6c01fc2b97a4296449f",
             "cb812bae2e00797890802e8aa6c162aac5cac4d8990c",
@@ -273,7 +273,7 @@ mod tests {
         .enumerate()
         {
             let address = from.create(nonce as u64);
-            assert_eq!(address, expected.parse::<ChecksumAddress>().unwrap());
+            assert_eq!(address, expected.parse::<IcanAddress>().unwrap());
         }
     }
 
@@ -318,7 +318,7 @@ mod tests {
             ),
         ];
         for (from, salt, init_code, expected) in tests {
-            let from = from.parse::<ChecksumAddress>().unwrap();
+            let from = from.parse::<IcanAddress>().unwrap();
 
             let salt = hex::decode(salt).unwrap();
             let salt: [u8; 32] = salt.try_into().unwrap();
@@ -326,7 +326,7 @@ mod tests {
             let init_code = hex::decode(init_code).unwrap();
             let init_code_hash = sha3(&init_code);
 
-            let expected = expected.parse::<ChecksumAddress>().unwrap();
+            let expected = expected.parse::<IcanAddress>().unwrap();
 
             assert_eq!(expected, from.create2(salt, init_code_hash));
             assert_eq!(expected, from.create2_from_code(salt, init_code));
