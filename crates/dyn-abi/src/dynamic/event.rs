@@ -138,7 +138,7 @@ pub struct DecodedEvent {
 
 #[cfg(test)]
 mod test {
-    use alloy_primitives::{address, b256, bytes, U256};
+    use alloy_primitives::{b256, bytes, cAddress, U256};
 
     use super::*;
 
@@ -177,7 +177,7 @@ mod test {
         let decoded = event.decode_log(&log, true).unwrap();
         assert_eq!(
             decoded.indexed,
-            vec![DynSolValue::Address(address!("0000000000000000000000000000000000012321"))]
+            vec![DynSolValue::Address(cAddress!("00000000000000000000000000000000000000012321"))]
         );
     }
 }

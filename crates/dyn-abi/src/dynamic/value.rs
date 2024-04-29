@@ -1,7 +1,7 @@
 use super::ty::as_tuple;
 use crate::{DynSolType, DynToken, Word};
 use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
-use alloy_primitives::{Address, Function, I256, U256};
+use alloy_primitives::{Function, IcanAddress, I256, U256};
 use alloy_sol_types::{abi::Encoder, utils::words_for_len};
 
 #[cfg(feature = "eip712")]
@@ -68,7 +68,7 @@ pub enum DynSolValue {
     /// A fixed-length byte array. The second parameter is the number of bytes.
     FixedBytes(Word, usize),
     /// An address.
-    Address(Address),
+    Address(IcanAddress),
     /// A function pointer.
     Function(Function),
 
@@ -96,9 +96,9 @@ pub enum DynSolValue {
     },
 }
 
-impl From<Address> for DynSolValue {
+impl From<IcanAddress> for DynSolValue {
     #[inline]
-    fn from(value: Address) -> Self {
+    fn from(value: IcanAddress) -> Self {
         Self::Address(value)
     }
 }
@@ -360,7 +360,7 @@ impl DynSolValue {
 
     /// Fallible cast to the contents of a variant DynSolValue {.
     #[inline]
-    pub const fn as_address(&self) -> Option<Address> {
+    pub const fn as_address(&self) -> Option<IcanAddress> {
         match self {
             Self::Address(a) => Some(*a),
             _ => None,

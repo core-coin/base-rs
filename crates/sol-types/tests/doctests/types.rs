@@ -1,4 +1,4 @@
-use alloy_primitives::Address;
+use alloy_primitives::IcanAddress;
 use alloy_sol_types::{sol, SolType};
 
 // Type definition: generates a new struct that implements `SolType`
@@ -19,5 +19,5 @@ fn types() {
     let _ = <sol!(bool)>::abi_encode(&true);
     let _ = B32::abi_encode(&[0; 32]);
     let _ = SolArrayOf::<sol!(bool)>::abi_encode(&vec![true, false]);
-    let _ = SolTuple::abi_encode(&(Address::ZERO, vec![0; 32], "hello".to_string()));
+    let _ = SolTuple::abi_encode(&(IcanAddress::ZERO, vec![0; 32], "hello".to_string()));
 }

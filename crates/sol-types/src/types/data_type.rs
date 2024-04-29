@@ -11,8 +11,8 @@
 use crate::{abi::token::*, private::SolTypeValue, utils, SolType, Word};
 use alloc::{string::String as RustString, vec::Vec};
 use alloy_primitives::{
-    sha3, Address as RustAddress, Bytes as RustBytes, FixedBytes as RustFixedBytes,
-    Function as RustFunction, I256, U256,
+    sha3, Bytes as RustBytes, FixedBytes as RustFixedBytes, Function as RustFunction,
+    IcanAddress as RustIcanAddress, I256, U256,
 };
 use core::{borrow::Borrow, fmt::*, hash::Hash, marker::PhantomData, ops::*};
 
@@ -205,10 +205,10 @@ where
 /// Address - `address`
 pub struct Address;
 
-impl<T: Borrow<[u8; 20]>> SolTypeValue<Address> for T {
+impl<T: Borrow<[u8; 22]>> SolTypeValue<Address> for T {
     #[inline]
     fn stv_to_tokens(&self) -> WordToken {
-        WordToken(RustAddress::new(*self.borrow()).into_word())
+        WordToken(RustIcanAddress::new(*self.borrow()).into_word())
     }
 
     #[inline]
@@ -223,7 +223,7 @@ impl<T: Borrow<[u8; 20]>> SolTypeValue<Address> for T {
 }
 
 impl SolType for Address {
-    type RustType = RustAddress;
+    type RustType = RustIcanAddress;
     type Token<'a> = WordToken;
 
     const SOL_NAME: &'static str = "address";
@@ -231,12 +231,12 @@ impl SolType for Address {
 
     #[inline]
     fn detokenize(token: Self::Token<'_>) -> Self::RustType {
-        RustAddress::from_word(token.0)
+        RustIcanAddress::from_word(token.0)
     }
 
     #[inline]
     fn valid_token(token: &Self::Token<'_>) -> bool {
-        utils::check_zeroes(&token.0[..12])
+        utils::check_zeroes(&token.0[..10])
     }
 }
 
@@ -1295,7 +1295,7 @@ mod tests {
     }
 
     roundtrip! {
-        roundtrip_address(Address: RustAddress);
+        roundtrip_address(Address: RustIcanAddress);
         roundtrip_bool(Bool: bool);
         roundtrip_bytes(Bytes: Vec<u8>);
         roundtrip_string(String: RustString);
@@ -1500,12 +1500,14 @@ mod tests {
 
     #[test]
     fn encode_packed() {
-        let value = (RustAddress::with_last_byte(1), U256::from(2), 3u32, -3i32, 3u32, -3i32);
+        let value = (RustIcanAddress::with_last_byte(1), U256::from(2), 3u32, -3i32, 3u32, -3i32);
 
         let res =
-            <sol! { (address, uint160, uint24, int24, uint32, int32) }>::abi_encode_packed(&value);
+            <sol! { (Address, uint160, uint24, int24, uint32, int32) }>::abi_encode_packed(
+                &value,
+            );
         let expected = hex!(
-            "0000000000000000000000000000000000000001"
+            "00000000000000000000000000000000000000000001"
             "0000000000000000000000000000000000000002"
             "000003"
             "fffffd"
@@ -1516,7 +1518,7 @@ mod tests {
 
         // Type is `(address, uint256, uint32, int32, uint32, int32)`
         let expected = hex!(
-            "0000000000000000000000000000000000000001"
+            "00000000000000000000000000000000000000000001"
             "0000000000000000000000000000000000000000000000000000000000000002"
             "00000003"
             "fffffffd"

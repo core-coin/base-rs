@@ -1,6 +1,6 @@
 use crate::SolValue;
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{sha3, Address, FixedBytes, B256, U256};
+use alloy_primitives::{sha3, IcanAddress, FixedBytes, B256, U256};
 
 /// EIP-712 domain attributes used in determining the domain separator.
 ///
@@ -29,7 +29,7 @@ pub struct Eip712Domain {
 
     /// The address of the contract that will verify the signature.
     #[cfg_attr(feature = "eip712-serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    pub verifying_contract: Option<Address>,
+    pub verifying_contract: Option<IcanAddress>,
 
     /// A disambiguating salt for the protocol. This can be used as a domain
     /// separator of last resort.
@@ -50,7 +50,7 @@ impl Eip712Domain {
         name: Option<Cow<'static, str>>,
         version: Option<Cow<'static, str>>,
         chain_id: Option<U256>,
-        verifying_contract: Option<Address>,
+        verifying_contract: Option<IcanAddress>,
         salt: Option<B256>,
     ) -> Self {
         Self { name, version, chain_id, verifying_contract, salt }
@@ -244,20 +244,20 @@ mod tests {
         name: "abcd",
         version: "1",
         chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         name: "abcd",
         version: "1",
         chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO // no trailing comma
     };
     const _: Eip712Domain = eip712_domain! {
         name: "abcd",
         version: "1",
         chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO, // trailing comma
     };
 
@@ -265,42 +265,42 @@ mod tests {
         name: "abcd",
         version: "1",
         // chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         name: "abcd",
         // version: "1",
         chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         name: "abcd",
         // version: "1",
         // chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         name: "abcd",
         // version: "1",
         // chain_id: 1,
-        // verifying_contract: Address::ZERO,
+        // verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         // name: "abcd",
         version: "1",
         // chain_id: 1,
-        // verifying_contract: Address::ZERO,
+        // verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
     const _: Eip712Domain = eip712_domain! {
         // name: "abcd",
         version: "1",
         // chain_id: 1,
-        verifying_contract: Address::ZERO,
+        verifying_contract: IcanAddress::ZERO,
         salt: B256::ZERO,
     };
 

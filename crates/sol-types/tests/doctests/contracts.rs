@@ -1,4 +1,4 @@
-use alloy_primitives::{address, hex, U256};
+use alloy_primitives::{cAddress, hex, U256};
 use alloy_sol_types::{sol, SolCall, SolConstructor, SolInterface};
 
 sol! {
@@ -37,12 +37,12 @@ fn transfer() {
     // random mainnet ERC20 transfer
     // https://etherscan.io/tx/0x947332ff624b5092fb92e8f02cdbb8a50314e861a4b39c29a286b3b75432165e
     let data = hex!(
-        "a9059cbb"
+        "4b40e901"
         "0000000000000000000000008bc47be1e3abbaba182069c89d08a61fa6c2b292"
         "0000000000000000000000000000000000000000000000000000000253c51700"
     );
     let expected = ERC20::transferCall {
-        to: address!("8bc47be1e3abbaba182069c89d08a61fa6c2b292"),
+        to: cAddress!("00008bc47be1e3abbaba182069c89d08a61fa6c2b292"),
         amount: U256::from(9995360000_u64),
     };
 

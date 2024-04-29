@@ -218,7 +218,8 @@ pub mod private {
         vec::Vec,
     };
     pub use alloy_primitives::{
-        bytes, sha3, Address, Bytes, FixedBytes, Function, LogData, Signed, Uint, B256, I256, U256,
+        bytes, sha3, Bytes, FixedBytes, Function, IcanAddress as Address, LogData, Signed, Uint,
+        B256, I256, U256,
     };
     pub use core::{
         borrow::{Borrow, BorrowMut},

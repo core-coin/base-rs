@@ -58,7 +58,7 @@ use alloc::{borrow::Cow, vec::Vec};
 /// traits for other types created with [`sol!`]:
 ///
 /// ```
-/// use alloy_primitives::Address;
+/// use alloy_primitives::IcanAddress;
 /// use alloy_sol_types::{sol, SolCall, SolStruct, SolValue};
 ///
 /// sol! {
@@ -81,7 +81,7 @@ use alloc::{borrow::Cow, vec::Vec};
 /// let my_bool = true;
 /// let _ = my_bool.abi_encode();
 ///
-/// let my_struct = MyStruct { a: true, b: 1, c: Address::ZERO };
+/// let my_struct = MyStruct { a: true, b: 1, c: IcanAddress::ZERO };
 /// let _ = my_struct.abi_encode();
 ///
 /// let my_enum = MyEnum::A;

@@ -80,7 +80,7 @@ mod tests {
 
     use super::*;
     use alloy_json_abi::EventParam;
-    use alloy_primitives::{address, b256, bytes, hex, sha3, Signed};
+    use alloy_primitives::{b256, bytes, cAddress, hex, sha3, Signed};
 
     #[test]
     fn empty() {
@@ -151,7 +151,7 @@ mod tests {
                     )),
                     256
                 ),
-                DynSolValue::Address(address!("2222222222222222222222222222222222222222")),
+                DynSolValue::Address(cAddress!("22222222222222222222222222222222222222222222")),
             ]
         );
         assert_eq!(
@@ -163,7 +163,7 @@ mod tests {
                     )),
                     256
                 ),
-                DynSolValue::Address(address!("1111111111111111111111111111111111111111")),
+                DynSolValue::Address(cAddress!("11111111111111111111111111111111111111111111")),
                 DynSolValue::FixedBytes(
                     b256!("00000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
                     32

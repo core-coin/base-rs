@@ -49,17 +49,17 @@ fn encode_data_nesting() {
     let mail = Mail {
         from: Person {
             name: "Cow".to_owned(),
-            wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826".parse().unwrap(),
+            wallet: "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826".parse().unwrap(),
         },
         to: Person {
             name: "Bob".to_owned(),
-            wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB".parse().unwrap(),
+            wallet: "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB".parse().unwrap(),
         },
         contents: "Hello, Bob!".to_owned(),
     };
 
     assert_eq!(
         alloy_sol_types::SolStruct::eip712_signing_hash(&mail, &domain),
-        "25c3d40a39e639a4d0b6e4d2ace5e1281e039c88494d97d8d08f99a6ea75d775".parse::<B256>().unwrap()
+        "be504c79df6f0a61fbafb0d84827b301d2e888d9e578eea504654f73e33705be".parse::<B256>().unwrap()
     )
 }

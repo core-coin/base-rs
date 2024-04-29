@@ -19,10 +19,11 @@ fn ethabi_encode(c: &mut Criterion) {
         });
     });
 
-    g.bench_function("struct", |b| {
-        let tokens = encode_struct_input_tokens();
-        b.iter(|| ethabi::encode(black_box(&tokens)));
-    });
+    //todo::error2215 uncomment when we will have 22 addresses in ethabi crate
+    // g.bench_function("struct", |b| {
+    //     let tokens = encode_struct_input_tokens();
+    //     b.iter(|| ethabi::encode(black_box(&tokens)));
+    // });
 
     g.finish();
 }
@@ -140,10 +141,10 @@ fn encode_single_input() -> String {
 
 fn encode_struct_input() -> Input {
     Input {
-        tokenIn: hex!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2").into(),
-        tokenOut: hex!("955d5c14C8D4944dA1Ea7836bd44D54a8eC35Ba1").into(),
+        tokenIn: hex!("0000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2").into(),
+        tokenOut: hex!("0000955d5c14C8D4944dA1Ea7836bd44D54a8eC35Ba1").into(),
         fee: 10000,
-        recipient: hex!("299A299A22F8C7397d9DB3702439069d951AeA74").into(),
+        recipient: hex!("0000299A299A22F8C7397d9DB3702439069d951AeA74").into(),
         deadline: U256::from(1685523099_u64),
         amountIn: U256::from(10000000000000000000_u128),
         amountOutMinimum: U256::from(836797564735606450550734848_u128),
@@ -151,23 +152,24 @@ fn encode_struct_input() -> Input {
     }
 }
 
-fn encode_struct_input_tokens() -> [ethabi::Token; 8] {
-    let input = encode_struct_input();
-    [
-        ethabi::Token::Address(input.tokenIn.0 .0.into()),
-        ethabi::Token::Address(input.tokenOut.0 .0.into()),
-        ethabi::Token::Uint(input.fee.into()),
-        ethabi::Token::Address(input.recipient.0 .0.into()),
-        ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.deadline.to_be_bytes_vec())),
-        ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.amountIn.to_be_bytes_vec())),
-        ethabi::Token::Uint(ethabi::Uint::from_big_endian(
-            &input.amountOutMinimum.to_be_bytes_vec(),
-        )),
-        ethabi::Token::Uint(ethabi::Uint::from_big_endian(
-            &input.sqrtPriceLimitX96.to_be_bytes_vec(),
-        )),
-    ]
-}
+//todo::error2215 uncomment when we will have 22 addresses in ethabi crate
+// fn encode_struct_input_tokens() -> [ethabi::Token; 8] {
+//     let input = encode_struct_input();
+//     [
+//         ethabi::Token::Address(input.tokenIn.0 .0.into()),
+//         ethabi::Token::Address(input.tokenOut.0 .0.into()),
+//         ethabi::Token::Uint(input.fee.into()),
+//         ethabi::Token::Address(input.recipient.0 .0.into()),
+//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.deadline.to_be_bytes_vec())),
+//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.amountIn.to_be_bytes_vec())),
+//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(
+//             &input.amountOutMinimum.to_be_bytes_vec(),
+//         )),
+//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(
+//             &input.sqrtPriceLimitX96.to_be_bytes_vec(),
+//         )),
+//     ]
+// }
 
 fn encode_struct_sol_values() -> [DynSolValue; 8] {
     let input = encode_struct_input();

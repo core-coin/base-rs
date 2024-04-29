@@ -654,22 +654,22 @@ impl DynSolType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{hex, Address};
+    use alloy_primitives::{hex, IcanAddress};
 
     #[test]
     fn dynamically_encodes() {
         let word1 =
-            "0000000000000000000000000101010101010101010101010101010101010101".parse().unwrap();
+            "0000000000000000000001010101010101010101010101010101010101010101".parse().unwrap();
         let word2 =
-            "0000000000000000000000000202020202020202020202020202020202020202".parse().unwrap();
+            "0000000000000000000002020202020202020202020202020202020202020202".parse().unwrap();
 
-        let val = DynSolValue::Address(Address::repeat_byte(0x01));
+        let val = DynSolValue::Address(IcanAddress::repeat_byte(0x01));
         let token = val.tokenize();
         assert_eq!(token, DynToken::from(word1));
 
         let val = DynSolValue::FixedArray(vec![
-            Address::repeat_byte(0x01).into(),
-            Address::repeat_byte(0x02).into(),
+            IcanAddress::repeat_byte(0x01).into(),
+            IcanAddress::repeat_byte(0x02).into(),
         ]);
 
         let token = val.tokenize();

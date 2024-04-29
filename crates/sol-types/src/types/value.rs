@@ -6,7 +6,7 @@ use crate::{
     Result, Word,
 };
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{Address, Bytes, FixedBytes, Function, I256, U256};
+use alloy_primitives::{Bytes, FixedBytes, Function, IcanAddress, I256, U256};
 
 /// A Solidity value.
 ///
@@ -200,7 +200,7 @@ impl_sol_value! {
     [] u128 => sol_data::Uint::<128> [];
     [] U256 => sol_data::Uint::<256> [];
 
-    [] Address => sol_data::Address [];
+    [] IcanAddress => sol_data::Address [];
     [] Function => sol_data::Function [];
     [const N: usize] FixedBytes<N> => sol_data::FixedBytes<N> [where ByteCount<N>: SupportedFixedBytes];
     [const N: usize] [u8; N] => sol_data::FixedBytes<N> [where ByteCount<N>: SupportedFixedBytes];
@@ -335,7 +335,7 @@ mod tests {
         assert_eq!(0u128.abi_encode(), Word::ZERO[..]);
         assert_eq!(U256::ZERO.abi_encode(), Word::ZERO[..]);
 
-        assert_eq!(Address::ZERO.abi_encode(), Word::ZERO[..]);
+        assert_eq!(IcanAddress::ZERO.abi_encode(), Word::ZERO[..]);
         assert_eq!(Function::ZERO.abi_encode(), Word::ZERO[..]);
 
         let encode_bytes = |b: &[u8]| {
@@ -385,7 +385,7 @@ mod tests {
             0u64,
             0u128,
             U256::ZERO,
-            Address::ZERO,
+            IcanAddress::ZERO,
             Function::ZERO,
         );
         let encoded = tuple.abi_encode();
@@ -405,7 +405,7 @@ mod tests {
             true,
             (
                 String::from("aaaa"),
-                Address::with_last_byte(69),
+                IcanAddress::with_last_byte(69),
                 b"bbbb".to_vec(),
                 b"cccc",
                 &b"dddd"[..],
@@ -416,19 +416,19 @@ mod tests {
 
     #[test]
     fn derefs() {
-        let x: &[Address; 0] = &[];
+        let x: &[IcanAddress; 0] = &[];
         x.abi_encode();
         assert_eq!(x.sol_name(), "address[0]");
 
-        let x = &[Address::ZERO];
+        let x = &[IcanAddress::ZERO];
         x.abi_encode();
         assert_eq!(x.sol_name(), "address[1]");
 
-        let x = &[Address::ZERO, Address::ZERO];
+        let x = &[IcanAddress::ZERO, IcanAddress::ZERO];
         x.abi_encode();
         assert_eq!(x.sol_name(), "address[2]");
 
-        let x = &[Address::ZERO][..];
+        let x = &[IcanAddress::ZERO][..];
         x.abi_encode();
         assert_eq!(x.sol_name(), "address[]");
 
@@ -437,7 +437,7 @@ mod tests {
         x.abi_encode();
         assert_eq!(x.sol_name(), "(bytes1,bytes4,bytes2)");
 
-        let tuple = &(&0u16, &"", b"0", &mut [Address::ZERO][..]);
+        let tuple = &(&0u16, &"", b"0", &mut [IcanAddress::ZERO][..]);
         tuple.abi_encode();
         assert_eq!(tuple.sol_name(), "(uint16,string,bytes1,address[])");
     }

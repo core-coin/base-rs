@@ -193,7 +193,7 @@ fn abi_decode(data: &[u8], params: &[Param], validate: bool) -> Result<Vec<DynSo
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{address, bytes, hex, Address, U256};
+    use alloy_primitives::{bytes, cAddress, hex, IcanAddress, U256};
 
     #[test]
     fn can_encode_decode_functions() {
@@ -230,12 +230,12 @@ mod tests {
         // encode
         let expected = alloy_primitives::hex!(
             "dd62ed3e"
-            "0000000000000000000000001111111111111111111111111111111111111111"
-            "0000000000000000000000002222222222222222222222222222222222222222"
+            "0000000000000000000011111111111111111111111111111111111111111111"
+            "0000000000000000000022222222222222222222222222222222222222222222"
         );
         let input = [
-            DynSolValue::Address(Address::repeat_byte(0x11)),
-            DynSolValue::Address(Address::repeat_byte(0x22)),
+            DynSolValue::Address(IcanAddress::repeat_byte(0x11)),
+            DynSolValue::Address(IcanAddress::repeat_byte(0x22)),
         ];
         let result = func.abi_encode_input(&input).unwrap();
         assert_eq!(expected[..], result);
@@ -243,7 +243,7 @@ mod tests {
         // Fail on unexpected input
         let wrong_input = [
             DynSolValue::Uint(U256::from(10u8), 256),
-            DynSolValue::Address(Address::repeat_byte(2u8)),
+            DynSolValue::Address(IcanAddress::repeat_byte(2u8)),
         ];
         assert!(func.abi_encode_input(&wrong_input).is_err());
 
@@ -253,7 +253,7 @@ mod tests {
         assert_eq!(decoded, [DynSolValue::Uint(U256::from(1u8), 256)]);
 
         // Fail on wrong response type
-        let bad_response = Address::repeat_byte(3u8).to_vec();
+        let bad_response = IcanAddress::repeat_byte(3u8).to_vec();
         assert!(func.abi_decode_output(&bad_response, true).is_err());
         assert!(func.abi_decode_output(&bad_response, false).is_err());
     }
@@ -265,7 +265,7 @@ mod tests {
         let func = Function::parse("register(bytes,address,bytes[])").unwrap();
         let input = [
             DynSolValue::Bytes(bytes!("09736b79736b79736b79026f7300").into()),
-            DynSolValue::Address(address!("B7b54cd129e6D8B24e6AE652a473449B273eE3E4")),
+            DynSolValue::Address(cAddress!("0000B7b54cd129e6D8B24e6AE652a473449B273eE3E4")),
             DynSolValue::Array(vec![]),
         ];
         let result = func.abi_encode_input(&input).unwrap();
