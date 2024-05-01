@@ -30,7 +30,7 @@ impl DynSolType {
     ///   - unit: same as [Solidity ether units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#ether-units)
     ///   - decimals with more digits than the unit's exponent value are not allowed
     /// - [`FixedBytes`](DynSolType::FixedBytes): `(0x)?[0-9A-Fa-f]{$0*2}`
-    /// - [`Address`](DynSolType::Address): `(0x)?[0-9A-Fa-f]{40}`
+    /// - [`IcanAddress`](DynSolType::Address): `[0-9A-Fa-f]{44}`
     /// - [`Function`](DynSolType::Function): `(0x)?[0-9A-Fa-f]{48}`
     /// - [`Bytes`](DynSolType::Bytes): `(0x)?[0-9A-Fa-f]+`
     /// - [`String`](DynSolType::String): `.*`
