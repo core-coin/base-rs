@@ -98,10 +98,7 @@ interface IUniswapV3PoolState {
 
     /// @notice The amounts of token0 and token1 that are owed to the protocol
     /// @dev Protocol fees will never exceed uint128 max in either token
-    function protocolFees()
-        external
-        view
-        returns (uint128 token0, uint128 token1);
+    function protocolFees() external view returns (uint128 token0, uint128 token1);
 
     /// @notice The currently in range liquidity available to the pool
     /// @dev This value has no relationship to the total liquidity across all ticks
@@ -121,9 +118,7 @@ interface IUniswapV3PoolState {
     /// Outside values can only be used if the tick is initialized, i.e. if liquidityGross is greater than 0.
     /// In addition, these values are only relative and must be used only in comparison to previous snapshots for
     /// a specific position.
-    function ticks(
-        int24 tick
-    )
+    function ticks(int24 tick)
         external
         view
         returns (
@@ -147,9 +142,7 @@ interface IUniswapV3PoolState {
     /// Returns feeGrowthInside1LastX128 fee growth of token1 inside the tick range as of the last mint/burn/poke,
     /// Returns tokensOwed0 the computed amount of token0 owed to the position as of the last mint/burn/poke,
     /// Returns tokensOwed1 the computed amount of token1 owed to the position as of the last mint/burn/poke
-    function positions(
-        bytes32 key
-    )
+    function positions(bytes32 key)
         external
         view
         returns (
@@ -168,9 +161,7 @@ interface IUniswapV3PoolState {
     /// Returns tickCumulative the tick multiplied by seconds elapsed for the life of the pool as of the observation timestamp,
     /// Returns secondsPerLiquidityCumulativeX128 the seconds per in range liquidity for the life of the pool as of the observation timestamp,
     /// Returns initialized whether the observation has been initialized and the values are safe to use
-    function observations(
-        uint256 index
-    )
+    function observations(uint256 index)
         external
         view
         returns (
@@ -195,15 +186,10 @@ interface IUniswapV3PoolDerivedState {
     /// @return tickCumulatives Cumulative tick values as of each `secondsAgos` from the current block timestamp
     /// @return secondsPerLiquidityCumulativeX128s Cumulative seconds per liquidity-in-range value as of each `secondsAgos` from the current block
     /// timestamp
-    function observe(
-        uint32[] calldata secondsAgos
-    )
+    function observe(uint32[] calldata secondsAgos)
         external
         view
-        returns (
-            int56[] memory tickCumulatives,
-            uint160[] memory secondsPerLiquidityCumulativeX128s
-        );
+        returns (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s);
 
     /// @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
     /// @dev Snapshots must only be compared to other snapshots, taken over a period for which a position existed.
@@ -214,10 +200,7 @@ interface IUniswapV3PoolDerivedState {
     /// @return tickCumulativeInside The snapshot of the tick accumulator for the range
     /// @return secondsPerLiquidityInsideX128 The snapshot of seconds per liquidity for the range
     /// @return secondsInside The snapshot of seconds per liquidity for the range
-    function snapshotCumulativesInside(
-        int24 tickLower,
-        int24 tickUpper
-    )
+    function snapshotCumulativesInside(int24 tickLower, int24 tickUpper)
         external
         view
         returns (
@@ -325,9 +308,7 @@ interface IUniswapV3PoolActions {
     /// @dev This method is no-op if the pool already has an observationCardinalityNext greater than or equal to
     /// the input observationCardinalityNext.
     /// @param observationCardinalityNext The desired minimum number of observations for the pool to store
-    function increaseObservationCardinalityNext(
-        uint16 observationCardinalityNext
-    ) external;
+    function increaseObservationCardinalityNext(uint16 observationCardinalityNext) external;
 }
 
 /// @title Permissioned pool actions
@@ -460,24 +441,14 @@ interface IUniswapV3PoolEvents {
     /// @param feeProtocol1Old The previous value of the token1 protocol fee
     /// @param feeProtocol0New The updated value of the token0 protocol fee
     /// @param feeProtocol1New The updated value of the token1 protocol fee
-    event SetFeeProtocol(
-        uint8 feeProtocol0Old,
-        uint8 feeProtocol1Old,
-        uint8 feeProtocol0New,
-        uint8 feeProtocol1New
-    );
+    event SetFeeProtocol(uint8 feeProtocol0Old, uint8 feeProtocol1Old, uint8 feeProtocol0New, uint8 feeProtocol1New);
 
     /// @notice Emitted when the collected protocol fees are withdrawn by the factory owner
     /// @param sender The address that collects the protocol fees
     /// @param recipient The address that receives the collected protocol fees
     /// @param amount0 The amount of token0 protocol fees that is withdrawn
     /// @param amount0 The amount of token1 protocol fees that is withdrawn
-    event CollectProtocol(
-        address indexed sender,
-        address indexed recipient,
-        uint128 amount0,
-        uint128 amount1
-    );
+    event CollectProtocol(address indexed sender, address indexed recipient, uint128 amount0, uint128 amount1);
 }
 
 /// @title The interface for a Uniswap V3 Pool
@@ -585,7 +556,7 @@ library SafeCast {
     /// @param y The uint256 to be casted
     /// @return z The casted integer, now type int256
     function toInt256(uint256 y) internal pure returns (int256 z) {
-        require(y < 2 ** 255);
+        require(y < 2**255);
         z = int256(y);
     }
 }
@@ -602,72 +573,44 @@ library TickMath {
     /// @dev The minimum value that can be returned from #getSqrtRatioAtTick. Equivalent to getSqrtRatioAtTick(MIN_TICK)
     uint160 internal constant MIN_SQRT_RATIO = 4295128739;
     /// @dev The maximum value that can be returned from #getSqrtRatioAtTick. Equivalent to getSqrtRatioAtTick(MAX_TICK)
-    uint160 internal constant MAX_SQRT_RATIO =
-        1461446703485210103287273052203988822378723970342;
+    uint160 internal constant MAX_SQRT_RATIO = 1461446703485210103287273052203988822378723970342;
 
     /// @notice Calculates sqrt(1.0001^tick) * 2^96
     /// @dev Throws if |tick| > max tick
     /// @param tick The input tick for the above formula
     /// @return sqrtPriceX96 A Fixed point Q64.96 number representing the sqrt of the ratio of the two assets (token1/token0)
     /// at the given tick
-    function getSqrtRatioAtTick(
-        int24 tick
-    ) internal pure returns (uint160 sqrtPriceX96) {
-        uint256 absTick = tick < 0
-            ? uint256(-int256(tick))
-            : uint256(int256(tick));
-        require(absTick <= uint256(MAX_TICK), "T");
+    function getSqrtRatioAtTick(int24 tick) internal pure returns (uint160 sqrtPriceX96) {
+        uint256 absTick = tick < 0 ? uint256(-int256(tick)) : uint256(int256(tick));
+        require(absTick <= uint256(MAX_TICK), 'T');
 
-        uint256 ratio = absTick & 0x1 != 0
-            ? 0xfffcb933bd6fad37aa2d162d1a594001
-            : 0x100000000000000000000000000000000;
-        if (absTick & 0x2 != 0)
-            ratio = (ratio * 0xfff97272373d413259a46990580e213a) >> 128;
-        if (absTick & 0x4 != 0)
-            ratio = (ratio * 0xfff2e50f5f656932ef12357cf3c7fdcc) >> 128;
-        if (absTick & 0x8 != 0)
-            ratio = (ratio * 0xffe5caca7e10e4e61c3624eaa0941cd0) >> 128;
-        if (absTick & 0x10 != 0)
-            ratio = (ratio * 0xffcb9843d60f6159c9db58835c926644) >> 128;
-        if (absTick & 0x20 != 0)
-            ratio = (ratio * 0xff973b41fa98c081472e6896dfb254c0) >> 128;
-        if (absTick & 0x40 != 0)
-            ratio = (ratio * 0xff2ea16466c96a3843ec78b326b52861) >> 128;
-        if (absTick & 0x80 != 0)
-            ratio = (ratio * 0xfe5dee046a99a2a811c461f1969c3053) >> 128;
-        if (absTick & 0x100 != 0)
-            ratio = (ratio * 0xfcbe86c7900a88aedcffc83b479aa3a4) >> 128;
-        if (absTick & 0x200 != 0)
-            ratio = (ratio * 0xf987a7253ac413176f2b074cf7815e54) >> 128;
-        if (absTick & 0x400 != 0)
-            ratio = (ratio * 0xf3392b0822b70005940c7a398e4b70f3) >> 128;
-        if (absTick & 0x800 != 0)
-            ratio = (ratio * 0xe7159475a2c29b7443b29c7fa6e889d9) >> 128;
-        if (absTick & 0x1000 != 0)
-            ratio = (ratio * 0xd097f3bdfd2022b8845ad8f792aa5825) >> 128;
-        if (absTick & 0x2000 != 0)
-            ratio = (ratio * 0xa9f746462d870fdf8a65dc1f90e061e5) >> 128;
-        if (absTick & 0x4000 != 0)
-            ratio = (ratio * 0x70d869a156d2a1b890bb3df62baf32f7) >> 128;
-        if (absTick & 0x8000 != 0)
-            ratio = (ratio * 0x31be135f97d08fd981231505542fcfa6) >> 128;
-        if (absTick & 0x10000 != 0)
-            ratio = (ratio * 0x9aa508b5b7a84e1c677de54f3e99bc9) >> 128;
-        if (absTick & 0x20000 != 0)
-            ratio = (ratio * 0x5d6af8dedb81196699c329225ee604) >> 128;
-        if (absTick & 0x40000 != 0)
-            ratio = (ratio * 0x2216e584f5fa1ea926041bedfe98) >> 128;
-        if (absTick & 0x80000 != 0)
-            ratio = (ratio * 0x48a170391f7dc42444e8fa2) >> 128;
+        uint256 ratio = absTick & 0x1 != 0 ? 0xfffcb933bd6fad37aa2d162d1a594001 : 0x100000000000000000000000000000000;
+        if (absTick & 0x2 != 0) ratio = (ratio * 0xfff97272373d413259a46990580e213a) >> 128;
+        if (absTick & 0x4 != 0) ratio = (ratio * 0xfff2e50f5f656932ef12357cf3c7fdcc) >> 128;
+        if (absTick & 0x8 != 0) ratio = (ratio * 0xffe5caca7e10e4e61c3624eaa0941cd0) >> 128;
+        if (absTick & 0x10 != 0) ratio = (ratio * 0xffcb9843d60f6159c9db58835c926644) >> 128;
+        if (absTick & 0x20 != 0) ratio = (ratio * 0xff973b41fa98c081472e6896dfb254c0) >> 128;
+        if (absTick & 0x40 != 0) ratio = (ratio * 0xff2ea16466c96a3843ec78b326b52861) >> 128;
+        if (absTick & 0x80 != 0) ratio = (ratio * 0xfe5dee046a99a2a811c461f1969c3053) >> 128;
+        if (absTick & 0x100 != 0) ratio = (ratio * 0xfcbe86c7900a88aedcffc83b479aa3a4) >> 128;
+        if (absTick & 0x200 != 0) ratio = (ratio * 0xf987a7253ac413176f2b074cf7815e54) >> 128;
+        if (absTick & 0x400 != 0) ratio = (ratio * 0xf3392b0822b70005940c7a398e4b70f3) >> 128;
+        if (absTick & 0x800 != 0) ratio = (ratio * 0xe7159475a2c29b7443b29c7fa6e889d9) >> 128;
+        if (absTick & 0x1000 != 0) ratio = (ratio * 0xd097f3bdfd2022b8845ad8f792aa5825) >> 128;
+        if (absTick & 0x2000 != 0) ratio = (ratio * 0xa9f746462d870fdf8a65dc1f90e061e5) >> 128;
+        if (absTick & 0x4000 != 0) ratio = (ratio * 0x70d869a156d2a1b890bb3df62baf32f7) >> 128;
+        if (absTick & 0x8000 != 0) ratio = (ratio * 0x31be135f97d08fd981231505542fcfa6) >> 128;
+        if (absTick & 0x10000 != 0) ratio = (ratio * 0x9aa508b5b7a84e1c677de54f3e99bc9) >> 128;
+        if (absTick & 0x20000 != 0) ratio = (ratio * 0x5d6af8dedb81196699c329225ee604) >> 128;
+        if (absTick & 0x40000 != 0) ratio = (ratio * 0x2216e584f5fa1ea926041bedfe98) >> 128;
+        if (absTick & 0x80000 != 0) ratio = (ratio * 0x48a170391f7dc42444e8fa2) >> 128;
 
         if (tick > 0) ratio = type(uint256).max / ratio;
 
         // this divides by 1<<32 rounding up to go from a Q128.128 to a Q128.96.
         // we then downcast because we know the result always fits within 160 bits due to our tick input constraint
         // we round up in the division so getTickAtSqrtRatio of the output price is always consistent
-        sqrtPriceX96 = uint160(
-            (ratio >> 32) + (ratio % (1 << 32) == 0 ? 0 : 1)
-        );
+        sqrtPriceX96 = uint160((ratio >> 32) + (ratio % (1 << 32) == 0 ? 0 : 1));
     }
 
     /// @notice Calculates the greatest tick value such that getRatioAtTick(tick) <= ratio
@@ -675,14 +618,9 @@ library TickMath {
     /// ever return.
     /// @param sqrtPriceX96 The sqrt ratio for which to compute the tick as a Q64.96
     /// @return tick The greatest tick for which the ratio is less than or equal to the input ratio
-    function getTickAtSqrtRatio(
-        uint160 sqrtPriceX96
-    ) internal pure returns (int24 tick) {
+    function getTickAtSqrtRatio(uint160 sqrtPriceX96) internal pure returns (int24 tick) {
         // second inequality must be < because the price can never reach the price at the max tick
-        require(
-            sqrtPriceX96 >= MIN_SQRT_RATIO && sqrtPriceX96 < MAX_SQRT_RATIO,
-            "R"
-        );
+        require(sqrtPriceX96 >= MIN_SQRT_RATIO && sqrtPriceX96 < MAX_SQRT_RATIO, 'R');
         uint256 ratio = uint256(sqrtPriceX96) << 32;
 
         uint256 r = ratio;
@@ -819,18 +757,10 @@ library TickMath {
 
         int256 log_sqrt10001 = log_2 * 255738958999603826347141; // 128.128 number
 
-        int24 tickLow = int24(
-            (log_sqrt10001 - 3402992956809132418596140100660247210) >> 128
-        );
-        int24 tickHi = int24(
-            (log_sqrt10001 + 291339464771989622907027621153398088495) >> 128
-        );
+        int24 tickLow = int24((log_sqrt10001 - 3402992956809132418596140100660247210) >> 128);
+        int24 tickHi = int24((log_sqrt10001 + 291339464771989622907027621153398088495) >> 128);
 
-        tick = tickLow == tickHi
-            ? tickLow
-            : getSqrtRatioAtTick(tickHi) <= sqrtPriceX96
-            ? tickHi
-            : tickLow;
+        tick = tickLow == tickHi ? tickLow : getSqrtRatioAtTick(tickHi) <= sqrtPriceX96 ? tickHi : tickLow;
     }
 }
 
@@ -842,9 +772,9 @@ library LiquidityMath {
     /// @return z The liquidity delta
     function addDelta(uint128 x, int128 y) internal pure returns (uint128 z) {
         if (y < 0) {
-            require((z = x - uint128(-y)) < x, "LS");
+            require((z = x - uint128(-y)) < x, 'LS');
         } else {
-            require((z = x + uint128(y)) >= x, "LA");
+            require((z = x + uint128(y)) >= x, 'LA');
         }
     }
 }
@@ -883,9 +813,7 @@ library Tick {
     /// @param tickSpacing The amount of required tick separation, realized in multiples of `tickSpacing`
     ///     e.g., a tickSpacing of 3 requires ticks to be initialized every 3rd tick i.e., ..., -6, -3, 0, 3, 6, ...
     /// @return The max liquidity per tick
-    function tickSpacingToMaxLiquidityPerTick(
-        int24 tickSpacing
-    ) internal pure returns (uint128) {
+    function tickSpacingToMaxLiquidityPerTick(int24 tickSpacing) internal pure returns (uint128) {
         int24 minTick = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
         int24 maxTick = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
         uint24 numTicks = uint24((maxTick - minTick) / tickSpacing) + 1;
@@ -908,11 +836,7 @@ library Tick {
         int24 tickCurrent,
         uint256 feeGrowthGlobal0X128,
         uint256 feeGrowthGlobal1X128
-    )
-        internal
-        view
-        returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128)
-    {
+    ) internal view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) {
         Info storage lower = self[tickLower];
         Info storage upper = self[tickUpper];
 
@@ -923,12 +847,8 @@ library Tick {
             feeGrowthBelow0X128 = lower.feeGrowthOutside0X128;
             feeGrowthBelow1X128 = lower.feeGrowthOutside1X128;
         } else {
-            feeGrowthBelow0X128 =
-                feeGrowthGlobal0X128 -
-                lower.feeGrowthOutside0X128;
-            feeGrowthBelow1X128 =
-                feeGrowthGlobal1X128 -
-                lower.feeGrowthOutside1X128;
+            feeGrowthBelow0X128 = feeGrowthGlobal0X128 - lower.feeGrowthOutside0X128;
+            feeGrowthBelow1X128 = feeGrowthGlobal1X128 - lower.feeGrowthOutside1X128;
         }
 
         // calculate fee growth above
@@ -938,22 +858,12 @@ library Tick {
             feeGrowthAbove0X128 = upper.feeGrowthOutside0X128;
             feeGrowthAbove1X128 = upper.feeGrowthOutside1X128;
         } else {
-            feeGrowthAbove0X128 =
-                feeGrowthGlobal0X128 -
-                upper.feeGrowthOutside0X128;
-            feeGrowthAbove1X128 =
-                feeGrowthGlobal1X128 -
-                upper.feeGrowthOutside1X128;
+            feeGrowthAbove0X128 = feeGrowthGlobal0X128 - upper.feeGrowthOutside0X128;
+            feeGrowthAbove1X128 = feeGrowthGlobal1X128 - upper.feeGrowthOutside1X128;
         }
 
-        feeGrowthInside0X128 =
-            feeGrowthGlobal0X128 -
-            feeGrowthBelow0X128 -
-            feeGrowthAbove0X128;
-        feeGrowthInside1X128 =
-            feeGrowthGlobal1X128 -
-            feeGrowthBelow1X128 -
-            feeGrowthAbove1X128;
+        feeGrowthInside0X128 = feeGrowthGlobal0X128 - feeGrowthBelow0X128 - feeGrowthAbove0X128;
+        feeGrowthInside1X128 = feeGrowthGlobal1X128 - feeGrowthBelow1X128 - feeGrowthAbove1X128;
     }
 
     /// @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
@@ -985,12 +895,9 @@ library Tick {
         Tick.Info storage info = self[tick];
 
         uint128 liquidityGrossBefore = info.liquidityGross;
-        uint128 liquidityGrossAfter = LiquidityMath.addDelta(
-            liquidityGrossBefore,
-            liquidityDelta
-        );
+        uint128 liquidityGrossAfter = LiquidityMath.addDelta(liquidityGrossBefore, liquidityDelta);
 
-        require(liquidityGrossAfter <= maxLiquidity, "LO");
+        require(liquidityGrossAfter <= maxLiquidity, 'LO');
 
         flipped = (liquidityGrossAfter == 0) != (liquidityGrossBefore == 0);
 
@@ -999,8 +906,7 @@ library Tick {
             if (tick <= tickCurrent) {
                 info.feeGrowthOutside0X128 = feeGrowthGlobal0X128;
                 info.feeGrowthOutside1X128 = feeGrowthGlobal1X128;
-                info
-                    .secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128;
+                info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128;
                 info.tickCumulativeOutside = tickCumulative;
                 info.secondsOutside = time;
             }
@@ -1018,10 +924,7 @@ library Tick {
     /// @notice Clears tick data
     /// @param self The mapping containing all initialized tick information for initialized ticks
     /// @param tick The tick that will be cleared
-    function clear(
-        mapping(int24 => Tick.Info) storage self,
-        int24 tick
-    ) internal {
+    function clear(mapping(int24 => Tick.Info) storage self, int24 tick) internal {
         delete self[tick];
     }
 
@@ -1044,18 +947,10 @@ library Tick {
         uint32 time
     ) internal returns (int128 liquidityNet) {
         Tick.Info storage info = self[tick];
-        info.feeGrowthOutside0X128 =
-            feeGrowthGlobal0X128 -
-            info.feeGrowthOutside0X128;
-        info.feeGrowthOutside1X128 =
-            feeGrowthGlobal1X128 -
-            info.feeGrowthOutside1X128;
-        info.secondsPerLiquidityOutsideX128 =
-            secondsPerLiquidityCumulativeX128 -
-            info.secondsPerLiquidityOutsideX128;
-        info.tickCumulativeOutside =
-            tickCumulative -
-            info.tickCumulativeOutside;
+        info.feeGrowthOutside0X128 = feeGrowthGlobal0X128 - info.feeGrowthOutside0X128;
+        info.feeGrowthOutside1X128 = feeGrowthGlobal1X128 - info.feeGrowthOutside1X128;
+        info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128 - info.secondsPerLiquidityOutsideX128;
+        info.tickCumulativeOutside = tickCumulative - info.tickCumulativeOutside;
         info.secondsOutside = time - info.secondsOutside;
         liquidityNet = info.liquidityNet;
     }
@@ -1161,9 +1056,7 @@ library TickBitmap {
     /// @param tick The tick for which to compute the position
     /// @return wordPos The key in the mapping containing the word in which the bit is stored
     /// @return bitPos The bit position in the word where the flag is stored
-    function position(
-        int24 tick
-    ) private pure returns (int16 wordPos, uint8 bitPos) {
+    function position(int24 tick) private pure returns (int16 wordPos, uint8 bitPos) {
         wordPos = int16(tick >> 8);
         bitPos = uint8(tick % 256);
     }
@@ -1210,9 +1103,7 @@ library TickBitmap {
             initialized = masked != 0;
             // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
             next = initialized
-                ? (compressed -
-                    int24(bitPos - BitMath.mostSignificantBit(masked))) *
-                    tickSpacing
+                ? (compressed - int24(bitPos - BitMath.mostSignificantBit(masked))) * tickSpacing
                 : (compressed - int24(bitPos)) * tickSpacing;
         } else {
             // start from the word of the next tick, since the current tick state doesn't matter
@@ -1225,12 +1116,8 @@ library TickBitmap {
             initialized = masked != 0;
             // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
             next = initialized
-                ? (compressed +
-                    1 +
-                    int24(BitMath.leastSignificantBit(masked) - bitPos)) *
-                    tickSpacing
-                : (compressed + 1 + int24(type(uint8).max - bitPos)) *
-                    tickSpacing;
+                ? (compressed + 1 + int24(BitMath.leastSignificantBit(masked) - bitPos)) * tickSpacing
+                : (compressed + 1 + int24(type(uint8).max - bitPos)) * tickSpacing;
         }
     }
 }
@@ -1391,9 +1278,7 @@ library Position {
         int24 tickLower,
         int24 tickUpper
     ) internal view returns (Position.Info storage position) {
-        position = self[
-            keccak256(abi.encodePacked(owner, tickLower, tickUpper))
-        ];
+        position = self[keccak256(abi.encodePacked(owner, tickLower, tickUpper))];
     }
 
     /// @notice Credits accumulated fees to a user's position
@@ -1411,30 +1296,29 @@ library Position {
 
         uint128 liquidityNext;
         if (liquidityDelta == 0) {
-            require(_self.liquidity > 0, "NP"); // disallow pokes for 0 liquidity positions
+            require(_self.liquidity > 0, 'NP'); // disallow pokes for 0 liquidity positions
             liquidityNext = _self.liquidity;
         } else {
-            liquidityNext = LiquidityMath.addDelta(
-                _self.liquidity,
-                liquidityDelta
-            );
+            liquidityNext = LiquidityMath.addDelta(_self.liquidity, liquidityDelta);
         }
 
         // calculate accumulated fees
-        uint128 tokensOwed0 = uint128(
-            FullMath.mulDiv(
-                feeGrowthInside0X128 - _self.feeGrowthInside0LastX128,
-                _self.liquidity,
-                FixedPoint128.Q128
-            )
-        );
-        uint128 tokensOwed1 = uint128(
-            FullMath.mulDiv(
-                feeGrowthInside1X128 - _self.feeGrowthInside1LastX128,
-                _self.liquidity,
-                FixedPoint128.Q128
-            )
-        );
+        uint128 tokensOwed0 =
+            uint128(
+                FullMath.mulDiv(
+                    feeGrowthInside0X128 - _self.feeGrowthInside0LastX128,
+                    _self.liquidity,
+                    FixedPoint128.Q128
+                )
+            );
+        uint128 tokensOwed1 =
+            uint128(
+                FullMath.mulDiv(
+                    feeGrowthInside1X128 - _self.feeGrowthInside1LastX128,
+                    _self.liquidity,
+                    FixedPoint128.Q128
+                )
+            );
 
         // update the position
         if (liquidityDelta != 0) self.liquidity = liquidityNext;
@@ -1485,8 +1369,7 @@ library Oracle {
             Observation({
                 blockTimestamp: blockTimestamp,
                 tickCumulative: last.tickCumulative + int56(tick) * delta,
-                secondsPerLiquidityCumulativeX128: last
-                    .secondsPerLiquidityCumulativeX128 +
+                secondsPerLiquidityCumulativeX128: last.secondsPerLiquidityCumulativeX128 +
                     ((uint160(delta) << 128) / (liquidity > 0 ? liquidity : 1)),
                 initialized: true
             });
@@ -1497,10 +1380,10 @@ library Oracle {
     /// @param time The time of the oracle initialization, via block.timestamp truncated to uint32
     /// @return cardinality The number of populated elements in the oracle array
     /// @return cardinalityNext The new length of the oracle array, independent of population
-    function initialize(
-        Observation[65535] storage self,
-        uint32 time
-    ) internal returns (uint16 cardinality, uint16 cardinalityNext) {
+    function initialize(Observation[65535] storage self, uint32 time)
+        internal
+        returns (uint16 cardinality, uint16 cardinalityNext)
+    {
         self[0] = Observation({
             blockTimestamp: time,
             tickCumulative: 0,
@@ -1558,7 +1441,7 @@ library Oracle {
         uint16 current,
         uint16 next
     ) internal returns (uint16) {
-        require(current > 0, "I");
+        require(current > 0, 'I');
         // no-op if the passed next value isn't greater than the current next value
         if (next <= current) return current;
         // store in each slot to prevent fresh SSTOREs in swaps
@@ -1573,12 +1456,16 @@ library Oracle {
     /// @param a A comparison timestamp from which to determine the relative position of `time`
     /// @param b From which to determine the relative position of `time`
     /// @return bool Whether `a` is chronologically <= `b`
-    function lte(uint32 time, uint32 a, uint32 b) private pure returns (bool) {
+    function lte(
+        uint32 time,
+        uint32 a,
+        uint32 b
+    ) private pure returns (bool) {
         // if there hasn't been overflow, no need to adjust
         if (a <= time && b <= time) return a <= b;
 
-        uint256 aAdjusted = a > time ? a : a + 2 ** 32;
-        uint256 bAdjusted = b > time ? b : b + 2 ** 32;
+        uint256 aAdjusted = a > time ? a : a + 2**32;
+        uint256 bAdjusted = b > time ? b : b + 2**32;
 
         return aAdjusted <= bAdjusted;
     }
@@ -1600,11 +1487,7 @@ library Oracle {
         uint32 target,
         uint16 index,
         uint16 cardinality
-    )
-        private
-        view
-        returns (Observation memory beforeOrAt, Observation memory atOrAfter)
-    {
+    ) private view returns (Observation memory beforeOrAt, Observation memory atOrAfter) {
         uint256 l = (index + 1) % cardinality; // oldest observation
         uint256 r = l + cardinality - 1; // newest observation
         uint256 i;
@@ -1624,8 +1507,7 @@ library Oracle {
             bool targetAtOrAfter = lte(time, beforeOrAt.blockTimestamp, target);
 
             // check if we've found the answer!
-            if (targetAtOrAfter && lte(time, target, atOrAfter.blockTimestamp))
-                break;
+            if (targetAtOrAfter && lte(time, target, atOrAfter.blockTimestamp)) break;
 
             if (!targetAtOrAfter) r = i - 1;
             else l = i + 1;
@@ -1652,11 +1534,7 @@ library Oracle {
         uint16 index,
         uint128 liquidity,
         uint16 cardinality
-    )
-        private
-        view
-        returns (Observation memory beforeOrAt, Observation memory atOrAfter)
-    {
+    ) private view returns (Observation memory beforeOrAt, Observation memory atOrAfter) {
         // optimistically set before to the newest observation
         beforeOrAt = self[index];
 
@@ -1667,10 +1545,7 @@ library Oracle {
                 return (beforeOrAt, atOrAfter);
             } else {
                 // otherwise, we need to transform
-                return (
-                    beforeOrAt,
-                    transform(beforeOrAt, target, tick, liquidity)
-                );
+                return (beforeOrAt, transform(beforeOrAt, target, tick, liquidity));
             }
         }
 
@@ -1679,7 +1554,7 @@ library Oracle {
         if (!beforeOrAt.initialized) beforeOrAt = self[0];
 
         // ensure that the target is chronologically at or after the oldest observation
-        require(lte(time, beforeOrAt.blockTimestamp, target), "OLD");
+        require(lte(time, beforeOrAt.blockTimestamp, target), 'OLD');
 
         // if we've reached this point, we have to binary search
         return binarySearch(self, time, target, index, cardinality);
@@ -1706,66 +1581,36 @@ library Oracle {
         uint16 index,
         uint128 liquidity,
         uint16 cardinality
-    )
-        internal
-        view
-        returns (
-            int56 tickCumulative,
-            uint160 secondsPerLiquidityCumulativeX128
-        )
-    {
+    ) internal view returns (int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128) {
         if (secondsAgo == 0) {
             Observation memory last = self[index];
-            if (last.blockTimestamp != time)
-                last = transform(last, time, tick, liquidity);
-            return (
-                last.tickCumulative,
-                last.secondsPerLiquidityCumulativeX128
-            );
+            if (last.blockTimestamp != time) last = transform(last, time, tick, liquidity);
+            return (last.tickCumulative, last.secondsPerLiquidityCumulativeX128);
         }
 
         uint32 target = time - secondsAgo;
 
-        (
-            Observation memory beforeOrAt,
-            Observation memory atOrAfter
-        ) = getSurroundingObservations(
-                self,
-                time,
-                target,
-                tick,
-                index,
-                liquidity,
-                cardinality
-            );
+        (Observation memory beforeOrAt, Observation memory atOrAfter) =
+            getSurroundingObservations(self, time, target, tick, index, liquidity, cardinality);
 
         if (target == beforeOrAt.blockTimestamp) {
             // we're at the left boundary
-            return (
-                beforeOrAt.tickCumulative,
-                beforeOrAt.secondsPerLiquidityCumulativeX128
-            );
+            return (beforeOrAt.tickCumulative, beforeOrAt.secondsPerLiquidityCumulativeX128);
         } else if (target == atOrAfter.blockTimestamp) {
             // we're at the right boundary
-            return (
-                atOrAfter.tickCumulative,
-                atOrAfter.secondsPerLiquidityCumulativeX128
-            );
+            return (atOrAfter.tickCumulative, atOrAfter.secondsPerLiquidityCumulativeX128);
         } else {
             // we're in the middle
-            uint32 observationTimeDelta = atOrAfter.blockTimestamp -
-                beforeOrAt.blockTimestamp;
+            uint32 observationTimeDelta = atOrAfter.blockTimestamp - beforeOrAt.blockTimestamp;
             uint32 targetDelta = target - beforeOrAt.blockTimestamp;
             return (
                 beforeOrAt.tickCumulative +
-                    ((atOrAfter.tickCumulative - beforeOrAt.tickCumulative) /
-                        observationTimeDelta) *
+                    ((atOrAfter.tickCumulative - beforeOrAt.tickCumulative) / observationTimeDelta) *
                     targetDelta,
                 beforeOrAt.secondsPerLiquidityCumulativeX128 +
                     uint160(
                         (uint256(
-                            atOrAfter.secondsPerLiquidityCumulativeX128 -
-                                beforeOrAt.secondsPerLiquidityCumulativeX128
+                            atOrAfter.secondsPerLiquidityCumulativeX128 - beforeOrAt.secondsPerLiquidityCumulativeX128
                         ) * targetDelta) / observationTimeDelta
                     )
             );
@@ -1791,23 +1636,13 @@ library Oracle {
         uint16 index,
         uint128 liquidity,
         uint16 cardinality
-    )
-        internal
-        view
-        returns (
-            int56[] memory tickCumulatives,
-            uint160[] memory secondsPerLiquidityCumulativeX128s
-        )
-    {
-        require(cardinality > 0, "I");
+    ) internal view returns (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s) {
+        require(cardinality > 0, 'I');
 
         tickCumulatives = new int56[](secondsAgos.length);
         secondsPerLiquidityCumulativeX128s = new uint160[](secondsAgos.length);
         for (uint256 i = 0; i < secondsAgos.length; i++) {
-            (
-                tickCumulatives[i],
-                secondsPerLiquidityCumulativeX128s[i]
-            ) = observeSingle(
+            (tickCumulatives[i], secondsPerLiquidityCumulativeX128s[i]) = observeSingle(
                 self,
                 time,
                 secondsAgos[i],
@@ -1832,19 +1667,13 @@ interface IERC20Minimal {
     /// @param recipient The account that will receive the amount transferred
     /// @param amount The number of tokens to send from the sender to the recipient
     /// @return Returns true for a successful transfer, false for an unsuccessful transfer
-    function transfer(
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
+    function transfer(address recipient, uint256 amount) external returns (bool);
 
     /// @notice Returns the current allowance given to a spender by an owner
     /// @param owner The account of the token owner
     /// @param spender The account of the token spender
     /// @return The current allowance granted by `owner` to `spender`
-    function allowance(
-        address owner,
-        address spender
-    ) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
 
     /// @notice Sets the allowance of a spender from the `msg.sender` to the value `amount`
     /// @param spender The account which will be allowed to spend a given amount of the owners tokens
@@ -1873,11 +1702,7 @@ interface IERC20Minimal {
     /// @param owner The account that approved spending of its tokens
     /// @param spender The account for which the spending allowance was modified
     /// @param value The new allowance from the owner to the spender
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /// @title TransferHelper
@@ -1888,14 +1713,14 @@ library TransferHelper {
     /// @param token The contract address of the token which will be transferred
     /// @param to The recipient of the transfer
     /// @param value The value of the transfer
-    function safeTransfer(address token, address to, uint256 value) internal {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(IERC20Minimal.transfer.selector, to, value)
-        );
-        require(
-            success && (data.length == 0 || abi.decode(data, (bool))),
-            "TF"
-        );
+    function safeTransfer(
+        address token,
+        address to,
+        uint256 value
+    ) internal {
+        (bool success, bytes memory data) =
+            token.call(abi.encodeWithSelector(IERC20Minimal.transfer.selector, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), 'TF');
     }
 }
 
@@ -1907,10 +1732,7 @@ library UnsafeMath {
     /// @param x The dividend
     /// @param y The divisor
     /// @return z The quotient, ceil(x / y)
-    function divRoundingUp(
-        uint256 x,
-        uint256 y
-    ) internal pure returns (uint256 z) {
+    function divRoundingUp(uint256 x, uint256 y) internal pure returns (uint256 z) {
         assembly {
             z := add(div(x, y), gt(mod(x, y), 0))
         }
@@ -1958,36 +1780,17 @@ library SqrtPriceMath {
                 uint256 denominator = numerator1 + product;
                 if (denominator >= numerator1)
                     // always fits in 160 bits
-                    return
-                        uint160(
-                            FullMath.mulDivRoundingUp(
-                                numerator1,
-                                sqrtPX96,
-                                denominator
-                            )
-                        );
+                    return uint160(FullMath.mulDivRoundingUp(numerator1, sqrtPX96, denominator));
             }
 
-            return
-                uint160(
-                    UnsafeMath.divRoundingUp(
-                        numerator1,
-                        (numerator1 / sqrtPX96).add(amount)
-                    )
-                );
+            return uint160(UnsafeMath.divRoundingUp(numerator1, (numerator1 / sqrtPX96).add(amount)));
         } else {
             uint256 product;
             // if the product overflows, we know the denominator underflows
             // in addition, we must check that the denominator does not underflow
-            require(
-                (product = amount * sqrtPX96) / amount == sqrtPX96 &&
-                    numerator1 > product
-            );
+            require((product = amount * sqrtPX96) / amount == sqrtPX96 && numerator1 > product);
             uint256 denominator = numerator1 - product;
-            return
-                FullMath
-                    .mulDivRoundingUp(numerator1, sqrtPX96, denominator)
-                    .toUint160();
+            return FullMath.mulDivRoundingUp(numerator1, sqrtPX96, denominator).toUint160();
         }
     }
 
@@ -2010,26 +1813,21 @@ library SqrtPriceMath {
         // if we're adding (subtracting), rounding down requires rounding the quotient down (up)
         // in both cases, avoid a mulDiv for most inputs
         if (add) {
-            uint256 quotient = (
-                amount <= type(uint160).max
-                    ? (amount << FixedPoint96.RESOLUTION) / liquidity
-                    : FullMath.mulDiv(amount, FixedPoint96.Q96, liquidity)
-            );
+            uint256 quotient =
+                (
+                    amount <= type(uint160).max
+                        ? (amount << FixedPoint96.RESOLUTION) / liquidity
+                        : FullMath.mulDiv(amount, FixedPoint96.Q96, liquidity)
+                );
 
             return uint256(sqrtPX96).add(quotient).toUint160();
         } else {
-            uint256 quotient = (
-                amount <= type(uint160).max
-                    ? UnsafeMath.divRoundingUp(
-                        amount << FixedPoint96.RESOLUTION,
-                        liquidity
-                    )
-                    : FullMath.mulDivRoundingUp(
-                        amount,
-                        FixedPoint96.Q96,
-                        liquidity
-                    )
-            );
+            uint256 quotient =
+                (
+                    amount <= type(uint160).max
+                        ? UnsafeMath.divRoundingUp(amount << FixedPoint96.RESOLUTION, liquidity)
+                        : FullMath.mulDivRoundingUp(amount, FixedPoint96.Q96, liquidity)
+                );
 
             require(sqrtPX96 > quotient);
             // always fits 160 bits
@@ -2056,18 +1854,8 @@ library SqrtPriceMath {
         // round to make sure that we don't pass the target price
         return
             zeroForOne
-                ? getNextSqrtPriceFromAmount0RoundingUp(
-                    sqrtPX96,
-                    liquidity,
-                    amountIn,
-                    true
-                )
-                : getNextSqrtPriceFromAmount1RoundingDown(
-                    sqrtPX96,
-                    liquidity,
-                    amountIn,
-                    true
-                );
+                ? getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96, liquidity, amountIn, true)
+                : getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96, liquidity, amountIn, true);
     }
 
     /// @notice Gets the next sqrt price given an output amount of token0 or token1
@@ -2089,18 +1877,8 @@ library SqrtPriceMath {
         // round to make sure that we pass the target price
         return
             zeroForOne
-                ? getNextSqrtPriceFromAmount1RoundingDown(
-                    sqrtPX96,
-                    liquidity,
-                    amountOut,
-                    false
-                )
-                : getNextSqrtPriceFromAmount0RoundingUp(
-                    sqrtPX96,
-                    liquidity,
-                    amountOut,
-                    false
-                );
+                ? getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96, liquidity, amountOut, false)
+                : getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96, liquidity, amountOut, false);
     }
 
     /// @notice Gets the amount0 delta between two prices
@@ -2117,8 +1895,7 @@ library SqrtPriceMath {
         uint128 liquidity,
         bool roundUp
     ) internal pure returns (uint256 amount0) {
-        if (sqrtRatioAX96 > sqrtRatioBX96)
-            (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
+        if (sqrtRatioAX96 > sqrtRatioBX96) (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
 
         uint256 numerator1 = uint256(liquidity) << FixedPoint96.RESOLUTION;
         uint256 numerator2 = sqrtRatioBX96 - sqrtRatioAX96;
@@ -2128,15 +1905,10 @@ library SqrtPriceMath {
         return
             roundUp
                 ? UnsafeMath.divRoundingUp(
-                    FullMath.mulDivRoundingUp(
-                        numerator1,
-                        numerator2,
-                        sqrtRatioBX96
-                    ),
+                    FullMath.mulDivRoundingUp(numerator1, numerator2, sqrtRatioBX96),
                     sqrtRatioAX96
                 )
-                : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96) /
-                    sqrtRatioAX96;
+                : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96) / sqrtRatioAX96;
     }
 
     /// @notice Gets the amount1 delta between two prices
@@ -2152,21 +1924,12 @@ library SqrtPriceMath {
         uint128 liquidity,
         bool roundUp
     ) internal pure returns (uint256 amount1) {
-        if (sqrtRatioAX96 > sqrtRatioBX96)
-            (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
+        if (sqrtRatioAX96 > sqrtRatioBX96) (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
 
         return
             roundUp
-                ? FullMath.mulDivRoundingUp(
-                    liquidity,
-                    sqrtRatioBX96 - sqrtRatioAX96,
-                    FixedPoint96.Q96
-                )
-                : FullMath.mulDiv(
-                    liquidity,
-                    sqrtRatioBX96 - sqrtRatioAX96,
-                    FixedPoint96.Q96
-                );
+                ? FullMath.mulDivRoundingUp(liquidity, sqrtRatioBX96 - sqrtRatioAX96, FixedPoint96.Q96)
+                : FullMath.mulDiv(liquidity, sqrtRatioBX96 - sqrtRatioAX96, FixedPoint96.Q96);
     }
 
     /// @notice Helper that gets signed token0 delta
@@ -2181,18 +1944,8 @@ library SqrtPriceMath {
     ) internal pure returns (int256 amount0) {
         return
             liquidity < 0
-                ? -getAmount0Delta(
-                    sqrtRatioAX96,
-                    sqrtRatioBX96,
-                    uint128(-liquidity),
-                    false
-                ).toInt256()
-                : getAmount0Delta(
-                    sqrtRatioAX96,
-                    sqrtRatioBX96,
-                    uint128(liquidity),
-                    true
-                ).toInt256();
+                ? -getAmount0Delta(sqrtRatioAX96, sqrtRatioBX96, uint128(-liquidity), false).toInt256()
+                : getAmount0Delta(sqrtRatioAX96, sqrtRatioBX96, uint128(liquidity), true).toInt256();
     }
 
     /// @notice Helper that gets signed token1 delta
@@ -2207,18 +1960,8 @@ library SqrtPriceMath {
     ) internal pure returns (int256 amount1) {
         return
             liquidity < 0
-                ? -getAmount1Delta(
-                    sqrtRatioAX96,
-                    sqrtRatioBX96,
-                    uint128(-liquidity),
-                    false
-                ).toInt256()
-                : getAmount1Delta(
-                    sqrtRatioAX96,
-                    sqrtRatioBX96,
-                    uint128(liquidity),
-                    true
-                ).toInt256();
+                ? -getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, uint128(-liquidity), false).toInt256()
+                : getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, uint128(liquidity), true).toInt256();
     }
 }
 
@@ -2256,26 +1999,11 @@ library SwapMath {
         bool exactIn = amountRemaining >= 0;
 
         if (exactIn) {
-            uint256 amountRemainingLessFee = FullMath.mulDiv(
-                uint256(amountRemaining),
-                1e6 - feePips,
-                1e6
-            );
+            uint256 amountRemainingLessFee = FullMath.mulDiv(uint256(amountRemaining), 1e6 - feePips, 1e6);
             amountIn = zeroForOne
-                ? SqrtPriceMath.getAmount0Delta(
-                    sqrtRatioTargetX96,
-                    sqrtRatioCurrentX96,
-                    liquidity,
-                    true
-                )
-                : SqrtPriceMath.getAmount1Delta(
-                    sqrtRatioCurrentX96,
-                    sqrtRatioTargetX96,
-                    liquidity,
-                    true
-                );
-            if (amountRemainingLessFee >= amountIn)
-                sqrtRatioNextX96 = sqrtRatioTargetX96;
+                ? SqrtPriceMath.getAmount0Delta(sqrtRatioTargetX96, sqrtRatioCurrentX96, liquidity, true)
+                : SqrtPriceMath.getAmount1Delta(sqrtRatioCurrentX96, sqrtRatioTargetX96, liquidity, true);
+            if (amountRemainingLessFee >= amountIn) sqrtRatioNextX96 = sqrtRatioTargetX96;
             else
                 sqrtRatioNextX96 = SqrtPriceMath.getNextSqrtPriceFromInput(
                     sqrtRatioCurrentX96,
@@ -2285,20 +2013,9 @@ library SwapMath {
                 );
         } else {
             amountOut = zeroForOne
-                ? SqrtPriceMath.getAmount1Delta(
-                    sqrtRatioTargetX96,
-                    sqrtRatioCurrentX96,
-                    liquidity,
-                    false
-                )
-                : SqrtPriceMath.getAmount0Delta(
-                    sqrtRatioCurrentX96,
-                    sqrtRatioTargetX96,
-                    liquidity,
-                    false
-                );
-            if (uint256(-amountRemaining) >= amountOut)
-                sqrtRatioNextX96 = sqrtRatioTargetX96;
+                ? SqrtPriceMath.getAmount1Delta(sqrtRatioTargetX96, sqrtRatioCurrentX96, liquidity, false)
+                : SqrtPriceMath.getAmount0Delta(sqrtRatioCurrentX96, sqrtRatioTargetX96, liquidity, false);
+            if (uint256(-amountRemaining) >= amountOut) sqrtRatioNextX96 = sqrtRatioTargetX96;
             else
                 sqrtRatioNextX96 = SqrtPriceMath.getNextSqrtPriceFromOutput(
                     sqrtRatioCurrentX96,
@@ -2314,37 +2031,17 @@ library SwapMath {
         if (zeroForOne) {
             amountIn = max && exactIn
                 ? amountIn
-                : SqrtPriceMath.getAmount0Delta(
-                    sqrtRatioNextX96,
-                    sqrtRatioCurrentX96,
-                    liquidity,
-                    true
-                );
+                : SqrtPriceMath.getAmount0Delta(sqrtRatioNextX96, sqrtRatioCurrentX96, liquidity, true);
             amountOut = max && !exactIn
                 ? amountOut
-                : SqrtPriceMath.getAmount1Delta(
-                    sqrtRatioNextX96,
-                    sqrtRatioCurrentX96,
-                    liquidity,
-                    false
-                );
+                : SqrtPriceMath.getAmount1Delta(sqrtRatioNextX96, sqrtRatioCurrentX96, liquidity, false);
         } else {
             amountIn = max && exactIn
                 ? amountIn
-                : SqrtPriceMath.getAmount1Delta(
-                    sqrtRatioCurrentX96,
-                    sqrtRatioNextX96,
-                    liquidity,
-                    true
-                );
+                : SqrtPriceMath.getAmount1Delta(sqrtRatioCurrentX96, sqrtRatioNextX96, liquidity, true);
             amountOut = max && !exactIn
                 ? amountOut
-                : SqrtPriceMath.getAmount0Delta(
-                    sqrtRatioCurrentX96,
-                    sqrtRatioNextX96,
-                    liquidity,
-                    false
-                );
+                : SqrtPriceMath.getAmount0Delta(sqrtRatioCurrentX96, sqrtRatioNextX96, liquidity, false);
         }
 
         // cap the output amount to not exceed the remaining output amount
@@ -2356,11 +2053,7 @@ library SwapMath {
             // we didn't reach the target, so take the remainder of the maximum input as fee
             feeAmount = uint256(amountRemaining) - amountIn;
         } else {
-            feeAmount = FullMath.mulDivRoundingUp(
-                amountIn,
-                feePips,
-                1e6 - feePips
-            );
+            feeAmount = FullMath.mulDivRoundingUp(amountIn, feePips, 1e6 - feePips);
         }
     }
 }
@@ -2567,7 +2260,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     /// to a function before the pool is initialized. The reentrancy guard is required throughout the contract because
     /// we use balance checks to determine the payment status of interactions such as mint, swap and flash.
     modifier lock() {
-        require(slot0.unlocked, "LOK");
+        require(slot0.unlocked, 'LOK');
         slot0.unlocked = false;
         _;
         slot0.unlocked = true;
@@ -2581,21 +2274,17 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 
     constructor() {
         int24 _tickSpacing;
-        (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(
-            msg.sender
-        ).parameters();
+        (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(msg.sender).parameters();
         tickSpacing = _tickSpacing;
 
-        maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
-            _tickSpacing
-        );
+        maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(_tickSpacing);
     }
 
     /// @dev Common checks for valid tick inputs.
     function checkTicks(int24 tickLower, int24 tickUpper) private pure {
-        require(tickLower < tickUpper, "TLU");
-        require(tickLower >= TickMath.MIN_TICK, "TLM");
-        require(tickUpper <= TickMath.MAX_TICK, "TUM");
+        require(tickLower < tickUpper, 'TLU');
+        require(tickLower >= TickMath.MIN_TICK, 'TLM');
+        require(tickUpper <= TickMath.MAX_TICK, 'TUM');
     }
 
     /// @dev Returns the block timestamp truncated to 32 bits, i.e. mod 2**32. This method is overridden in tests.
@@ -2607,12 +2296,8 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     /// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
     /// check
     function balance0() private view returns (uint256) {
-        (bool success, bytes memory data) = token0.staticcall(
-            abi.encodeWithSelector(
-                IERC20Minimal.balanceOf.selector,
-                address(this)
-            )
-        );
+        (bool success, bytes memory data) =
+            token0.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
         require(success && data.length >= 32);
         return abi.decode(data, (uint256));
     }
@@ -2621,21 +2306,14 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     /// @dev This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
     /// check
     function balance1() private view returns (uint256) {
-        (bool success, bytes memory data) = token1.staticcall(
-            abi.encodeWithSelector(
-                IERC20Minimal.balanceOf.selector,
-                address(this)
-            )
-        );
+        (bool success, bytes memory data) =
+            token1.staticcall(abi.encodeWithSelector(IERC20Minimal.balanceOf.selector, address(this)));
         require(success && data.length >= 32);
         return abi.decode(data, (uint256));
     }
 
     /// @inheritdoc IUniswapV3PoolDerivedState
-    function snapshotCumulativesInside(
-        int24 tickLower,
-        int24 tickUpper
-    )
+    function snapshotCumulativesInside(int24 tickLower, int24 tickUpper)
         external
         view
         override
@@ -2659,12 +2337,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             Tick.Info storage lower = ticks[tickLower];
             Tick.Info storage upper = ticks[tickUpper];
             bool initializedLower;
-            (
-                tickCumulativeLower,
-                secondsPerLiquidityOutsideLowerX128,
-                secondsOutsideLower,
-                initializedLower
-            ) = (
+            (tickCumulativeLower, secondsPerLiquidityOutsideLowerX128, secondsOutsideLower, initializedLower) = (
                 lower.tickCumulativeOutside,
                 lower.secondsPerLiquidityOutsideX128,
                 lower.secondsOutside,
@@ -2673,12 +2346,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             require(initializedLower);
 
             bool initializedUpper;
-            (
-                tickCumulativeUpper,
-                secondsPerLiquidityOutsideUpperX128,
-                secondsOutsideUpper,
-                initializedUpper
-            ) = (
+            (tickCumulativeUpper, secondsPerLiquidityOutsideUpperX128, secondsOutsideUpper, initializedUpper) = (
                 upper.tickCumulativeOutside,
                 upper.secondsPerLiquidityOutsideX128,
                 upper.secondsOutside,
@@ -2692,16 +2360,13 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         if (_slot0.tick < tickLower) {
             return (
                 tickCumulativeLower - tickCumulativeUpper,
-                secondsPerLiquidityOutsideLowerX128 -
-                    secondsPerLiquidityOutsideUpperX128,
+                secondsPerLiquidityOutsideLowerX128 - secondsPerLiquidityOutsideUpperX128,
                 secondsOutsideLower - secondsOutsideUpper
             );
         } else if (_slot0.tick < tickUpper) {
             uint32 time = _blockTimestamp();
-            (
-                int56 tickCumulative,
-                uint160 secondsPerLiquidityCumulativeX128
-            ) = observations.observeSingle(
+            (int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128) =
+                observations.observeSingle(
                     time,
                     0,
                     _slot0.tick,
@@ -2719,25 +2384,19 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         } else {
             return (
                 tickCumulativeUpper - tickCumulativeLower,
-                secondsPerLiquidityOutsideUpperX128 -
-                    secondsPerLiquidityOutsideLowerX128,
+                secondsPerLiquidityOutsideUpperX128 - secondsPerLiquidityOutsideLowerX128,
                 secondsOutsideUpper - secondsOutsideLower
             );
         }
     }
 
     /// @inheritdoc IUniswapV3PoolDerivedState
-    function observe(
-        uint32[] calldata secondsAgos
-    )
+    function observe(uint32[] calldata secondsAgos)
         external
         view
         override
         noDelegateCall
-        returns (
-            int56[] memory tickCumulatives,
-            uint160[] memory secondsPerLiquidityCumulativeX128s
-        )
+        returns (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s)
     {
         return
             observations.observe(
@@ -2751,32 +2410,28 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     }
 
     /// @inheritdoc IUniswapV3PoolActions
-    function increaseObservationCardinalityNext(
-        uint16 observationCardinalityNext
-    ) external override lock noDelegateCall {
+    function increaseObservationCardinalityNext(uint16 observationCardinalityNext)
+        external
+        override
+        lock
+        noDelegateCall
+    {
         uint16 observationCardinalityNextOld = slot0.observationCardinalityNext; // for the event
-        uint16 observationCardinalityNextNew = observations.grow(
-            observationCardinalityNextOld,
-            observationCardinalityNext
-        );
+        uint16 observationCardinalityNextNew =
+            observations.grow(observationCardinalityNextOld, observationCardinalityNext);
         slot0.observationCardinalityNext = observationCardinalityNextNew;
         if (observationCardinalityNextOld != observationCardinalityNextNew)
-            emit IncreaseObservationCardinalityNext(
-                observationCardinalityNextOld,
-                observationCardinalityNextNew
-            );
+            emit IncreaseObservationCardinalityNext(observationCardinalityNextOld, observationCardinalityNextNew);
     }
 
     /// @inheritdoc IUniswapV3PoolActions
     /// @dev not locked because it initializes unlocked
     function initialize(uint160 sqrtPriceX96) external override {
-        require(slot0.sqrtPriceX96 == 0, "AI");
+        require(slot0.sqrtPriceX96 == 0, 'AI');
 
         int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
 
-        (uint16 cardinality, uint16 cardinalityNext) = observations.initialize(
-            _blockTimestamp()
-        );
+        (uint16 cardinality, uint16 cardinalityNext) = observations.initialize(_blockTimestamp());
 
         slot0 = Slot0({
             sqrtPriceX96: sqrtPriceX96,
@@ -2806,12 +2461,14 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     /// @return position a storage pointer referencing the position with the given owner and tick range
     /// @return amount0 the amount of token0 owed to the pool, negative if the pool should pay the recipient
     /// @return amount1 the amount of token1 owed to the pool, negative if the pool should pay the recipient
-    function _modifyPosition(
-        ModifyPositionParams memory params
-    )
+    function _modifyPosition(ModifyPositionParams memory params)
         private
         noDelegateCall
-        returns (Position.Info storage position, int256 amount0, int256 amount1)
+        returns (
+            Position.Info storage position,
+            int256 amount0,
+            int256 amount1
+        )
     {
         checkTicks(params.tickLower, params.tickUpper);
 
@@ -2839,10 +2496,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
                 uint128 liquidityBefore = liquidity; // SLOAD for gas optimization
 
                 // write an oracle entry
-                (
-                    slot0.observationIndex,
-                    slot0.observationCardinality
-                ) = observations.write(
+                (slot0.observationIndex, slot0.observationCardinality) = observations.write(
                     _slot0.observationIndex,
                     _blockTimestamp(),
                     _slot0.tick,
@@ -2862,10 +2516,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
                     params.liquidityDelta
                 );
 
-                liquidity = LiquidityMath.addDelta(
-                    liquidityBefore,
-                    params.liquidityDelta
-                );
+                liquidity = LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta);
             } else {
                 // current tick is above the passed range; liquidity can only become in range by crossing from right to
                 // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
@@ -2900,10 +2551,8 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         bool flippedUpper;
         if (liquidityDelta != 0) {
             uint32 time = _blockTimestamp();
-            (
-                int56 tickCumulative,
-                uint160 secondsPerLiquidityCumulativeX128
-            ) = observations.observeSingle(
+            (int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128) =
+                observations.observeSingle(
                     time,
                     0,
                     slot0.tick,
@@ -2945,20 +2594,10 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             }
         }
 
-        (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) = ticks
-            .getFeeGrowthInside(
-                tickLower,
-                tickUpper,
-                tick,
-                _feeGrowthGlobal0X128,
-                _feeGrowthGlobal1X128
-            );
+        (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) =
+            ticks.getFeeGrowthInside(tickLower, tickUpper, tick, _feeGrowthGlobal0X128, _feeGrowthGlobal1X128);
 
-        position.update(
-            liquidityDelta,
-            feeGrowthInside0X128,
-            feeGrowthInside1X128
-        );
+        position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
 
         // clear any tick data that is no longer needed
         if (liquidityDelta < 0) {
@@ -2981,14 +2620,15 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         bytes calldata data
     ) external override lock returns (uint256 amount0, uint256 amount1) {
         require(amount > 0);
-        (, int256 amount0Int, int256 amount1Int) = _modifyPosition(
-            ModifyPositionParams({
-                owner: recipient,
-                tickLower: tickLower,
-                tickUpper: tickUpper,
-                liquidityDelta: int256(amount).toInt128()
-            })
-        );
+        (, int256 amount0Int, int256 amount1Int) =
+            _modifyPosition(
+                ModifyPositionParams({
+                    owner: recipient,
+                    tickLower: tickLower,
+                    tickUpper: tickUpper,
+                    liquidityDelta: int256(amount).toInt128()
+                })
+            );
 
         amount0 = uint256(amount0Int);
         amount1 = uint256(amount1Int);
@@ -2997,25 +2637,11 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         uint256 balance1Before;
         if (amount0 > 0) balance0Before = balance0();
         if (amount1 > 0) balance1Before = balance1();
-        IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(
-            amount0,
-            amount1,
-            data
-        );
-        if (amount0 > 0)
-            require(balance0Before.add(amount0) <= balance0(), "M0");
-        if (amount1 > 0)
-            require(balance1Before.add(amount1) <= balance1(), "M1");
+        IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data);
+        if (amount0 > 0) require(balance0Before.add(amount0) <= balance0(), 'M0');
+        if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
 
-        emit Mint(
-            msg.sender,
-            recipient,
-            tickLower,
-            tickUpper,
-            amount,
-            amount0,
-            amount1
-        );
+        emit Mint(msg.sender, recipient, tickLower, tickUpper, amount, amount0, amount1);
     }
 
     /// @inheritdoc IUniswapV3PoolActions
@@ -3027,18 +2653,10 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         uint128 amount1Requested
     ) external override lock returns (uint128 amount0, uint128 amount1) {
         // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
-        Position.Info storage position = positions.get(
-            msg.sender,
-            tickLower,
-            tickUpper
-        );
+        Position.Info storage position = positions.get(msg.sender, tickLower, tickUpper);
 
-        amount0 = amount0Requested > position.tokensOwed0
-            ? position.tokensOwed0
-            : amount0Requested;
-        amount1 = amount1Requested > position.tokensOwed1
-            ? position.tokensOwed1
-            : amount1Requested;
+        amount0 = amount0Requested > position.tokensOwed0 ? position.tokensOwed0 : amount0Requested;
+        amount1 = amount1Requested > position.tokensOwed1 ? position.tokensOwed1 : amount1Requested;
 
         if (amount0 > 0) {
             position.tokensOwed0 -= amount0;
@@ -3049,14 +2667,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             TransferHelper.safeTransfer(token1, recipient, amount1);
         }
 
-        emit Collect(
-            msg.sender,
-            recipient,
-            tickLower,
-            tickUpper,
-            amount0,
-            amount1
-        );
+        emit Collect(msg.sender, recipient, tickLower, tickUpper, amount0, amount1);
     }
 
     /// @inheritdoc IUniswapV3PoolActions
@@ -3066,11 +2677,8 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         int24 tickUpper,
         uint128 amount
     ) external override lock returns (uint256 amount0, uint256 amount1) {
-        (
-            Position.Info storage position,
-            int256 amount0Int,
-            int256 amount1Int
-        ) = _modifyPosition(
+        (Position.Info storage position, int256 amount0Int, int256 amount1Int) =
+            _modifyPosition(
                 ModifyPositionParams({
                     owner: msg.sender,
                     tickLower: tickLower,
@@ -3149,68 +2757,55 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         int256 amountSpecified,
         uint160 sqrtPriceLimitX96,
         bytes calldata data
-    )
-        external
-        override
-        noDelegateCall
-        returns (int256 amount0, int256 amount1)
-    {
-        require(amountSpecified != 0, "AS");
+    ) external override noDelegateCall returns (int256 amount0, int256 amount1) {
+        require(amountSpecified != 0, 'AS');
 
         Slot0 memory slot0Start = slot0;
 
-        require(slot0Start.unlocked, "LOK");
+        require(slot0Start.unlocked, 'LOK');
         require(
             zeroForOne
-                ? sqrtPriceLimitX96 < slot0Start.sqrtPriceX96 &&
-                    sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
-                : sqrtPriceLimitX96 > slot0Start.sqrtPriceX96 &&
-                    sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,
-            "SPL"
+                ? sqrtPriceLimitX96 < slot0Start.sqrtPriceX96 && sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
+                : sqrtPriceLimitX96 > slot0Start.sqrtPriceX96 && sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,
+            'SPL'
         );
 
         slot0.unlocked = false;
 
-        SwapCache memory cache = SwapCache({
-            liquidityStart: liquidity,
-            blockTimestamp: _blockTimestamp(),
-            feeProtocol: zeroForOne
-                ? (slot0Start.feeProtocol % 16)
-                : (slot0Start.feeProtocol >> 4),
-            secondsPerLiquidityCumulativeX128: 0,
-            tickCumulative: 0,
-            computedLatestObservation: false
-        });
+        SwapCache memory cache =
+            SwapCache({
+                liquidityStart: liquidity,
+                blockTimestamp: _blockTimestamp(),
+                feeProtocol: zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
+                secondsPerLiquidityCumulativeX128: 0,
+                tickCumulative: 0,
+                computedLatestObservation: false
+            });
 
         bool exactInput = amountSpecified > 0;
 
-        SwapState memory state = SwapState({
-            amountSpecifiedRemaining: amountSpecified,
-            amountCalculated: 0,
-            sqrtPriceX96: slot0Start.sqrtPriceX96,
-            tick: slot0Start.tick,
-            feeGrowthGlobalX128: zeroForOne
-                ? feeGrowthGlobal0X128
-                : feeGrowthGlobal1X128,
-            protocolFee: 0,
-            liquidity: cache.liquidityStart
-        });
+        SwapState memory state =
+            SwapState({
+                amountSpecifiedRemaining: amountSpecified,
+                amountCalculated: 0,
+                sqrtPriceX96: slot0Start.sqrtPriceX96,
+                tick: slot0Start.tick,
+                feeGrowthGlobalX128: zeroForOne ? feeGrowthGlobal0X128 : feeGrowthGlobal1X128,
+                protocolFee: 0,
+                liquidity: cache.liquidityStart
+            });
 
         // continue swapping as long as we haven't used the entire input/output and haven't reached the price limit
-        while (
-            state.amountSpecifiedRemaining != 0 &&
-            state.sqrtPriceX96 != sqrtPriceLimitX96
-        ) {
+        while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96) {
             StepComputations memory step;
 
             step.sqrtPriceStartX96 = state.sqrtPriceX96;
 
-            (step.tickNext, step.initialized) = tickBitmap
-                .nextInitializedTickWithinOneWord(
-                    state.tick,
-                    tickSpacing,
-                    zeroForOne
-                );
+            (step.tickNext, step.initialized) = tickBitmap.nextInitializedTickWithinOneWord(
+                state.tick,
+                tickSpacing,
+                zeroForOne
+            );
 
             // ensure that we do not overshoot the min/max tick, as the tick bitmap is not aware of these bounds
             if (step.tickNext < TickMath.MIN_TICK) {
@@ -3223,18 +2818,9 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             step.sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(step.tickNext);
 
             // compute values to swap to the target tick, price limit, or point where input/output amount is exhausted
-            (
+            (state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount) = SwapMath.computeSwapStep(
                 state.sqrtPriceX96,
-                step.amountIn,
-                step.amountOut,
-                step.feeAmount
-            ) = SwapMath.computeSwapStep(
-                state.sqrtPriceX96,
-                (
-                    zeroForOne
-                        ? step.sqrtPriceNextX96 < sqrtPriceLimitX96
-                        : step.sqrtPriceNextX96 > sqrtPriceLimitX96
-                )
+                (zeroForOne ? step.sqrtPriceNextX96 < sqrtPriceLimitX96 : step.sqrtPriceNextX96 > sqrtPriceLimitX96)
                     ? sqrtPriceLimitX96
                     : step.sqrtPriceNextX96,
                 state.liquidity,
@@ -3243,16 +2829,11 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             );
 
             if (exactInput) {
-                state.amountSpecifiedRemaining -= (step.amountIn +
-                    step.feeAmount).toInt256();
-                state.amountCalculated = state.amountCalculated.sub(
-                    step.amountOut.toInt256()
-                );
+                state.amountSpecifiedRemaining -= (step.amountIn + step.feeAmount).toInt256();
+                state.amountCalculated = state.amountCalculated.sub(step.amountOut.toInt256());
             } else {
                 state.amountSpecifiedRemaining += step.amountOut.toInt256();
-                state.amountCalculated = state.amountCalculated.add(
-                    (step.amountIn + step.feeAmount).toInt256()
-                );
+                state.amountCalculated = state.amountCalculated.add((step.amountIn + step.feeAmount).toInt256());
             }
 
             // if the protocol fee is on, calculate how much is owed, decrement feeAmount, and increment protocolFee
@@ -3264,11 +2845,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 
             // update global fee tracker
             if (state.liquidity > 0)
-                state.feeGrowthGlobalX128 += FullMath.mulDiv(
-                    step.feeAmount,
-                    FixedPoint128.Q128,
-                    state.liquidity
-                );
+                state.feeGrowthGlobalX128 += FullMath.mulDiv(step.feeAmount, FixedPoint128.Q128, state.liquidity);
 
             // shift tick if we reached the next price
             if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
@@ -3277,10 +2854,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
                     // check for the placeholder value, which we replace with the actual value the first time the swap
                     // crosses an initialized tick
                     if (!cache.computedLatestObservation) {
-                        (
-                            cache.tickCumulative,
-                            cache.secondsPerLiquidityCumulativeX128
-                        ) = observations.observeSingle(
+                        (cache.tickCumulative, cache.secondsPerLiquidityCumulativeX128) = observations.observeSingle(
                             cache.blockTimestamp,
                             0,
                             slot0Start.tick,
@@ -3290,30 +2864,20 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
                         );
                         cache.computedLatestObservation = true;
                     }
-                    int128 liquidityNet = ticks.cross(
-                        step.tickNext,
-                        (
-                            zeroForOne
-                                ? state.feeGrowthGlobalX128
-                                : feeGrowthGlobal0X128
-                        ),
-                        (
-                            zeroForOne
-                                ? feeGrowthGlobal1X128
-                                : state.feeGrowthGlobalX128
-                        ),
-                        cache.secondsPerLiquidityCumulativeX128,
-                        cache.tickCumulative,
-                        cache.blockTimestamp
-                    );
+                    int128 liquidityNet =
+                        ticks.cross(
+                            step.tickNext,
+                            (zeroForOne ? state.feeGrowthGlobalX128 : feeGrowthGlobal0X128),
+                            (zeroForOne ? feeGrowthGlobal1X128 : state.feeGrowthGlobalX128),
+                            cache.secondsPerLiquidityCumulativeX128,
+                            cache.tickCumulative,
+                            cache.blockTimestamp
+                        );
                     // if we're moving leftward, we interpret liquidityNet as the opposite sign
                     // safe because liquidityNet cannot be type(int128).min
                     if (zeroForOne) liquidityNet = -liquidityNet;
 
-                    state.liquidity = LiquidityMath.addDelta(
-                        state.liquidity,
-                        liquidityNet
-                    );
+                    state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet);
                 }
 
                 state.tick = zeroForOne ? step.tickNext - 1 : step.tickNext;
@@ -3325,10 +2889,8 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 
         // update tick and write an oracle entry if the tick change
         if (state.tick != slot0Start.tick) {
-            (
-                uint16 observationIndex,
-                uint16 observationCardinality
-            ) = observations.write(
+            (uint16 observationIndex, uint16 observationCardinality) =
+                observations.write(
                     slot0Start.observationIndex,
                     cache.blockTimestamp,
                     slot0Start.tick,
@@ -3336,12 +2898,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
                     slot0Start.observationCardinality,
                     slot0Start.observationCardinalityNext
                 );
-            (
-                slot0.sqrtPriceX96,
-                slot0.tick,
-                slot0.observationIndex,
-                slot0.observationCardinality
-            ) = (
+            (slot0.sqrtPriceX96, slot0.tick, slot0.observationIndex, slot0.observationCardinality) = (
                 state.sqrtPriceX96,
                 state.tick,
                 observationIndex,
@@ -3353,8 +2910,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         }
 
         // update liquidity if it changed
-        if (cache.liquidityStart != state.liquidity)
-            liquidity = state.liquidity;
+        if (cache.liquidityStart != state.liquidity) liquidity = state.liquidity;
 
         // update fee growth global and, if necessary, protocol fees
         // overflow is acceptable, protocol has to withdraw before it hits type(uint128).max fees
@@ -3367,57 +2923,25 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         }
 
         (amount0, amount1) = zeroForOne == exactInput
-            ? (
-                amountSpecified - state.amountSpecifiedRemaining,
-                state.amountCalculated
-            )
-            : (
-                state.amountCalculated,
-                amountSpecified - state.amountSpecifiedRemaining
-            );
+            ? (amountSpecified - state.amountSpecifiedRemaining, state.amountCalculated)
+            : (state.amountCalculated, amountSpecified - state.amountSpecifiedRemaining);
 
         // do the transfers and collect payment
         if (zeroForOne) {
-            if (amount1 < 0)
-                TransferHelper.safeTransfer(
-                    token1,
-                    recipient,
-                    uint256(-amount1)
-                );
+            if (amount1 < 0) TransferHelper.safeTransfer(token1, recipient, uint256(-amount1));
 
             uint256 balance0Before = balance0();
-            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(
-                amount0,
-                amount1,
-                data
-            );
-            require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
+            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
+            require(balance0Before.add(uint256(amount0)) <= balance0(), 'IIA');
         } else {
-            if (amount0 < 0)
-                TransferHelper.safeTransfer(
-                    token0,
-                    recipient,
-                    uint256(-amount0)
-                );
+            if (amount0 < 0) TransferHelper.safeTransfer(token0, recipient, uint256(-amount0));
 
             uint256 balance1Before = balance1();
-            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(
-                amount0,
-                amount1,
-                data
-            );
-            require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
+            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
+            require(balance1Before.add(uint256(amount1)) <= balance1(), 'IIA');
         }
 
-        emit Swap(
-            msg.sender,
-            recipient,
-            amount0,
-            amount1,
-            state.sqrtPriceX96,
-            state.liquidity,
-            state.tick
-        );
+        emit Swap(msg.sender, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
         slot0.unlocked = true;
     }
 
@@ -3429,29 +2953,23 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         bytes calldata data
     ) external override lock noDelegateCall {
         uint128 _liquidity = liquidity;
-        require(_liquidity > 0, "L");
+        require(_liquidity > 0, 'L');
 
         uint256 fee0 = FullMath.mulDivRoundingUp(amount0, fee, 1e6);
         uint256 fee1 = FullMath.mulDivRoundingUp(amount1, fee, 1e6);
         uint256 balance0Before = balance0();
         uint256 balance1Before = balance1();
 
-        if (amount0 > 0)
-            TransferHelper.safeTransfer(token0, recipient, amount0);
-        if (amount1 > 0)
-            TransferHelper.safeTransfer(token1, recipient, amount1);
+        if (amount0 > 0) TransferHelper.safeTransfer(token0, recipient, amount0);
+        if (amount1 > 0) TransferHelper.safeTransfer(token1, recipient, amount1);
 
-        IUniswapV3FlashCallback(msg.sender).uniswapV3FlashCallback(
-            fee0,
-            fee1,
-            data
-        );
+        IUniswapV3FlashCallback(msg.sender).uniswapV3FlashCallback(fee0, fee1, data);
 
         uint256 balance0After = balance0();
         uint256 balance1After = balance1();
 
-        require(balance0Before.add(fee0) <= balance0After, "F0");
-        require(balance1Before.add(fee1) <= balance1After, "F1");
+        require(balance0Before.add(fee0) <= balance0After, 'F0');
+        require(balance1Before.add(fee1) <= balance1After, 'F1');
 
         // sub is safe because we know balanceAfter is gt balanceBefore by at least fee
         uint256 paid0 = balance0After - balance0Before;
@@ -3461,43 +2979,27 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             uint8 feeProtocol0 = slot0.feeProtocol % 16;
             uint256 fees0 = feeProtocol0 == 0 ? 0 : paid0 / feeProtocol0;
             if (uint128(fees0) > 0) protocolFees.token0 += uint128(fees0);
-            feeGrowthGlobal0X128 += FullMath.mulDiv(
-                paid0 - fees0,
-                FixedPoint128.Q128,
-                _liquidity
-            );
+            feeGrowthGlobal0X128 += FullMath.mulDiv(paid0 - fees0, FixedPoint128.Q128, _liquidity);
         }
         if (paid1 > 0) {
             uint8 feeProtocol1 = slot0.feeProtocol >> 4;
             uint256 fees1 = feeProtocol1 == 0 ? 0 : paid1 / feeProtocol1;
             if (uint128(fees1) > 0) protocolFees.token1 += uint128(fees1);
-            feeGrowthGlobal1X128 += FullMath.mulDiv(
-                paid1 - fees1,
-                FixedPoint128.Q128,
-                _liquidity
-            );
+            feeGrowthGlobal1X128 += FullMath.mulDiv(paid1 - fees1, FixedPoint128.Q128, _liquidity);
         }
 
         emit Flash(msg.sender, recipient, amount0, amount1, paid0, paid1);
     }
 
     /// @inheritdoc IUniswapV3PoolOwnerActions
-    function setFeeProtocol(
-        uint8 feeProtocol0,
-        uint8 feeProtocol1
-    ) external override lock onlyFactoryOwner {
+    function setFeeProtocol(uint8 feeProtocol0, uint8 feeProtocol1) external override lock onlyFactoryOwner {
         require(
             (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <= 10)) &&
                 (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10))
         );
         uint8 feeProtocolOld = slot0.feeProtocol;
         slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 4);
-        emit SetFeeProtocol(
-            feeProtocolOld % 16,
-            feeProtocolOld >> 4,
-            feeProtocol0,
-            feeProtocol1
-        );
+        emit SetFeeProtocol(feeProtocolOld % 16, feeProtocolOld >> 4, feeProtocol0, feeProtocol1);
     }
 
     /// @inheritdoc IUniswapV3PoolOwnerActions
@@ -3505,19 +3007,9 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         address recipient,
         uint128 amount0Requested,
         uint128 amount1Requested
-    )
-        external
-        override
-        lock
-        onlyFactoryOwner
-        returns (uint128 amount0, uint128 amount1)
-    {
-        amount0 = amount0Requested > protocolFees.token0
-            ? protocolFees.token0
-            : amount0Requested;
-        amount1 = amount1Requested > protocolFees.token1
-            ? protocolFees.token1
-            : amount1Requested;
+    ) external override lock onlyFactoryOwner returns (uint128 amount0, uint128 amount1) {
+        amount0 = amount0Requested > protocolFees.token0 ? protocolFees.token0 : amount0Requested;
+        amount1 = amount1Requested > protocolFees.token1 ? protocolFees.token1 : amount1Requested;
 
         if (amount0 > 0) {
             if (amount0 == protocolFees.token0) amount0--; // ensure that the slot is not cleared, for gas savings
@@ -3560,18 +3052,8 @@ contract UniswapV3PoolDeployer is IUniswapV3PoolDeployer {
         uint24 fee,
         int24 tickSpacing
     ) internal returns (address pool) {
-        parameters = Parameters({
-            factory: factory,
-            token0: token0,
-            token1: token1,
-            fee: fee,
-            tickSpacing: tickSpacing
-        });
-        pool = address(
-            new UniswapV3Pool{
-                salt: keccak256(abi.encode(token0, token1, fee))
-            }()
-        );
+        parameters = Parameters({factory: factory, token0: token0, token1: token1, fee: fee, tickSpacing: tickSpacing});
+        pool = address(new UniswapV3Pool{salt: keccak256(abi.encode(token0, token1, fee))}());
         delete parameters;
     }
 }

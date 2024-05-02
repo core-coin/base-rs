@@ -39,7 +39,7 @@ fn big_function() {
     let f = serde_json::from_str::<alloy_json_abi::Function>(s).unwrap();
     assert_eq!(f.signature(), expected);
     assert_eq!(f.selector(), alloy_primitives::sha3(expected)[..4]);
-    assert_eq!(f.selector(), alloy_primitives::hex!("87201b41"));
+    assert_eq!(f.selector(), alloy_primitives::hex!("89f025a5"));
 
     let ethabi = serde_json::from_str::<ethabi::Function>(s).unwrap();
     assert_eq!(f.selector(), ethabi.short_signature());

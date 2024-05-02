@@ -28,11 +28,7 @@ interface IAccessControl {
      *
      * _Available since v3.1._
      */
-    event RoleAdminChanged(
-        bytes32 indexed role,
-        bytes32 indexed previousAdminRole,
-        bytes32 indexed newAdminRole
-    );
+    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);
 
     /**
      * @dev Emitted when `account` is granted `role`.
@@ -40,11 +36,7 @@ interface IAccessControl {
      * `sender` is the account that originated the contract call, an admin role
      * bearer except when using {AccessControl-_setupRole}.
      */
-    event RoleGranted(
-        bytes32 indexed role,
-        address indexed account,
-        address indexed sender
-    );
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
 
     /**
      * @dev Emitted when `account` is revoked `role`.
@@ -53,19 +45,12 @@ interface IAccessControl {
      *   - if using `revokeRole`, it is the admin role bearer
      *   - if using `renounceRole`, it is the role bearer (i.e. `account`)
      */
-    event RoleRevoked(
-        bytes32 indexed role,
-        address indexed account,
-        address indexed sender
-    );
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
 
     /**
      * @dev Returns `true` if `account` has been granted `role`.
      */
-    function hasRole(
-        bytes32 role,
-        address account
-    ) external view returns (bool);
+    function hasRole(bytes32 role, address account) external view returns (bool);
 
     /**
      * @dev Returns the admin role that controls `role`. See {grantRole} and
@@ -161,10 +146,7 @@ library Math {
      *
      * _Available since v5.0._
      */
-    function tryAdd(
-        uint256 a,
-        uint256 b
-    ) internal pure returns (bool, uint256) {
+    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         unchecked {
             uint256 c = a + b;
             if (c < a) return (false, 0);
@@ -177,10 +159,7 @@ library Math {
      *
      * _Available since v5.0._
      */
-    function trySub(
-        uint256 a,
-        uint256 b
-    ) internal pure returns (bool, uint256) {
+    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         unchecked {
             if (b > a) return (false, 0);
             return (true, a - b);
@@ -192,10 +171,7 @@ library Math {
      *
      * _Available since v5.0._
      */
-    function tryMul(
-        uint256 a,
-        uint256 b
-    ) internal pure returns (bool, uint256) {
+    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         unchecked {
             // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
             // benefit is lost if 'b' is also tested.
@@ -212,10 +188,7 @@ library Math {
      *
      * _Available since v5.0._
      */
-    function tryDiv(
-        uint256 a,
-        uint256 b
-    ) internal pure returns (bool, uint256) {
+    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         unchecked {
             if (b == 0) return (false, 0);
             return (true, a / b);
@@ -227,10 +200,7 @@ library Math {
      *
      * _Available since v5.0._
      */
-    function tryMod(
-        uint256 a,
-        uint256 b
-    ) internal pure returns (bool, uint256) {
+    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         unchecked {
             if (b == 0) return (false, 0);
             return (true, a % b);
@@ -281,11 +251,7 @@ library Math {
      * @dev Original credit to Remco Bloemen under MIT license (https://xn--2-umb.com/21/muldiv)
      * with further edits by Uniswap Labs also under MIT license.
      */
-    function mulDiv(
-        uint256 x,
-        uint256 y,
-        uint256 denominator
-    ) internal pure returns (uint256 result) {
+    function mulDiv(uint256 x, uint256 y, uint256 denominator) internal pure returns (uint256 result) {
         unchecked {
             // 512-bit multiply [prod1 prod0] = x * y. Compute the product mod 2^256 and mod 2^256 - 1, then use
             // use the Chinese Remainder Theorem to reconstruct the 512 bit result. The result is stored in two 256
@@ -371,12 +337,7 @@ library Math {
     /**
      * @notice Calculates x * y / denominator with full precision, following the selected rounding direction.
      */
-    function mulDiv(
-        uint256 x,
-        uint256 y,
-        uint256 denominator,
-        Rounding rounding
-    ) internal pure returns (uint256) {
+    function mulDiv(uint256 x, uint256 y, uint256 denominator, Rounding rounding) internal pure returns (uint256) {
         uint256 result = mulDiv(x, y, denominator);
         if (rounding == Rounding.Up && mulmod(x, y, denominator) > 0) {
             result += 1;
@@ -425,15 +386,10 @@ library Math {
     /**
      * @notice Calculates sqrt(a), following the selected rounding direction.
      */
-    function sqrt(
-        uint256 a,
-        Rounding rounding
-    ) internal pure returns (uint256) {
+    function sqrt(uint256 a, Rounding rounding) internal pure returns (uint256) {
         unchecked {
             uint256 result = sqrt(a);
-            return
-                result +
-                (rounding == Rounding.Up && result * result < a ? 1 : 0);
+            return result + (rounding == Rounding.Up && result * result < a ? 1 : 0);
         }
     }
 
@@ -483,15 +439,10 @@ library Math {
      * @dev Return the log in base 2, following the selected rounding direction, of a positive value.
      * Returns 0 if given 0.
      */
-    function log2(
-        uint256 value,
-        Rounding rounding
-    ) internal pure returns (uint256) {
+    function log2(uint256 value, Rounding rounding) internal pure returns (uint256) {
         unchecked {
             uint256 result = log2(value);
-            return
-                result +
-                (rounding == Rounding.Up && 1 << result < value ? 1 : 0);
+            return result + (rounding == Rounding.Up && 1 << result < value ? 1 : 0);
         }
     }
 
@@ -537,15 +488,10 @@ library Math {
      * @dev Return the log in base 10, following the selected rounding direction, of a positive value.
      * Returns 0 if given 0.
      */
-    function log10(
-        uint256 value,
-        Rounding rounding
-    ) internal pure returns (uint256) {
+    function log10(uint256 value, Rounding rounding) internal pure returns (uint256) {
         unchecked {
             uint256 result = log10(value);
-            return
-                result +
-                (rounding == Rounding.Up && 10 ** result < value ? 1 : 0);
+            return result + (rounding == Rounding.Up && 10 ** result < value ? 1 : 0);
         }
     }
 
@@ -585,15 +531,10 @@ library Math {
      * @dev Return the log in base 256, following the selected rounding direction, of a positive value.
      * Returns 0 if given 0.
      */
-    function log256(
-        uint256 value,
-        Rounding rounding
-    ) internal pure returns (uint256) {
+    function log256(uint256 value, Rounding rounding) internal pure returns (uint256) {
         unchecked {
             uint256 result = log256(value);
-            return
-                result +
-                (rounding == Rounding.Up && 1 << (result << 3) < value ? 1 : 0);
+            return result + (rounding == Rounding.Up && 1 << (result << 3) < value ? 1 : 0);
         }
     }
 }
@@ -680,11 +621,7 @@ library Strings {
      * @dev Converts a `int256` to its ASCII `string` decimal representation.
      */
     function toString(int256 value) internal pure returns (string memory) {
-        return
-            string.concat(
-                value < 0 ? "-" : "",
-                toString(SignedMath.abs(value))
-            );
+        return string.concat(value < 0 ? "-" : "", toString(SignedMath.abs(value)));
     }
 
     /**
@@ -699,10 +636,7 @@ library Strings {
     /**
      * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
      */
-    function toHexString(
-        uint256 value,
-        uint256 length
-    ) internal pure returns (string memory) {
+    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
         uint256 localValue = value;
         bytes memory buffer = new bytes(2 * length + 2);
         buffer[0] = "0";
@@ -727,13 +661,8 @@ library Strings {
     /**
      * @dev Returns true if the two strings are equal.
      */
-    function equal(
-        string memory a,
-        string memory b
-    ) internal pure returns (bool) {
-        return
-            bytes(a).length == bytes(b).length &&
-            keccak256(bytes(a)) == keccak256(bytes(b));
+    function equal(string memory a, string memory b) internal pure returns (bool) {
+        return bytes(a).length == bytes(b).length && keccak256(bytes(a)) == keccak256(bytes(b));
     }
 }
 
@@ -778,9 +707,7 @@ abstract contract ERC165 is IERC165 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
         return interfaceId == type(IERC165).interfaceId;
     }
 }
@@ -852,21 +779,14 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IAccessControl).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IAccessControl).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev Returns `true` if `account` has been granted `role`.
      */
-    function hasRole(
-        bytes32 role,
-        address account
-    ) public view virtual returns (bool) {
+    function hasRole(bytes32 role, address account) public view virtual returns (bool) {
         return _roles[role].members[account];
     }
 
@@ -917,10 +837,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
      *
      * May emit a {RoleGranted} event.
      */
-    function grantRole(
-        bytes32 role,
-        address account
-    ) public virtual onlyRole(getRoleAdmin(role)) {
+    function grantRole(bytes32 role, address account) public virtual onlyRole(getRoleAdmin(role)) {
         _grantRole(role, account);
     }
 
@@ -935,10 +852,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
      *
      * May emit a {RoleRevoked} event.
      */
-    function revokeRole(
-        bytes32 role,
-        address account
-    ) public virtual onlyRole(getRoleAdmin(role)) {
+    function revokeRole(bytes32 role, address account) public virtual onlyRole(getRoleAdmin(role)) {
         _revokeRole(role, account);
     }
 
@@ -958,10 +872,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
      *
      * May emit a {RoleRevoked} event.
      */
-    function renounceRole(
-        bytes32 role,
-        address callerConfirmation
-    ) public virtual {
+    function renounceRole(bytes32 role, address callerConfirmation) public virtual {
         if (callerConfirmation != _msgSender()) {
             revert AccessControlBadConfirmation();
         }
@@ -1044,10 +955,7 @@ interface IAccessControlDefaultAdminRules is IAccessControl {
      * address to become the {defaultAdmin} by calling {acceptDefaultAdminTransfer} only after `acceptSchedule`
      * passes.
      */
-    event DefaultAdminTransferScheduled(
-        address indexed newAdmin,
-        uint48 acceptSchedule
-    );
+    event DefaultAdminTransferScheduled(address indexed newAdmin, uint48 acceptSchedule);
 
     /**
      * @dev Emitted when a {pendingDefaultAdmin} is reset if it was never accepted, regardless of its schedule.
@@ -1058,10 +966,7 @@ interface IAccessControlDefaultAdminRules is IAccessControl {
      * @dev Emitted when a {defaultAdminDelay} change is started, setting `newDelay` as the next
      * delay to be applied between default admin transfer after `effectSchedule` has passed.
      */
-    event DefaultAdminDelayChangeScheduled(
-        uint48 newDelay,
-        uint48 effectSchedule
-    );
+    event DefaultAdminDelayChangeScheduled(uint48 newDelay, uint48 effectSchedule);
 
     /**
      * @dev Emitted when a {pendingDefaultAdminDelay} is reset if its schedule didn't pass.
@@ -1083,10 +988,7 @@ interface IAccessControlDefaultAdminRules is IAccessControl {
      *
      * NOTE: A zero address `newAdmin` means that {defaultAdmin} is being renounced.
      */
-    function pendingDefaultAdmin()
-        external
-        view
-        returns (address newAdmin, uint48 acceptSchedule);
+    function pendingDefaultAdmin() external view returns (address newAdmin, uint48 acceptSchedule);
 
     /**
      * @dev Returns the delay required to schedule the acceptance of a {defaultAdmin} transfer started.
@@ -1110,10 +1012,7 @@ interface IAccessControlDefaultAdminRules is IAccessControl {
      * NOTE: A zero value only for `newDelay` means that the next {defaultAdminDelay}
      * will be zero after the effect schedule.
      */
-    function pendingDefaultAdminDelay()
-        external
-        view
-        returns (uint48 newDelay, uint48 effectSchedule);
+    function pendingDefaultAdminDelay() external view returns (uint48 newDelay, uint48 effectSchedule);
 
     /**
      * @dev Starts a {defaultAdmin} transfer by setting a {pendingDefaultAdmin} scheduled for acceptance
@@ -2535,11 +2434,7 @@ interface IERC5313 {
  *
  * _Available since v4.9._
  */
-abstract contract AccessControlDefaultAdminRules is
-    IAccessControlDefaultAdminRules,
-    IERC5313,
-    AccessControl
-{
+abstract contract AccessControlDefaultAdminRules is IAccessControlDefaultAdminRules, IERC5313, AccessControl {
     // pending admin pair read/written together frequently
     address private _pendingDefaultAdmin;
     uint48 private _pendingDefaultAdminSchedule; // 0 == unset
@@ -2565,12 +2460,8 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IAccessControlDefaultAdminRules).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IAccessControlDefaultAdminRules).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -2587,10 +2478,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @dev See {AccessControl-grantRole}. Reverts for `DEFAULT_ADMIN_ROLE`.
      */
-    function grantRole(
-        bytes32 role,
-        address account
-    ) public virtual override(AccessControl, IAccessControl) {
+    function grantRole(bytes32 role, address account) public virtual override(AccessControl, IAccessControl) {
         if (role == DEFAULT_ADMIN_ROLE) {
             revert AccessControlEnforcedDefaultAdminRules();
         }
@@ -2600,10 +2488,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @dev See {AccessControl-revokeRole}. Reverts for `DEFAULT_ADMIN_ROLE`.
      */
-    function revokeRole(
-        bytes32 role,
-        address account
-    ) public virtual override(AccessControl, IAccessControl) {
+    function revokeRole(bytes32 role, address account) public virtual override(AccessControl, IAccessControl) {
         if (role == DEFAULT_ADMIN_ROLE) {
             revert AccessControlEnforcedDefaultAdminRules();
         }
@@ -2623,17 +2508,10 @@ abstract contract AccessControlDefaultAdminRules is
      * thereby disabling any functionality that is only available for it, and the possibility of reassigning a
      * non-administrated role.
      */
-    function renounceRole(
-        bytes32 role,
-        address account
-    ) public virtual override(AccessControl, IAccessControl) {
+    function renounceRole(bytes32 role, address account) public virtual override(AccessControl, IAccessControl) {
         if (role == DEFAULT_ADMIN_ROLE && account == defaultAdmin()) {
             (address newDefaultAdmin, uint48 schedule) = pendingDefaultAdmin();
-            if (
-                newDefaultAdmin != address(0) ||
-                !_isScheduleSet(schedule) ||
-                !_hasSchedulePassed(schedule)
-            ) {
+            if (newDefaultAdmin != address(0) || !_isScheduleSet(schedule) || !_hasSchedulePassed(schedule)) {
                 revert AccessControlEnforcedDefaultAdminDelay(schedule);
             }
             delete _pendingDefaultAdminSchedule;
@@ -2650,10 +2528,7 @@ abstract contract AccessControlDefaultAdminRules is
      * NOTE: Exposing this function through another mechanism may make the `DEFAULT_ADMIN_ROLE`
      * assignable again. Make sure to guarantee this is the expected behavior in your implementation.
      */
-    function _grantRole(
-        bytes32 role,
-        address account
-    ) internal virtual override {
+    function _grantRole(bytes32 role, address account) internal virtual override {
         if (role == DEFAULT_ADMIN_ROLE) {
             if (defaultAdmin() != address(0)) {
                 revert AccessControlEnforcedDefaultAdminRules();
@@ -2666,10 +2541,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @dev See {AccessControl-_revokeRole}.
      */
-    function _revokeRole(
-        bytes32 role,
-        address account
-    ) internal virtual override {
+    function _revokeRole(bytes32 role, address account) internal virtual override {
         if (role == DEFAULT_ADMIN_ROLE && account == defaultAdmin()) {
             delete _currentDefaultAdmin;
         }
@@ -2679,10 +2551,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @dev See {AccessControl-_setRoleAdmin}. Reverts for `DEFAULT_ADMIN_ROLE`.
      */
-    function _setRoleAdmin(
-        bytes32 role,
-        bytes32 adminRole
-    ) internal virtual override {
+    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual override {
         if (role == DEFAULT_ADMIN_ROLE) {
             revert AccessControlEnforcedDefaultAdminRules();
         }
@@ -2703,12 +2572,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function pendingDefaultAdmin()
-        public
-        view
-        virtual
-        returns (address newAdmin, uint48 schedule)
-    {
+    function pendingDefaultAdmin() public view virtual returns (address newAdmin, uint48 schedule) {
         return (_pendingDefaultAdmin, _pendingDefaultAdminSchedule);
     }
 
@@ -2717,37 +2581,21 @@ abstract contract AccessControlDefaultAdminRules is
      */
     function defaultAdminDelay() public view virtual returns (uint48) {
         uint48 schedule = _pendingDelaySchedule;
-        return
-            (_isScheduleSet(schedule) && _hasSchedulePassed(schedule))
-                ? _pendingDelay
-                : _currentDelay;
+        return (_isScheduleSet(schedule) && _hasSchedulePassed(schedule)) ? _pendingDelay : _currentDelay;
     }
 
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function pendingDefaultAdminDelay()
-        public
-        view
-        virtual
-        returns (uint48 newDelay, uint48 schedule)
-    {
+    function pendingDefaultAdminDelay() public view virtual returns (uint48 newDelay, uint48 schedule) {
         schedule = _pendingDelaySchedule;
-        return
-            (_isScheduleSet(schedule) && !_hasSchedulePassed(schedule))
-                ? (_pendingDelay, schedule)
-                : (0, 0);
+        return (_isScheduleSet(schedule) && !_hasSchedulePassed(schedule)) ? (_pendingDelay, schedule) : (0, 0);
     }
 
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function defaultAdminDelayIncreaseWait()
-        public
-        view
-        virtual
-        returns (uint48)
-    {
+    function defaultAdminDelayIncreaseWait() public view virtual returns (uint48) {
         return 5 days;
     }
 
@@ -2758,9 +2606,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function beginDefaultAdminTransfer(
-        address newAdmin
-    ) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
+    function beginDefaultAdminTransfer(address newAdmin) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         _beginDefaultAdminTransfer(newAdmin);
     }
 
@@ -2770,8 +2616,7 @@ abstract contract AccessControlDefaultAdminRules is
      * Internal function without access restriction.
      */
     function _beginDefaultAdminTransfer(address newAdmin) internal virtual {
-        uint48 newSchedule = SafeCast.toUint48(block.timestamp) +
-            defaultAdminDelay();
+        uint48 newSchedule = SafeCast.toUint48(block.timestamp) + defaultAdminDelay();
         _setPendingDefaultAdmin(newAdmin, newSchedule);
         emit DefaultAdminTransferScheduled(newAdmin, newSchedule);
     }
@@ -2779,11 +2624,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function cancelDefaultAdminTransfer()
-        public
-        virtual
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function cancelDefaultAdminTransfer() public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         _cancelDefaultAdminTransfer();
     }
 
@@ -2831,9 +2672,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function changeDefaultAdminDelay(
-        uint48 newDelay
-    ) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
+    function changeDefaultAdminDelay(uint48 newDelay) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         _changeDefaultAdminDelay(newDelay);
     }
 
@@ -2843,8 +2682,7 @@ abstract contract AccessControlDefaultAdminRules is
      * Internal function without access restriction.
      */
     function _changeDefaultAdminDelay(uint48 newDelay) internal virtual {
-        uint48 newSchedule = SafeCast.toUint48(block.timestamp) +
-            _delayChangeWait(newDelay);
+        uint48 newSchedule = SafeCast.toUint48(block.timestamp) + _delayChangeWait(newDelay);
         _setPendingDelay(newDelay, newSchedule);
         emit DefaultAdminDelayChangeScheduled(newDelay, newSchedule);
     }
@@ -2852,11 +2690,7 @@ abstract contract AccessControlDefaultAdminRules is
     /**
      * @inheritdoc IAccessControlDefaultAdminRules
      */
-    function rollbackDefaultAdminDelay()
-        public
-        virtual
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function rollbackDefaultAdminDelay() public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         _rollbackDefaultAdminDelay();
     }
 
@@ -2878,9 +2712,7 @@ abstract contract AccessControlDefaultAdminRules is
      *
      * See {defaultAdminDelayIncreaseWait}.
      */
-    function _delayChangeWait(
-        uint48 newDelay
-    ) internal view virtual returns (uint48) {
+    function _delayChangeWait(uint48 newDelay) internal view virtual returns (uint48) {
         uint48 currentDelay = defaultAdminDelay();
 
         // When increasing the delay, we schedule the delay change to occur after a period of "new delay" has passed, up
@@ -2907,10 +2739,7 @@ abstract contract AccessControlDefaultAdminRules is
      *
      * May emit a DefaultAdminTransferCanceled event.
      */
-    function _setPendingDefaultAdmin(
-        address newAdmin,
-        uint48 newSchedule
-    ) private {
+    function _setPendingDefaultAdmin(address newAdmin, uint48 newSchedule) private {
         (, uint48 oldSchedule) = pendingDefaultAdmin();
 
         _pendingDefaultAdmin = newAdmin;
@@ -2984,10 +2813,7 @@ interface IAccessControlEnumerable is IAccessControl {
      * https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post]
      * for more information.
      */
-    function getRoleMember(
-        bytes32 role,
-        uint256 index
-    ) external view returns (address);
+    function getRoleMember(bytes32 role, uint256 index) external view returns (address);
 
     /**
      * @dev Returns the number of accounts that have `role`. Can be used
@@ -3112,10 +2938,7 @@ library EnumerableSet {
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function _contains(
-        Set storage set,
-        bytes32 value
-    ) private view returns (bool) {
+    function _contains(Set storage set, bytes32 value) private view returns (bool) {
         return set._indexes[value] != 0;
     }
 
@@ -3136,10 +2959,7 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function _at(
-        Set storage set,
-        uint256 index
-    ) private view returns (bytes32) {
+    function _at(Set storage set, uint256 index) private view returns (bytes32) {
         return set._values[index];
     }
 
@@ -3167,10 +2987,7 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(
-        Bytes32Set storage set,
-        bytes32 value
-    ) internal returns (bool) {
+    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {
         return _add(set._inner, value);
     }
 
@@ -3180,20 +2997,14 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(
-        Bytes32Set storage set,
-        bytes32 value
-    ) internal returns (bool) {
+    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {
         return _remove(set._inner, value);
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(
-        Bytes32Set storage set,
-        bytes32 value
-    ) internal view returns (bool) {
+    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {
         return _contains(set._inner, value);
     }
 
@@ -3214,10 +3025,7 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        Bytes32Set storage set,
-        uint256 index
-    ) internal view returns (bytes32) {
+    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {
         return _at(set._inner, index);
     }
 
@@ -3229,9 +3037,7 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(
-        Bytes32Set storage set
-    ) internal view returns (bytes32[] memory) {
+    function values(Bytes32Set storage set) internal view returns (bytes32[] memory) {
         bytes32[] memory store = _values(set._inner);
         bytes32[] memory result;
 
@@ -3255,10 +3061,7 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(
-        AddressSet storage set,
-        address value
-    ) internal returns (bool) {
+    function add(AddressSet storage set, address value) internal returns (bool) {
         return _add(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -3268,20 +3071,14 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(
-        AddressSet storage set,
-        address value
-    ) internal returns (bool) {
+    function remove(AddressSet storage set, address value) internal returns (bool) {
         return _remove(set._inner, bytes32(uint256(uint160(value))));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(
-        AddressSet storage set,
-        address value
-    ) internal view returns (bool) {
+    function contains(AddressSet storage set, address value) internal view returns (bool) {
         return _contains(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -3302,10 +3099,7 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        AddressSet storage set,
-        uint256 index
-    ) internal view returns (address) {
+    function at(AddressSet storage set, uint256 index) internal view returns (address) {
         return address(uint160(uint256(_at(set._inner, index))));
     }
 
@@ -3317,9 +3111,7 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(
-        AddressSet storage set
-    ) internal view returns (address[] memory) {
+    function values(AddressSet storage set) internal view returns (address[] memory) {
         bytes32[] memory store = _values(set._inner);
         address[] memory result;
 
@@ -3353,20 +3145,14 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(
-        UintSet storage set,
-        uint256 value
-    ) internal returns (bool) {
+    function remove(UintSet storage set, uint256 value) internal returns (bool) {
         return _remove(set._inner, bytes32(value));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(
-        UintSet storage set,
-        uint256 value
-    ) internal view returns (bool) {
+    function contains(UintSet storage set, uint256 value) internal view returns (bool) {
         return _contains(set._inner, bytes32(value));
     }
 
@@ -3387,10 +3173,7 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        UintSet storage set,
-        uint256 index
-    ) internal view returns (uint256) {
+    function at(UintSet storage set, uint256 index) internal view returns (uint256) {
         return uint256(_at(set._inner, index));
     }
 
@@ -3402,9 +3185,7 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(
-        UintSet storage set
-    ) internal view returns (uint256[] memory) {
+    function values(UintSet storage set) internal view returns (uint256[] memory) {
         bytes32[] memory store = _values(set._inner);
         uint256[] memory result;
 
@@ -3420,10 +3201,7 @@ library EnumerableSet {
 /**
  * @dev Extension of {AccessControl} that allows enumerating the members of each role.
  */
-abstract contract AccessControlEnumerable is
-    IAccessControlEnumerable,
-    AccessControl
-{
+abstract contract AccessControlEnumerable is IAccessControlEnumerable, AccessControl {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     mapping(bytes32 => EnumerableSet.AddressSet) private _roleMembers;
@@ -3431,12 +3209,8 @@ abstract contract AccessControlEnumerable is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IAccessControlEnumerable).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IAccessControlEnumerable).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -3451,10 +3225,7 @@ abstract contract AccessControlEnumerable is
      * https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post]
      * for more information.
      */
-    function getRoleMember(
-        bytes32 role,
-        uint256 index
-    ) public view virtual returns (address) {
+    function getRoleMember(bytes32 role, uint256 index) public view virtual returns (address) {
         return _roleMembers[role].at(index);
     }
 
@@ -3462,19 +3233,14 @@ abstract contract AccessControlEnumerable is
      * @dev Returns the number of accounts that have `role`. Can be used
      * together with {getRoleMember} to enumerate all bearers of a role.
      */
-    function getRoleMemberCount(
-        bytes32 role
-    ) public view virtual returns (uint256) {
+    function getRoleMemberCount(bytes32 role) public view virtual returns (uint256) {
         return _roleMembers[role].length();
     }
 
     /**
      * @dev Overload {_grantRole} to track enumerable memberships
      */
-    function _grantRole(
-        bytes32 role,
-        address account
-    ) internal virtual override {
+    function _grantRole(bytes32 role, address account) internal virtual override {
         super._grantRole(role, account);
         _roleMembers[role].add(account);
     }
@@ -3482,10 +3248,7 @@ abstract contract AccessControlEnumerable is
     /**
      * @dev Overload {_revokeRole} to track enumerable memberships
      */
-    function _revokeRole(
-        bytes32 role,
-        address account
-    ) internal virtual override {
+    function _revokeRole(bytes32 role, address account) internal virtual override {
         super._revokeRole(role, account);
         _roleMembers[role].remove(account);
     }
@@ -3520,10 +3283,7 @@ abstract contract Ownable is Context {
      */
     error OwnableInvalidOwner(address owner);
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -3603,10 +3363,7 @@ abstract contract Ownable is Context {
 abstract contract Ownable2Step is Ownable {
     address private _pendingOwner;
 
-    event OwnershipTransferStarted(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Returns the address of the pending owner.
@@ -3619,9 +3376,7 @@ abstract contract Ownable2Step is Ownable {
      * @dev Starts the ownership transfer of the contract to a new account. Replaces the pending transfer if there is one.
      * Can only be called by the current owner.
      */
-    function transferOwnership(
-        address newOwner
-    ) public virtual override onlyOwner {
+    function transferOwnership(address newOwner) public virtual override onlyOwner {
         _pendingOwner = newOwner;
         emit OwnershipTransferStarted(owner(), newOwner);
     }
@@ -3669,11 +3424,7 @@ interface IERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     /**
      * @dev Returns the amount of tokens in existence.
@@ -3701,10 +3452,7 @@ interface IERC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(
-        address owner,
-        address spender
-    ) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -3731,11 +3479,7 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
 }
 
 // OpenZeppelin Contracts (last updated v4.9.0) (token/ERC20/extensions/IERC20Permit.sol)
@@ -3862,10 +3606,7 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(
-        address target,
-        bytes memory data
-    ) internal returns (bytes memory) {
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
         return functionCallWithValue(target, data, 0, defaultRevert);
     }
 
@@ -3898,11 +3639,7 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) internal returns (bytes memory) {
+    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {
         return functionCallWithValue(target, data, value, defaultRevert);
     }
 
@@ -3925,16 +3662,8 @@ library Address {
         if (address(this).balance < value) {
             revert AddressInsufficientBalance(address(this));
         }
-        (bool success, bytes memory returndata) = target.call{value: value}(
-            data
-        );
-        return
-            verifyCallResultFromTarget(
-                target,
-                success,
-                returndata,
-                customRevert
-            );
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResultFromTarget(target, success, returndata, customRevert);
     }
 
     /**
@@ -3943,10 +3672,7 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(
-        address target,
-        bytes memory data
-    ) internal view returns (bytes memory) {
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
         return functionStaticCall(target, data, defaultRevert);
     }
 
@@ -3962,13 +3688,7 @@ library Address {
         function() internal view customRevert
     ) internal view returns (bytes memory) {
         (bool success, bytes memory returndata) = target.staticcall(data);
-        return
-            verifyCallResultFromTarget(
-                target,
-                success,
-                returndata,
-                customRevert
-            );
+        return verifyCallResultFromTarget(target, success, returndata, customRevert);
     }
 
     /**
@@ -3977,10 +3697,7 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(
-        address target,
-        bytes memory data
-    ) internal returns (bytes memory) {
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
         return functionDelegateCall(target, data, defaultRevert);
     }
 
@@ -3996,13 +3713,7 @@ library Address {
         function() internal view customRevert
     ) internal returns (bytes memory) {
         (bool success, bytes memory returndata) = target.delegatecall(data);
-        return
-            verifyCallResultFromTarget(
-                target,
-                success,
-                returndata,
-                customRevert
-            );
+        return verifyCallResultFromTarget(target, success, returndata, customRevert);
     }
 
     /**
@@ -4037,10 +3748,7 @@ library Address {
      *
      * _Available since v5.0._
      */
-    function verifyCallResult(
-        bool success,
-        bytes memory returndata
-    ) internal view returns (bytes memory) {
+    function verifyCallResult(bool success, bytes memory returndata) internal view returns (bytes memory) {
         return verifyCallResult(success, returndata, defaultRevert);
     }
 
@@ -4073,10 +3781,7 @@ library Address {
         revert FailedInnerCall();
     }
 
-    function _revert(
-        bytes memory returndata,
-        function() internal view customRevert
-    ) private view {
+    function _revert(bytes memory returndata, function() internal view customRevert) private view {
         // Look for revert reason and bubble it up if present
         if (returndata.length > 0) {
             // The easiest way to bubble the revert reason is using memory via assembly
@@ -4112,11 +3817,7 @@ library SafeERC20 {
     /**
      * @dev Indicates a failed `decreaseAllowance` request.
      */
-    error SafeERC20FailedDecreaseAllowance(
-        address spender,
-        uint256 currentAllowance,
-        uint256 requestedDecrease
-    );
+    error SafeERC20FailedDecreaseAllowance(address spender, uint256 currentAllowance, uint256 requestedDecrease);
 
     /**
      * @dev Transfer `value` amount of `token` from the calling contract to `to`. If `token` returns no value,
@@ -4130,27 +3831,15 @@ library SafeERC20 {
      * @dev Transfer `value` amount of `token` from `from` to `to`, spending the approval given by `from` to the
      * calling contract. If `token` returns no value, non-reverting calls are assumed to be successful.
      */
-    function safeTransferFrom(
-        IERC20 token,
-        address from,
-        address to,
-        uint256 value
-    ) internal {
-        _callOptionalReturn(
-            token,
-            abi.encodeCall(token.transferFrom, (from, to, value))
-        );
+    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+        _callOptionalReturn(token, abi.encodeCall(token.transferFrom, (from, to, value)));
     }
 
     /**
      * @dev Increase the calling contract's allowance toward `spender` by `value`. If `token` returns no value,
      * non-reverting calls are assumed to be successful.
      */
-    function safeIncreaseAllowance(
-        IERC20 token,
-        address spender,
-        uint256 value
-    ) internal {
+    function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
         uint256 oldAllowance = token.allowance(address(this), spender);
         forceApprove(token, spender, oldAllowance + value);
     }
@@ -4159,19 +3848,11 @@ library SafeERC20 {
      * @dev Decrease the calling contract's allowance toward `spender` by `requestedDecrease`. If `token` returns no value,
      * non-reverting calls are assumed to be successful.
      */
-    function safeDecreaseAllowance(
-        IERC20 token,
-        address spender,
-        uint256 requestedDecrease
-    ) internal {
+    function safeDecreaseAllowance(IERC20 token, address spender, uint256 requestedDecrease) internal {
         unchecked {
             uint256 currentAllowance = token.allowance(address(this), spender);
             if (currentAllowance < requestedDecrease) {
-                revert SafeERC20FailedDecreaseAllowance(
-                    spender,
-                    currentAllowance,
-                    requestedDecrease
-                );
+                revert SafeERC20FailedDecreaseAllowance(spender, currentAllowance, requestedDecrease);
             }
             forceApprove(token, spender, currentAllowance - requestedDecrease);
         }
@@ -4182,21 +3863,11 @@ library SafeERC20 {
      * non-reverting calls are assumed to be successful. Compatible with tokens that require the approval to be set to
      * 0 before setting it to a non-zero value.
      */
-    function forceApprove(
-        IERC20 token,
-        address spender,
-        uint256 value
-    ) internal {
-        bytes memory approvalCall = abi.encodeCall(
-            token.approve,
-            (spender, value)
-        );
+    function forceApprove(IERC20 token, address spender, uint256 value) internal {
+        bytes memory approvalCall = abi.encodeCall(token.approve, (spender, value));
 
         if (!_callOptionalReturnBool(token, approvalCall)) {
-            _callOptionalReturn(
-                token,
-                abi.encodeCall(token.approve, (spender, 0))
-            );
+            _callOptionalReturn(token, abi.encodeCall(token.approve, (spender, 0)));
             _callOptionalReturn(token, approvalCall);
         }
     }
@@ -4248,19 +3919,13 @@ library SafeERC20 {
      *
      * This is a variant of {_callOptionalReturn} that silents catches all reverts and returns a bool instead.
      */
-    function _callOptionalReturnBool(
-        IERC20 token,
-        bytes memory data
-    ) private returns (bool) {
+    function _callOptionalReturnBool(IERC20 token, bytes memory data) private returns (bool) {
         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
         // we're implementing it ourselves. We cannot use {Address-functionCall} here since this should return false
         // and not revert is the subcall reverts.
 
         (bool success, bytes memory returndata) = address(token).call(data);
-        return
-            success &&
-            (returndata.length == 0 || abi.decode(returndata, (bool))) &&
-            address(token).code.length > 0;
+        return success && (returndata.length == 0 || abi.decode(returndata, (bool))) && address(token).code.length > 0;
     }
 }
 
@@ -4295,11 +3960,7 @@ contract VestingWallet is Context {
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
      */
-    constructor(
-        address beneficiaryAddress,
-        uint64 startTimestamp,
-        uint64 durationSeconds
-    ) payable {
+    constructor(address beneficiaryAddress, uint64 startTimestamp, uint64 durationSeconds) payable {
         if (beneficiaryAddress == address(0)) {
             revert VestingWalletInvalidBeneficiary(address(0));
         }
@@ -4397,34 +4058,22 @@ contract VestingWallet is Context {
     /**
      * @dev Calculates the amount of ether that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(
-        uint64 timestamp
-    ) public view virtual returns (uint256) {
+    function vestedAmount(uint64 timestamp) public view virtual returns (uint256) {
         return _vestingSchedule(address(this).balance + released(), timestamp);
     }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(
-        address token,
-        uint64 timestamp
-    ) public view virtual returns (uint256) {
-        return
-            _vestingSchedule(
-                IERC20(token).balanceOf(address(this)) + released(token),
-                timestamp
-            );
+    function vestedAmount(address token, uint64 timestamp) public view virtual returns (uint256) {
+        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(token), timestamp);
     }
 
     /**
      * @dev Virtual implementation of the vesting formula. This returns the amount vested, as a function of time, for
      * an asset given its total historical allocation.
      */
-    function _vestingSchedule(
-        uint256 totalAllocation,
-        uint64 timestamp
-    ) internal view virtual returns (uint256) {
+    function _vestingSchedule(uint256 totalAllocation, uint64 timestamp) internal view virtual returns (uint256) {
         if (timestamp < start()) {
             return 0;
         } else if (timestamp > end()) {
@@ -4478,11 +4127,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
     /**
      * @dev Empty proposal or a mismatch between the parameters length for a proposal call.
      */
-    error GovernorInvalidProposalLength(
-        uint256 targets,
-        uint256 calldatas,
-        uint256 values
-    );
+    error GovernorInvalidProposalLength(uint256 targets, uint256 calldatas, uint256 values);
 
     /**
      * @dev The vote was already cast.
@@ -4519,11 +4164,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      *
      * See {Governor-_encodeStateBitmap}.
      */
-    error GovernorUnexpectedProposalState(
-        uint256 proposalId,
-        ProposalState current,
-        bytes32 expectedStates
-    );
+    error GovernorUnexpectedProposalState(uint256 proposalId, ProposalState current, bytes32 expectedStates);
 
     /**
      * @dev The voting period set is not a valid period.
@@ -4533,11 +4174,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
     /**
      * @dev The `proposer` does not have the required votes to operate on a proposal.
      */
-    error GovernorInsufficientProposerVotes(
-        address proposer,
-        uint256 votes,
-        uint256 threshold
-    );
+    error GovernorInsufficientProposerVotes(address proposer, uint256 votes, uint256 threshold);
 
     /**
      * @dev The vote type used is not valid for the corresponding counting module.
@@ -4574,13 +4211,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      *
      * Note: `support` values should be seen as buckets. Their interpretation depends on the voting module used.
      */
-    event VoteCast(
-        address indexed voter,
-        uint256 proposalId,
-        uint8 support,
-        uint256 weight,
-        string reason
-    );
+    event VoteCast(address indexed voter, uint256 proposalId, uint8 support, uint256 weight, string reason);
 
     /**
      * @dev Emitted when a vote is cast with params.
@@ -4662,9 +4293,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      * @notice module:core
      * @dev Current state of a proposal, following Compound's convention
      */
-    function state(
-        uint256 proposalId
-    ) public view virtual returns (ProposalState);
+    function state(uint256 proposalId) public view virtual returns (ProposalState);
 
     /**
      * @notice module:core
@@ -4672,26 +4301,20 @@ abstract contract IGovernor is IERC165, IERC6372 {
      * snapshot is performed at the end of this block. Hence, voting for this proposal starts at the beginning of the
      * following block.
      */
-    function proposalSnapshot(
-        uint256 proposalId
-    ) public view virtual returns (uint256);
+    function proposalSnapshot(uint256 proposalId) public view virtual returns (uint256);
 
     /**
      * @notice module:core
      * @dev Timepoint at which votes close. If using block number, votes close at the end of this block, so it is
      * possible to cast a vote during this block.
      */
-    function proposalDeadline(
-        uint256 proposalId
-    ) public view virtual returns (uint256);
+    function proposalDeadline(uint256 proposalId) public view virtual returns (uint256);
 
     /**
      * @notice module:core
      * @dev The account that created a proposal.
      */
-    function proposalProposer(
-        uint256 proposalId
-    ) public view virtual returns (address);
+    function proposalProposer(uint256 proposalId) public view virtual returns (address);
 
     /**
      * @notice module:user-config
@@ -4729,10 +4352,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      * Note: this can be implemented in a number of ways, for example by reading the delegated balance from one (or
      * multiple), {ERC20Votes} tokens.
      */
-    function getVotes(
-        address account,
-        uint256 timepoint
-    ) public view virtual returns (uint256);
+    function getVotes(address account, uint256 timepoint) public view virtual returns (uint256);
 
     /**
      * @notice module:reputation
@@ -4748,10 +4368,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      * @notice module:voting
      * @dev Returns whether `account` has cast a vote on `proposalId`.
      */
-    function hasVoted(
-        uint256 proposalId,
-        address account
-    ) public view virtual returns (bool);
+    function hasVoted(uint256 proposalId, address account) public view virtual returns (bool);
 
     /**
      * @dev Create a new proposal. Vote start after a delay specified by {IGovernor-votingDelay} and lasts for a
@@ -4799,10 +4416,7 @@ abstract contract IGovernor is IERC165, IERC6372 {
      *
      * Emits a {VoteCast} event.
      */
-    function castVote(
-        uint256 proposalId,
-        uint8 support
-    ) public virtual returns (uint256 balance);
+    function castVote(uint256 proposalId, uint8 support) public virtual returns (uint256 balance);
 
     /**
      * @dev Cast a vote with a reason
@@ -4876,9 +4490,7 @@ abstract contract IGovernorTimelock is IGovernor {
 
     function timelock() public view virtual returns (address);
 
-    function proposalEta(
-        uint256 proposalId
-    ) public view virtual returns (uint256);
+    function proposalEta(uint256 proposalId) public view virtual returns (uint256);
 
     function queue(
         address[] memory targets,
@@ -5032,10 +4644,7 @@ library ECDSA {
      *
      * _Available since v4.3._
      */
-    function tryRecover(
-        bytes32 hash,
-        bytes memory signature
-    ) internal pure returns (address, RecoverError, bytes32) {
+    function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError, bytes32) {
         if (signature.length == 65) {
             bytes32 r;
             bytes32 s;
@@ -5050,11 +4659,7 @@ library ECDSA {
             }
             return tryRecover(hash, v, r, s);
         } else {
-            return (
-                address(0),
-                RecoverError.InvalidSignatureLength,
-                bytes32(signature.length)
-            );
+            return (address(0), RecoverError.InvalidSignatureLength, bytes32(signature.length));
         }
     }
 
@@ -5072,14 +4677,8 @@ library ECDSA {
      * this is by receiving a hash of the original message (which may otherwise
      * be too long), and then calling {toEthSignedMessageHash} on it.
      */
-    function recover(
-        bytes32 hash,
-        bytes memory signature
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(
-            hash,
-            signature
-        );
+    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
+        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, signature);
         _throwError(error, errorArg);
         return recovered;
     }
@@ -5091,16 +4690,9 @@ library ECDSA {
      *
      * _Available since v4.3._
      */
-    function tryRecover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address, RecoverError, bytes32) {
+    function tryRecover(bytes32 hash, bytes32 r, bytes32 vs) internal pure returns (address, RecoverError, bytes32) {
         unchecked {
-            bytes32 s = vs &
-                bytes32(
-                    0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                );
+            bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
             // We do not check for an overflow here since the shift operation results in 0 or 1.
             uint8 v = uint8((uint256(vs) >> 255) + 27);
             return tryRecover(hash, v, r, s);
@@ -5112,16 +4704,8 @@ library ECDSA {
      *
      * _Available since v4.2._
      */
-    function recover(
-        bytes32 hash,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(
-            hash,
-            r,
-            vs
-        );
+    function recover(bytes32 hash, bytes32 r, bytes32 vs) internal pure returns (address) {
+        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, r, vs);
         _throwError(error, errorArg);
         return recovered;
     }
@@ -5147,10 +4731,7 @@ library ECDSA {
         // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
         // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
         // these malleable signatures as well.
-        if (
-            uint256(s) >
-            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
-        ) {
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
             return (address(0), RecoverError.InvalidSignatureS, s);
         }
 
@@ -5167,18 +4748,8 @@ library ECDSA {
      * @dev Overload of {ECDSA-recover} that receives the `v`,
      * `r` and `s` signature fields separately.
      */
-    function recover(
-        bytes32 hash,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (address) {
-        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(
-            hash,
-            v,
-            r,
-            s
-        );
+    function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal pure returns (address) {
+        (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, v, r, s);
         _throwError(error, errorArg);
         return recovered;
     }
@@ -5191,9 +4762,7 @@ library ECDSA {
      *
      * See {recover}.
      */
-    function toEthSignedMessageHash(
-        bytes32 hash
-    ) internal pure returns (bytes32 message) {
+    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 message) {
         // 32 is the length in bytes of hash,
         // enforced by the type signature above
         /// @solidity memory-safe-assembly
@@ -5212,17 +4781,8 @@ library ECDSA {
      *
      * See {recover}.
      */
-    function toEthSignedMessageHash(
-        bytes memory s
-    ) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encodePacked(
-                    "\x19Ethereum Signed Message:\n",
-                    Strings.toString(s.length),
-                    s
-                )
-            );
+    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(s.length), s));
     }
 
     /**
@@ -5234,10 +4794,7 @@ library ECDSA {
      *
      * See {recover}.
      */
-    function toTypedDataHash(
-        bytes32 domainSeparator,
-        bytes32 structHash
-    ) internal pure returns (bytes32 data) {
+    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32 data) {
         /// @solidity memory-safe-assembly
         assembly {
             let ptr := mload(0x40)
@@ -5254,10 +4811,7 @@ library ECDSA {
      *
      * See {recover}.
      */
-    function toDataWithIntendedValidatorHash(
-        address validator,
-        bytes memory data
-    ) internal pure returns (bytes32) {
+    function toDataWithIntendedValidatorHash(address validator, bytes memory data) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(hex"19_00", validator, data));
     }
 }
@@ -5324,9 +4878,7 @@ library StorageSlot {
     /**
      * @dev Returns an `AddressSlot` with member `value` located at `slot`.
      */
-    function getAddressSlot(
-        bytes32 slot
-    ) internal pure returns (AddressSlot storage r) {
+    function getAddressSlot(bytes32 slot) internal pure returns (AddressSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5336,9 +4888,7 @@ library StorageSlot {
     /**
      * @dev Returns an `BooleanSlot` with member `value` located at `slot`.
      */
-    function getBooleanSlot(
-        bytes32 slot
-    ) internal pure returns (BooleanSlot storage r) {
+    function getBooleanSlot(bytes32 slot) internal pure returns (BooleanSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5348,9 +4898,7 @@ library StorageSlot {
     /**
      * @dev Returns an `Bytes32Slot` with member `value` located at `slot`.
      */
-    function getBytes32Slot(
-        bytes32 slot
-    ) internal pure returns (Bytes32Slot storage r) {
+    function getBytes32Slot(bytes32 slot) internal pure returns (Bytes32Slot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5360,9 +4908,7 @@ library StorageSlot {
     /**
      * @dev Returns an `Uint256Slot` with member `value` located at `slot`.
      */
-    function getUint256Slot(
-        bytes32 slot
-    ) internal pure returns (Uint256Slot storage r) {
+    function getUint256Slot(bytes32 slot) internal pure returns (Uint256Slot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5372,9 +4918,7 @@ library StorageSlot {
     /**
      * @dev Returns an `StringSlot` with member `value` located at `slot`.
      */
-    function getStringSlot(
-        bytes32 slot
-    ) internal pure returns (StringSlot storage r) {
+    function getStringSlot(bytes32 slot) internal pure returns (StringSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5384,9 +4928,7 @@ library StorageSlot {
     /**
      * @dev Returns an `StringSlot` representation of the string storage pointer `store`.
      */
-    function getStringSlot(
-        string storage store
-    ) internal pure returns (StringSlot storage r) {
+    function getStringSlot(string storage store) internal pure returns (StringSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := store.slot
@@ -5396,9 +4938,7 @@ library StorageSlot {
     /**
      * @dev Returns an `BytesSlot` with member `value` located at `slot`.
      */
-    function getBytesSlot(
-        bytes32 slot
-    ) internal pure returns (BytesSlot storage r) {
+    function getBytesSlot(bytes32 slot) internal pure returns (BytesSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := slot
@@ -5408,9 +4948,7 @@ library StorageSlot {
     /**
      * @dev Returns an `BytesSlot` representation of the bytes storage pointer `store`.
      */
-    function getBytesSlot(
-        bytes storage store
-    ) internal pure returns (BytesSlot storage r) {
+    function getBytesSlot(bytes storage store) internal pure returns (BytesSlot storage r) {
         /// @solidity memory-safe-assembly
         assembly {
             r.slot := store.slot
@@ -5452,8 +4990,7 @@ type ShortString is bytes32;
  */
 library ShortStrings {
     // Used as an identifier for strings longer than 31 bytes.
-    bytes32 private constant _FALLBACK_SENTINEL =
-        0x00000000000000000000000000000000000000000000000000000000000000FF;
+    bytes32 private constant _FALLBACK_SENTINEL = 0x00000000000000000000000000000000000000000000000000000000000000FF;
 
     error StringTooLong(string str);
     error InvalidShortString();
@@ -5463,9 +5000,7 @@ library ShortStrings {
      *
      * This will trigger a `StringTooLong` error is the input string is too long.
      */
-    function toShortString(
-        string memory str
-    ) internal pure returns (ShortString) {
+    function toShortString(string memory str) internal pure returns (ShortString) {
         bytes memory bstr = bytes(str);
         if (bstr.length > 31) {
             revert StringTooLong(str);
@@ -5502,10 +5037,7 @@ library ShortStrings {
     /**
      * @dev Encode a string into a `ShortString`, or write it to storage if it is too long.
      */
-    function toShortStringWithFallback(
-        string memory value,
-        string storage store
-    ) internal returns (ShortString) {
+    function toShortStringWithFallback(string memory value, string storage store) internal returns (ShortString) {
         if (bytes(value).length < 32) {
             return toShortString(value);
         } else {
@@ -5517,10 +5049,7 @@ library ShortStrings {
     /**
      * @dev Decode a string that was encoded to `ShortString` or written to storage using {setWithFallback}.
      */
-    function toStringWithFallback(
-        ShortString value,
-        string storage store
-    ) internal pure returns (string memory) {
+    function toStringWithFallback(ShortString value, string storage store) internal pure returns (string memory) {
         if (ShortString.unwrap(value) != _FALLBACK_SENTINEL) {
             return toString(value);
         } else {
@@ -5534,10 +5063,7 @@ library ShortStrings {
      * WARNING: This will return the "byte length" of the string. This may not reflect the actual length in terms of
      * actual characters as the UTF-8 encoding of a single character can span over multiple bytes.
      */
-    function byteLengthWithFallback(
-        ShortString value,
-        string storage store
-    ) internal view returns (uint256) {
+    function byteLengthWithFallback(ShortString value, string storage store) internal view returns (uint256) {
         if (ShortString.unwrap(value) != _FALLBACK_SENTINEL) {
             return byteLength(value);
         } else {
@@ -5601,9 +5127,7 @@ abstract contract EIP712 is IERC5267 {
     using ShortStrings for *;
 
     bytes32 private constant _TYPE_HASH =
-        keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     // Cache the domain separator as an immutable value, but also store the chain id that it corresponds to, in order to
     // invalidate the cached domain separator if the chain id changes.
@@ -5654,16 +5178,7 @@ abstract contract EIP712 is IERC5267 {
     }
 
     function _buildDomainSeparator() private view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    _TYPE_HASH,
-                    _hashedName,
-                    _hashedVersion,
-                    block.chainid,
-                    address(this)
-                )
-            );
+        return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this)));
     }
 
     /**
@@ -5681,9 +5196,7 @@ abstract contract EIP712 is IERC5267 {
      * address signer = ECDSA.recover(digest, signature);
      * ```
      */
-    function _hashTypedDataV4(
-        bytes32 structHash
-    ) internal view virtual returns (bytes32) {
+    function _hashTypedDataV4(bytes32 structHash) internal view virtual returns (bytes32) {
         return ECDSA.toTypedDataHash(_domainSeparatorV4(), structHash);
     }
 
@@ -5805,9 +5318,7 @@ library DoubleEndedQueue {
      *
      * Reverts with `QueueEmpty` if the queue is empty.
      */
-    function popBack(
-        Bytes32Deque storage deque
-    ) internal returns (bytes32 value) {
+    function popBack(Bytes32Deque storage deque) internal returns (bytes32 value) {
         if (empty(deque)) revert QueueEmpty();
         int128 backIndex;
         unchecked {
@@ -5835,9 +5346,7 @@ library DoubleEndedQueue {
      *
      * Reverts with `QueueEmpty` if the queue is empty.
      */
-    function popFront(
-        Bytes32Deque storage deque
-    ) internal returns (bytes32 value) {
+    function popFront(Bytes32Deque storage deque) internal returns (bytes32 value) {
         if (empty(deque)) revert QueueEmpty();
         int128 frontIndex = deque._begin;
         value = deque._data[frontIndex];
@@ -5852,9 +5361,7 @@ library DoubleEndedQueue {
      *
      * Reverts with `QueueEmpty` if the queue is empty.
      */
-    function front(
-        Bytes32Deque storage deque
-    ) internal view returns (bytes32 value) {
+    function front(Bytes32Deque storage deque) internal view returns (bytes32 value) {
         if (empty(deque)) revert QueueEmpty();
         int128 frontIndex = deque._begin;
         return deque._data[frontIndex];
@@ -5865,9 +5372,7 @@ library DoubleEndedQueue {
      *
      * Reverts with `QueueEmpty` if the queue is empty.
      */
-    function back(
-        Bytes32Deque storage deque
-    ) internal view returns (bytes32 value) {
+    function back(Bytes32Deque storage deque) internal view returns (bytes32 value) {
         if (empty(deque)) revert QueueEmpty();
         int128 backIndex;
         unchecked {
@@ -5882,14 +5387,9 @@ library DoubleEndedQueue {
      *
      * Reverts with `QueueOutOfBounds` if the index is out of bounds.
      */
-    function at(
-        Bytes32Deque storage deque,
-        uint256 index
-    ) internal view returns (bytes32 value) {
+    function at(Bytes32Deque storage deque, uint256 index) internal view returns (bytes32 value) {
         // int256(deque._begin) is a safe upcast
-        int128 idx = SafeCast.toInt128(
-            int256(deque._begin) + SafeCast.toInt256(index)
-        );
+        int128 idx = SafeCast.toInt128(int256(deque._begin) + SafeCast.toInt256(index));
         if (idx >= deque._end) revert QueueOutOfBounds();
         return deque._data[idx];
     }
@@ -5908,9 +5408,7 @@ library DoubleEndedQueue {
     /**
      * @dev Returns the number of items in the queue.
      */
-    function length(
-        Bytes32Deque storage deque
-    ) internal view returns (uint256) {
+    function length(Bytes32Deque storage deque) internal view returns (uint256) {
         // The interface preserves the invariant that begin <= end so we assume this will not overflow.
         // We also assume there are at most int256.max items in the queue.
         unchecked {
@@ -5937,22 +5435,12 @@ library DoubleEndedQueue {
  *
  * _Available since v4.3._
  */
-abstract contract Governor is
-    Context,
-    ERC165,
-    EIP712,
-    IGovernor,
-    IERC721Receiver,
-    IERC1155Receiver
-{
+abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receiver, IERC1155Receiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
-    bytes32 public constant BALLOT_TYPEHASH =
-        keccak256("Ballot(uint256 proposalId,uint8 support)");
+    bytes32 public constant BALLOT_TYPEHASH = keccak256("Ballot(uint256 proposalId,uint8 support)");
     bytes32 public constant EXTENDED_BALLOT_TYPEHASH =
-        keccak256(
-            "ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)"
-        );
+        keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     // solhint-disable var-name-mixedcase
     struct ProposalCore {
@@ -5969,8 +5457,7 @@ abstract contract Governor is
     }
     // solhint-enable var-name-mixedcase
 
-    bytes32 private constant _ALL_PROPOSAL_STATES_BITMAP =
-        bytes32((2 ** (uint8(type(ProposalState).max) + 1)) - 1);
+    bytes32 private constant _ALL_PROPOSAL_STATES_BITMAP = bytes32((2 ** (uint8(type(ProposalState).max) + 1)) - 1);
     string private _name;
 
     /// @custom:oz-retyped-from mapping(uint256 => Governor.ProposalCore)
@@ -6023,11 +5510,8 @@ abstract contract Governor is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC165) returns (bool) {
-        bytes4 governorCancelId = this.cancel.selector ^
-            this.proposalProposer.selector;
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC165) returns (bool) {
+        bytes4 governorCancelId = this.cancel.selector ^ this.proposalProposer.selector;
 
         bytes4 governorParamsId = this.castVoteWithReasonAndParams.selector ^
             this.castVoteWithReasonAndParamsBySig.selector ^
@@ -6040,9 +5524,7 @@ abstract contract Governor is
             governorParamsId;
 
         // An updated interface id in v4.6, with params added.
-        bytes4 governor46Id = type(IGovernor).interfaceId ^
-            type(IERC6372).interfaceId ^
-            governorCancelId;
+        bytes4 governor46Id = type(IGovernor).interfaceId ^ type(IERC6372).interfaceId ^ governorCancelId;
 
         // For the updated interface id in v4.9, we use governorCancelId directly.
 
@@ -6087,20 +5569,13 @@ abstract contract Governor is
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public pure virtual override returns (uint256) {
-        return
-            uint256(
-                keccak256(
-                    abi.encode(targets, values, calldatas, descriptionHash)
-                )
-            );
+        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash)));
     }
 
     /**
      * @dev See {IGovernor-state}.
      */
-    function state(
-        uint256 proposalId
-    ) public view virtual override returns (ProposalState) {
+    function state(uint256 proposalId) public view virtual override returns (ProposalState) {
         ProposalCore storage proposal = _proposals[proposalId];
 
         if (proposal.executed) {
@@ -6146,52 +5621,38 @@ abstract contract Governor is
     /**
      * @dev See {IGovernor-proposalSnapshot}.
      */
-    function proposalSnapshot(
-        uint256 proposalId
-    ) public view virtual override returns (uint256) {
+    function proposalSnapshot(uint256 proposalId) public view virtual override returns (uint256) {
         return _proposals[proposalId].voteStart;
     }
 
     /**
      * @dev See {IGovernor-proposalDeadline}.
      */
-    function proposalDeadline(
-        uint256 proposalId
-    ) public view virtual override returns (uint256) {
+    function proposalDeadline(uint256 proposalId) public view virtual override returns (uint256) {
         return _proposals[proposalId].voteEnd;
     }
 
     /**
      * @dev Returns the account that created a given proposal.
      */
-    function proposalProposer(
-        uint256 proposalId
-    ) public view virtual override returns (address) {
+    function proposalProposer(uint256 proposalId) public view virtual override returns (address) {
         return _proposals[proposalId].proposer;
     }
 
     /**
      * @dev Amount of votes already cast passes the threshold limit.
      */
-    function _quorumReached(
-        uint256 proposalId
-    ) internal view virtual returns (bool);
+    function _quorumReached(uint256 proposalId) internal view virtual returns (bool);
 
     /**
      * @dev Is the proposal successful or not.
      */
-    function _voteSucceeded(
-        uint256 proposalId
-    ) internal view virtual returns (bool);
+    function _voteSucceeded(uint256 proposalId) internal view virtual returns (bool);
 
     /**
      * @dev Get the voting weight of `account` at a specific `timepoint`, for a vote as described by `params`.
      */
-    function _getVotes(
-        address account,
-        uint256 timepoint,
-        bytes memory params
-    ) internal view virtual returns (uint256);
+    function _getVotes(address account, uint256 timepoint, bytes memory params) internal view virtual returns (uint256);
 
     /**
      * @dev Register a vote for `proposalId` by `account` with a given `support`, voting `weight` and voting `params`.
@@ -6226,10 +5687,7 @@ abstract contract Governor is
         string memory description
     ) public virtual override returns (uint256) {
         address proposer = _msgSender();
-        require(
-            _isValidDescriptionForProposer(proposer, description),
-            "Governor: proposer restricted"
-        );
+        require(_isValidDescriptionForProposer(proposer, description), "Governor: proposer restricted");
 
         uint256 currentTimepoint = clock();
 
@@ -6238,38 +5696,17 @@ abstract contract Governor is
             uint256 proposerVotes = getVotes(proposer, currentTimepoint - 1);
             uint256 votesThreshold = proposalThreshold();
             if (proposerVotes < votesThreshold) {
-                revert GovernorInsufficientProposerVotes(
-                    proposer,
-                    proposerVotes,
-                    votesThreshold
-                );
+                revert GovernorInsufficientProposerVotes(proposer, proposerVotes, votesThreshold);
             }
         }
 
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            keccak256(bytes(description))
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
 
-        if (
-            targets.length != values.length ||
-            targets.length != calldatas.length ||
-            targets.length == 0
-        ) {
-            revert GovernorInvalidProposalLength(
-                targets.length,
-                calldatas.length,
-                values.length
-            );
+        if (targets.length != values.length || targets.length != calldatas.length || targets.length == 0) {
+            revert GovernorInvalidProposalLength(targets.length, calldatas.length, values.length);
         }
         if (_proposals[proposalId].voteStart != 0) {
-            revert GovernorUnexpectedProposalState(
-                proposalId,
-                state(proposalId),
-                bytes32(0)
-            );
+            revert GovernorUnexpectedProposalState(proposalId, state(proposalId), bytes32(0));
         }
 
         uint256 snapshot = currentTimepoint + votingDelay();
@@ -6309,23 +5746,14 @@ abstract contract Governor is
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public payable virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState currentState = state(proposalId);
-        if (
-            currentState != ProposalState.Succeeded &&
-            currentState != ProposalState.Queued
-        ) {
+        if (currentState != ProposalState.Succeeded && currentState != ProposalState.Queued) {
             revert GovernorUnexpectedProposalState(
                 proposalId,
                 currentState,
-                _encodeStateBitmap(ProposalState.Succeeded) |
-                    _encodeStateBitmap(ProposalState.Queued)
+                _encodeStateBitmap(ProposalState.Succeeded) | _encodeStateBitmap(ProposalState.Queued)
             );
         }
         _proposals[proposalId].executed = true;
@@ -6348,19 +5776,10 @@ abstract contract Governor is
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
         ProposalState currentState = state(proposalId);
         if (currentState != ProposalState.Pending) {
-            revert GovernorUnexpectedProposalState(
-                proposalId,
-                currentState,
-                _encodeStateBitmap(ProposalState.Pending)
-            );
+            revert GovernorUnexpectedProposalState(proposalId, currentState, _encodeStateBitmap(ProposalState.Pending));
         }
         if (_msgSender() != proposalProposer(proposalId)) {
             revert GovernorOnlyProposer(_msgSender());
@@ -6379,9 +5798,7 @@ abstract contract Governor is
         bytes32 /*descriptionHash*/
     ) internal virtual {
         for (uint256 i = 0; i < targets.length; ++i) {
-            (bool success, bytes memory returndata) = targets[i].call{
-                value: values[i]
-            }(calldatas[i]);
+            (bool success, bytes memory returndata) = targets[i].call{value: values[i]}(calldatas[i]);
             Address.verifyCallResult(success, returndata);
         }
     }
@@ -6434,12 +5851,7 @@ abstract contract Governor is
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) internal virtual returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState currentState = state(proposalId);
 
@@ -6463,10 +5875,7 @@ abstract contract Governor is
     /**
      * @dev See {IGovernor-getVotes}.
      */
-    function getVotes(
-        address account,
-        uint256 timepoint
-    ) public view virtual override returns (uint256) {
+    function getVotes(address account, uint256 timepoint) public view virtual override returns (uint256) {
         return _getVotes(account, timepoint, _defaultParams());
     }
 
@@ -6484,10 +5893,7 @@ abstract contract Governor is
     /**
      * @dev See {IGovernor-castVote}.
      */
-    function castVote(
-        uint256 proposalId,
-        uint8 support
-    ) public virtual override returns (uint256) {
+    function castVote(uint256 proposalId, uint8 support) public virtual override returns (uint256) {
         address voter = _msgSender();
         return _castVote(proposalId, voter, support, "");
     }
@@ -6528,9 +5934,7 @@ abstract contract Governor is
         bytes32 s
     ) public virtual override returns (uint256) {
         address voter = ECDSA.recover(
-            _hashTypedDataV4(
-                keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support))
-            ),
+            _hashTypedDataV4(keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support))),
             v,
             r,
             s
@@ -6582,8 +5986,7 @@ abstract contract Governor is
         uint8 support,
         string memory reason
     ) internal virtual returns (uint256) {
-        return
-            _castVote(proposalId, account, support, reason, _defaultParams());
+        return _castVote(proposalId, account, support, reason, _defaultParams());
     }
 
     /**
@@ -6602,11 +6005,7 @@ abstract contract Governor is
         ProposalCore storage proposal = _proposals[proposalId];
         ProposalState currentState = state(proposalId);
         if (currentState != ProposalState.Active) {
-            revert GovernorUnexpectedProposalState(
-                proposalId,
-                currentState,
-                _encodeStateBitmap(ProposalState.Active)
-            );
+            revert GovernorUnexpectedProposalState(proposalId, currentState, _encodeStateBitmap(ProposalState.Active));
         }
 
         uint256 weight = _getVotes(account, proposal.voteStart, params);
@@ -6615,14 +6014,7 @@ abstract contract Governor is
         if (params.length == 0) {
             emit VoteCast(account, proposalId, support, weight, reason);
         } else {
-            emit VoteCastWithParams(
-                account,
-                proposalId,
-                support,
-                weight,
-                reason,
-                params
-            );
+            emit VoteCastWithParams(account, proposalId, support, weight, reason, params);
         }
 
         return weight;
@@ -6634,14 +6026,8 @@ abstract contract Governor is
      * in a governance proposal to recover tokens or Ether that was sent to the governor contract by mistake.
      * Note that if the executor is simply the governor itself, use of `relay` is redundant.
      */
-    function relay(
-        address target,
-        uint256 value,
-        bytes calldata data
-    ) external payable virtual onlyGovernance {
-        (bool success, bytes memory returndata) = target.call{value: value}(
-            data
-        );
+    function relay(address target, uint256 value, bytes calldata data) external payable virtual onlyGovernance {
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         Address.verifyCallResult(success, returndata);
     }
 
@@ -6657,12 +6043,7 @@ abstract contract Governor is
      * @dev See {IERC721Receiver-onERC721Received}.
      * Receiving tokens is disabled if the governance executor is other than the governor itself (eg. when using with a timelock).
      */
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public virtual returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes memory) public virtual returns (bytes4) {
         if (_executor() != address(this)) {
             revert GovernorDisabledDeposit();
         }
@@ -6673,13 +6054,7 @@ abstract contract Governor is
      * @dev See {IERC1155Receiver-onERC1155Received}.
      * Receiving tokens is disabled if the governance executor is other than the governor itself (eg. when using with a timelock).
      */
-    function onERC1155Received(
-        address,
-        address,
-        uint256,
-        uint256,
-        bytes memory
-    ) public virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
         if (_executor() != address(this)) {
             revert GovernorDisabledDeposit();
         }
@@ -6715,9 +6090,7 @@ abstract contract Governor is
      *            ^-- Active
      *             ^- Pending
      */
-    function _encodeStateBitmap(
-        ProposalState proposalState
-    ) internal pure returns (bytes32) {
+    function _encodeStateBitmap(ProposalState proposalState) internal pure returns (bytes32) {
         return bytes32(1 << uint8(proposalState));
     }
 
@@ -6818,10 +6191,7 @@ abstract contract IGovernorCompatibilityBravo is IGovernor {
     /**
      * @dev Mismatch between the parameters length for a proposal call.
      */
-    error GovernorInvalidSignaturesLength(
-        uint256 signatures,
-        uint256 calldatas
-    );
+    error GovernorInvalidSignaturesLength(uint256 signatures, uint256 calldatas);
 
     /**
      * @dev Proposal structure from Compound Governor Bravo. Not actually used by the compatibility layer, as
@@ -6926,10 +6296,7 @@ abstract contract IGovernorCompatibilityBravo is IGovernor {
     /**
      * @dev Part of the Governor Bravo's interface: _"Gets the receipt for a voter on a given proposal"_.
      */
-    function getReceipt(
-        uint256 proposalId,
-        address voter
-    ) public view virtual returns (Receipt memory);
+    function getReceipt(uint256 proposalId, address voter) public view virtual returns (Receipt memory);
 }
 
 /**
@@ -6942,11 +6309,7 @@ abstract contract IGovernorCompatibilityBravo is IGovernor {
  *
  * _Available since v4.3._
  */
-abstract contract GovernorCompatibilityBravo is
-    IGovernorTimelock,
-    IGovernorCompatibilityBravo,
-    Governor
-{
+abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorCompatibilityBravo, Governor {
     enum VoteType {
         Against,
         For,
@@ -6968,13 +6331,7 @@ abstract contract GovernorCompatibilityBravo is
     mapping(uint256 => ProposalDetails) private _proposalDetails;
 
     // solhint-disable-next-line func-name-mixedcase
-    function COUNTING_MODE()
-        public
-        pure
-        virtual
-        override
-        returns (string memory)
-    {
+    function COUNTING_MODE() public pure virtual override returns (string memory) {
         return "support=bravo&quorum=bravo";
     }
 
@@ -6989,13 +6346,7 @@ abstract contract GovernorCompatibilityBravo is
         string memory description
     ) public virtual override(IGovernor, Governor) returns (uint256) {
         // Stores the proposal details (if not already present) and executes the propose logic from the core.
-        _storeProposal(
-            targets,
-            values,
-            new string[](calldatas.length),
-            calldatas,
-            description
-        );
+        _storeProposal(targets, values, new string[](calldatas.length), calldatas, description);
         return super.propose(targets, values, calldatas, description);
     }
 
@@ -7010,23 +6361,14 @@ abstract contract GovernorCompatibilityBravo is
         string memory description
     ) public virtual override returns (uint256) {
         if (signatures.length != calldatas.length) {
-            revert GovernorInvalidSignaturesLength(
-                signatures.length,
-                calldatas.length
-            );
+            revert GovernorInvalidSignaturesLength(signatures.length, calldatas.length);
         }
         // Stores the full proposal and fallback to the public (possibly overridden) propose. The fallback is done
         // after the full proposal is stored, so the store operation included in the fallback will be skipped. Here we
         // call `propose` and not `super.propose` to make sure if a child contract override `propose`, whatever code
         // is added there is also executed when calling this alternative interface.
         _storeProposal(targets, values, signatures, calldatas, description);
-        return
-            propose(
-                targets,
-                values,
-                _encodeCalldata(signatures, calldatas),
-                description
-            );
+        return propose(targets, values, _encodeCalldata(signatures, calldatas), description);
     }
 
     /**
@@ -7081,22 +6423,13 @@ abstract contract GovernorCompatibilityBravo is
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public virtual override(IGovernor, Governor) returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
         address proposer = proposalProposer(proposalId);
 
         uint256 proposerVotes = getVotes(proposer, clock() - 1);
         uint256 votesThreshold = proposalThreshold();
         if (_msgSender() != proposer && proposerVotes >= votesThreshold) {
-            revert GovernorInsufficientProposerVotes(
-                proposer,
-                proposerVotes,
-                votesThreshold
-            );
+            revert GovernorInsufficientProposerVotes(proposer, proposerVotes, votesThreshold);
         }
 
         return _cancel(targets, values, calldatas, descriptionHash);
@@ -7113,10 +6446,7 @@ abstract contract GovernorCompatibilityBravo is
         for (uint256 i = 0; i < fullcalldatas.length; ++i) {
             fullcalldatas[i] = bytes(signatures[i]).length == 0
                 ? calldatas[i]
-                : bytes.concat(
-                    abi.encodeWithSignature(signatures[i]),
-                    calldatas[i]
-                );
+                : bytes.concat(abi.encodeWithSignature(signatures[i]), calldatas[i]);
         }
 
         return fullcalldatas;
@@ -7130,12 +6460,7 @@ abstract contract GovernorCompatibilityBravo is
     )
         private
         view
-        returns (
-            address[] memory targets,
-            uint256[] memory values,
-            bytes[] memory calldatas,
-            bytes32 descriptionHash
-        )
+        returns (address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
     {
         ProposalDetails storage details = _proposalDetails[proposalId];
         return (
@@ -7157,12 +6482,7 @@ abstract contract GovernorCompatibilityBravo is
         string memory description
     ) private {
         bytes32 descriptionHash = keccak256(bytes(description));
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            _encodeCalldata(signatures, calldatas),
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, _encodeCalldata(signatures, calldatas), descriptionHash);
 
         ProposalDetails storage details = _proposalDetails[proposalId];
         if (details.descriptionHash == bytes32(0)) {
@@ -7232,21 +6552,13 @@ abstract contract GovernorCompatibilityBravo is
         )
     {
         ProposalDetails storage details = _proposalDetails[proposalId];
-        return (
-            details.targets,
-            details.values,
-            details.signatures,
-            details.calldatas
-        );
+        return (details.targets, details.values, details.signatures, details.calldatas);
     }
 
     /**
      * @dev See {IGovernorCompatibilityBravo-getReceipt}.
      */
-    function getReceipt(
-        uint256 proposalId,
-        address voter
-    ) public view virtual override returns (Receipt memory) {
+    function getReceipt(uint256 proposalId, address voter) public view virtual override returns (Receipt memory) {
         return _proposalDetails[proposalId].receipts[voter];
     }
 
@@ -7261,19 +6573,14 @@ abstract contract GovernorCompatibilityBravo is
     /**
      * @dev See {IGovernor-hasVoted}.
      */
-    function hasVoted(
-        uint256 proposalId,
-        address account
-    ) public view virtual override returns (bool) {
+    function hasVoted(uint256 proposalId, address account) public view virtual override returns (bool) {
         return _proposalDetails[proposalId].receipts[account].hasVoted;
     }
 
     /**
      * @dev See {Governor-_quorumReached}. In this module, only forVotes count toward the quorum.
      */
-    function _quorumReached(
-        uint256 proposalId
-    ) internal view virtual override returns (bool) {
+    function _quorumReached(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalDetails storage details = _proposalDetails[proposalId];
         return quorum(proposalSnapshot(proposalId)) <= details.forVotes;
     }
@@ -7281,9 +6588,7 @@ abstract contract GovernorCompatibilityBravo is
     /**
      * @dev See {Governor-_voteSucceeded}. In this module, the forVotes must be strictly over the againstVotes.
      */
-    function _voteSucceeded(
-        uint256 proposalId
-    ) internal view virtual override returns (bool) {
+    function _voteSucceeded(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalDetails storage details = _proposalDetails[proposalId];
         return details.forVotes > details.againstVotes;
     }
@@ -7350,23 +6655,14 @@ abstract contract GovernorCountingSimple is Governor {
      * @dev See {IGovernor-COUNTING_MODE}.
      */
     // solhint-disable-next-line func-name-mixedcase
-    function COUNTING_MODE()
-        public
-        pure
-        virtual
-        override
-        returns (string memory)
-    {
+    function COUNTING_MODE() public pure virtual override returns (string memory) {
         return "support=bravo&quorum=for,abstain";
     }
 
     /**
      * @dev See {IGovernor-hasVoted}.
      */
-    function hasVoted(
-        uint256 proposalId,
-        address account
-    ) public view virtual override returns (bool) {
+    function hasVoted(uint256 proposalId, address account) public view virtual override returns (bool) {
         return _proposalVotes[proposalId].hasVoted[account];
     }
 
@@ -7375,39 +6671,24 @@ abstract contract GovernorCountingSimple is Governor {
      */
     function proposalVotes(
         uint256 proposalId
-    )
-        public
-        view
-        virtual
-        returns (uint256 againstVotes, uint256 forVotes, uint256 abstainVotes)
-    {
+    ) public view virtual returns (uint256 againstVotes, uint256 forVotes, uint256 abstainVotes) {
         ProposalVote storage proposalVote = _proposalVotes[proposalId];
-        return (
-            proposalVote.againstVotes,
-            proposalVote.forVotes,
-            proposalVote.abstainVotes
-        );
+        return (proposalVote.againstVotes, proposalVote.forVotes, proposalVote.abstainVotes);
     }
 
     /**
      * @dev See {Governor-_quorumReached}.
      */
-    function _quorumReached(
-        uint256 proposalId
-    ) internal view virtual override returns (bool) {
+    function _quorumReached(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalVote storage proposalVote = _proposalVotes[proposalId];
 
-        return
-            quorum(proposalSnapshot(proposalId)) <=
-            proposalVote.forVotes + proposalVote.abstainVotes;
+        return quorum(proposalSnapshot(proposalId)) <= proposalVote.forVotes + proposalVote.abstainVotes;
     }
 
     /**
      * @dev See {Governor-_voteSucceeded}. In this module, the forVotes must be strictly over the againstVotes.
      */
-    function _voteSucceeded(
-        uint256 proposalId
-    ) internal view virtual override returns (bool) {
+    function _voteSucceeded(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalVote storage proposalVote = _proposalVotes[proposalId];
 
         return proposalVote.forVotes > proposalVote.againstVotes;
@@ -7465,10 +6746,7 @@ abstract contract GovernorPreventLateQuorum is Governor {
     event ProposalExtended(uint256 indexed proposalId, uint64 extendedDeadline);
 
     /// @dev Emitted when the {lateQuorumVoteExtension} parameter is changed.
-    event LateQuorumVoteExtensionSet(
-        uint64 oldVoteExtension,
-        uint64 newVoteExtension
-    );
+    event LateQuorumVoteExtensionSet(uint64 oldVoteExtension, uint64 newVoteExtension);
 
     /**
      * @dev Initializes the vote extension parameter: the time in either number of blocks or seconds (depending on the governor
@@ -7483,14 +6761,8 @@ abstract contract GovernorPreventLateQuorum is Governor {
      * @dev Returns the proposal deadline, which may have been extended beyond that set at proposal creation, if the
      * proposal reached quorum late in the voting period. See {Governor-proposalDeadline}.
      */
-    function proposalDeadline(
-        uint256 proposalId
-    ) public view virtual override returns (uint256) {
-        return
-            Math.max(
-                super.proposalDeadline(proposalId),
-                _extendedDeadlines[proposalId]
-            );
+    function proposalDeadline(uint256 proposalId) public view virtual override returns (uint256) {
+        return Math.max(super.proposalDeadline(proposalId), _extendedDeadlines[proposalId]);
     }
 
     /**
@@ -7506,13 +6778,7 @@ abstract contract GovernorPreventLateQuorum is Governor {
         string memory reason,
         bytes memory params
     ) internal virtual override returns (uint256) {
-        uint256 result = super._castVote(
-            proposalId,
-            account,
-            support,
-            reason,
-            params
-        );
+        uint256 result = super._castVote(proposalId, account, support, reason, params);
 
         if (_extendedDeadlines[proposalId] == 0 && _quorumReached(proposalId)) {
             uint64 extendedDeadline = clock() + lateQuorumVoteExtension();
@@ -7541,9 +6807,7 @@ abstract contract GovernorPreventLateQuorum is Governor {
      *
      * Emits a {LateQuorumVoteExtensionSet} event.
      */
-    function setLateQuorumVoteExtension(
-        uint64 newVoteExtension
-    ) public virtual onlyGovernance {
+    function setLateQuorumVoteExtension(uint64 newVoteExtension) public virtual onlyGovernance {
         _setLateQuorumVoteExtension(newVoteExtension);
     }
 
@@ -7553,9 +6817,7 @@ abstract contract GovernorPreventLateQuorum is Governor {
      *
      * Emits a {LateQuorumVoteExtensionSet} event.
      */
-    function _setLateQuorumVoteExtension(
-        uint64 newVoteExtension
-    ) internal virtual {
+    function _setLateQuorumVoteExtension(uint64 newVoteExtension) internal virtual {
         emit LateQuorumVoteExtensionSet(_voteExtension, newVoteExtension);
         _voteExtension = newVoteExtension;
     }
@@ -7575,19 +6837,12 @@ abstract contract GovernorSettings is Governor {
 
     event VotingDelaySet(uint256 oldVotingDelay, uint256 newVotingDelay);
     event VotingPeriodSet(uint256 oldVotingPeriod, uint256 newVotingPeriod);
-    event ProposalThresholdSet(
-        uint256 oldProposalThreshold,
-        uint256 newProposalThreshold
-    );
+    event ProposalThresholdSet(uint256 oldProposalThreshold, uint256 newProposalThreshold);
 
     /**
      * @dev Initialize the governance parameters.
      */
-    constructor(
-        uint256 initialVotingDelay,
-        uint256 initialVotingPeriod,
-        uint256 initialProposalThreshold
-    ) {
+    constructor(uint256 initialVotingDelay, uint256 initialVotingPeriod, uint256 initialProposalThreshold) {
         _setVotingDelay(initialVotingDelay);
         _setVotingPeriod(initialVotingPeriod);
         _setProposalThreshold(initialProposalThreshold);
@@ -7610,13 +6865,7 @@ abstract contract GovernorSettings is Governor {
     /**
      * @dev See {Governor-proposalThreshold}.
      */
-    function proposalThreshold()
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function proposalThreshold() public view virtual override returns (uint256) {
         return _proposalThreshold;
     }
 
@@ -7625,9 +6874,7 @@ abstract contract GovernorSettings is Governor {
      *
      * Emits a {VotingDelaySet} event.
      */
-    function setVotingDelay(
-        uint256 newVotingDelay
-    ) public virtual onlyGovernance {
+    function setVotingDelay(uint256 newVotingDelay) public virtual onlyGovernance {
         _setVotingDelay(newVotingDelay);
     }
 
@@ -7636,9 +6883,7 @@ abstract contract GovernorSettings is Governor {
      *
      * Emits a {VotingPeriodSet} event.
      */
-    function setVotingPeriod(
-        uint256 newVotingPeriod
-    ) public virtual onlyGovernance {
+    function setVotingPeriod(uint256 newVotingPeriod) public virtual onlyGovernance {
         _setVotingPeriod(newVotingPeriod);
     }
 
@@ -7647,9 +6892,7 @@ abstract contract GovernorSettings is Governor {
      *
      * Emits a {ProposalThresholdSet} event.
      */
-    function setProposalThreshold(
-        uint256 newProposalThreshold
-    ) public virtual onlyGovernance {
+    function setProposalThreshold(uint256 newProposalThreshold) public virtual onlyGovernance {
         _setProposalThreshold(newProposalThreshold);
     }
 
@@ -7682,9 +6925,7 @@ abstract contract GovernorSettings is Governor {
      *
      * Emits a {ProposalThresholdSet} event.
      */
-    function _setProposalThreshold(
-        uint256 newProposalThreshold
-    ) internal virtual {
+    function _setProposalThreshold(uint256 newProposalThreshold) internal virtual {
         emit ProposalThresholdSet(_proposalThreshold, newProposalThreshold);
         _proposalThreshold = newProposalThreshold;
     }
@@ -7809,26 +7050,14 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, Governor) returns (bool) {
-        return
-            interfaceId == type(IGovernorTimelock).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, Governor) returns (bool) {
+        return interfaceId == type(IGovernorTimelock).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev Overridden version of the {Governor-state} function with added support for the `Queued` and `Expired` state.
      */
-    function state(
-        uint256 proposalId
-    )
-        public
-        view
-        virtual
-        override(IGovernor, Governor)
-        returns (ProposalState)
-    {
+    function state(uint256 proposalId) public view virtual override(IGovernor, Governor) returns (ProposalState) {
         ProposalState currentState = super.state(proposalId);
 
         if (currentState != ProposalState.Succeeded) {
@@ -7855,9 +7084,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
     /**
      * @dev Public accessor to check the eta of a queued proposal
      */
-    function proposalEta(
-        uint256 proposalId
-    ) public view virtual override returns (uint256) {
+    function proposalEta(uint256 proposalId) public view virtual override returns (uint256) {
         return _proposalTimelocks[proposalId];
     }
 
@@ -7870,12 +7097,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState currentState = state(proposalId);
         if (currentState != ProposalState.Succeeded) {
@@ -7890,22 +7112,10 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         _proposalTimelocks[proposalId] = SafeCast.toUint64(eta);
 
         for (uint256 i = 0; i < targets.length; ++i) {
-            if (
-                _timelock.queuedTransactions(
-                    keccak256(
-                        abi.encode(targets[i], values[i], "", calldatas[i], eta)
-                    )
-                )
-            ) {
+            if (_timelock.queuedTransactions(keccak256(abi.encode(targets[i], values[i], "", calldatas[i], eta)))) {
                 revert GovernorAlreadyQueuedProposal(proposalId);
             }
-            _timelock.queueTransaction(
-                targets[i],
-                values[i],
-                "",
-                calldatas[i],
-                eta
-            );
+            _timelock.queueTransaction(targets[i], values[i], "", calldatas[i], eta);
         }
 
         emit ProposalQueued(proposalId, eta);
@@ -7929,13 +7139,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         }
         Address.sendValue(payable(_timelock), msg.value);
         for (uint256 i = 0; i < targets.length; ++i) {
-            _timelock.executeTransaction(
-                targets[i],
-                values[i],
-                "",
-                calldatas[i],
-                eta
-            );
+            _timelock.executeTransaction(targets[i], values[i], "", calldatas[i], eta);
         }
     }
 
@@ -7949,12 +7153,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) internal virtual override returns (uint256) {
-        uint256 proposalId = super._cancel(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = super._cancel(targets, values, calldatas, descriptionHash);
 
         uint256 eta = proposalEta(proposalId);
         if (eta > 0) {
@@ -7962,13 +7161,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
             delete _proposalTimelocks[proposalId];
             // do external call later
             for (uint256 i = 0; i < targets.length; ++i) {
-                _timelock.cancelTransaction(
-                    targets[i],
-                    values[i],
-                    "",
-                    calldatas[i],
-                    eta
-                );
+                _timelock.cancelTransaction(targets[i], values[i], "", calldatas[i], eta);
             }
         }
 
@@ -8003,9 +7196,7 @@ abstract contract GovernorTimelockCompound is IGovernorTimelock, Governor {
 
      * CAUTION: It is not recommended to change the timelock while there are other queued governance proposals.
      */
-    function updateTimelock(
-        ICompoundTimelock newTimelock
-    ) external virtual onlyGovernance {
+    function updateTimelock(ICompoundTimelock newTimelock) external virtual onlyGovernance {
         _updateTimelock(newTimelock);
     }
 
@@ -8033,12 +7224,7 @@ abstract contract ERC721Holder is IERC721Receiver {
      *
      * Always returns `IERC721Receiver.onERC721Received.selector`.
      */
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public virtual returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes memory) public virtual returns (bytes4) {
         return this.onERC721Received.selector;
     }
 }
@@ -8054,12 +7240,8 @@ abstract contract ERC1155Receiver is ERC165, IERC1155Receiver {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC165, IERC165) returns (bool) {
-        return
-            interfaceId == type(IERC1155Receiver).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IERC1155Receiver).interfaceId || super.supportsInterface(interfaceId);
     }
 }
 
@@ -8127,11 +7309,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
     /**
      * @dev Mismatch between the parameters length for an operation call.
      */
-    error TimelockInvalidOperationLength(
-        uint256 targets,
-        uint256 payloads,
-        uint256 values
-    );
+    error TimelockInvalidOperationLength(uint256 targets, uint256 payloads, uint256 values);
 
     /**
      * @dev The schedule operation doesn't meet the minimum delay.
@@ -8141,10 +7319,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
     /**
      * @dev The current state of an operation is not as required.
      */
-    error TimelockUnexpectedOperationState(
-        bytes32 operationId,
-        OperationState expected
-    );
+    error TimelockUnexpectedOperationState(bytes32 operationId, OperationState expected);
 
     /**
      * @dev The predecessor to an operation not yet done.
@@ -8172,13 +7347,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
     /**
      * @dev Emitted when a call is performed as part of operation `id`.
      */
-    event CallExecuted(
-        bytes32 indexed id,
-        uint256 indexed index,
-        address target,
-        uint256 value,
-        bytes data
-    );
+    event CallExecuted(bytes32 indexed id, uint256 indexed index, address target, uint256 value, bytes data);
 
     /**
      * @dev Emitted when new proposal is scheduled with non-zero salt.
@@ -8208,12 +7377,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
      * administration through timelocked proposals. Previous versions of this contract would assign
      * this admin to the deployer automatically and should be renounced as well.
      */
-    constructor(
-        uint256 minDelay,
-        address[] memory proposers,
-        address[] memory executors,
-        address admin
-    ) {
+    constructor(uint256 minDelay, address[] memory proposers, address[] memory executors, address admin) {
         // self administration
         _grantRole(DEFAULT_ADMIN_ROLE, address(this));
 
@@ -8260,13 +7424,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
      */
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(AccessControl, ERC1155Receiver)
-        returns (bool)
-    {
+    ) public view virtual override(AccessControl, ERC1155Receiver) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -8342,8 +7500,7 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 predecessor,
         bytes32 salt
     ) public pure virtual returns (bytes32) {
-        return
-            keccak256(abi.encode(targets, values, payloads, predecessor, salt));
+        return keccak256(abi.encode(targets, values, payloads, predecessor, salt));
     }
 
     /**
@@ -8388,34 +7545,14 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 salt,
         uint256 delay
     ) public virtual onlyRole(PROPOSER_ROLE) {
-        if (
-            targets.length != values.length || targets.length != payloads.length
-        ) {
-            revert TimelockInvalidOperationLength(
-                targets.length,
-                payloads.length,
-                values.length
-            );
+        if (targets.length != values.length || targets.length != payloads.length) {
+            revert TimelockInvalidOperationLength(targets.length, payloads.length, values.length);
         }
 
-        bytes32 id = hashOperationBatch(
-            targets,
-            values,
-            payloads,
-            predecessor,
-            salt
-        );
+        bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
         _schedule(id, delay);
         for (uint256 i = 0; i < targets.length; ++i) {
-            emit CallScheduled(
-                id,
-                i,
-                targets[i],
-                values[i],
-                payloads[i],
-                predecessor,
-                delay
-            );
+            emit CallScheduled(id, i, targets[i], values[i], payloads[i], predecessor, delay);
         }
         if (salt != bytes32(0)) {
             emit CallSalt(id, salt);
@@ -8498,23 +7635,11 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
         bytes32 predecessor,
         bytes32 salt
     ) public payable virtual onlyRoleOrOpenRole(EXECUTOR_ROLE) {
-        if (
-            targets.length != values.length || targets.length != payloads.length
-        ) {
-            revert TimelockInvalidOperationLength(
-                targets.length,
-                payloads.length,
-                values.length
-            );
+        if (targets.length != values.length || targets.length != payloads.length) {
+            revert TimelockInvalidOperationLength(targets.length, payloads.length, values.length);
         }
 
-        bytes32 id = hashOperationBatch(
-            targets,
-            values,
-            payloads,
-            predecessor,
-            salt
-        );
+        bytes32 id = hashOperationBatch(targets, values, payloads, predecessor, salt);
 
         _beforeCall(id, predecessor);
         for (uint256 i = 0; i < targets.length; ++i) {
@@ -8530,14 +7655,8 @@ contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
     /**
      * @dev Execute an operation's call.
      */
-    function _execute(
-        address target,
-        uint256 value,
-        bytes calldata data
-    ) internal virtual {
-        (bool success, bytes memory returndata) = target.call{value: value}(
-            data
-        );
+    function _execute(address target, uint256 value, bytes calldata data) internal virtual {
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         Address.verifyCallResult(success, returndata);
     }
 
@@ -8617,26 +7736,14 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, Governor) returns (bool) {
-        return
-            interfaceId == type(IGovernorTimelock).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, Governor) returns (bool) {
+        return interfaceId == type(IGovernorTimelock).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev Overridden version of the {Governor-state} function with added support for the `Queued` state.
      */
-    function state(
-        uint256 proposalId
-    )
-        public
-        view
-        virtual
-        override(IGovernor, Governor)
-        returns (ProposalState)
-    {
+    function state(uint256 proposalId) public view virtual override(IGovernor, Governor) returns (ProposalState) {
         ProposalState currentState = super.state(proposalId);
 
         if (currentState != ProposalState.Succeeded) {
@@ -8666,9 +7773,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     /**
      * @dev Public accessor to check the eta of a queued proposal
      */
-    function proposalEta(
-        uint256 proposalId
-    ) public view virtual override returns (uint256) {
+    function proposalEta(uint256 proposalId) public view virtual override returns (uint256) {
         uint256 eta = _timelock.getTimestamp(_timelockIds[proposalId]);
         return eta == 1 ? 0 : eta; // _DONE_TIMESTAMP (1) should be replaced with a 0 value
     }
@@ -8682,12 +7787,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) public virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
         ProposalState currentState = state(proposalId);
         if (currentState != ProposalState.Succeeded) {
@@ -8699,21 +7799,8 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
         }
 
         uint256 delay = _timelock.getMinDelay();
-        _timelockIds[proposalId] = _timelock.hashOperationBatch(
-            targets,
-            values,
-            calldatas,
-            0,
-            descriptionHash
-        );
-        _timelock.scheduleBatch(
-            targets,
-            values,
-            calldatas,
-            0,
-            descriptionHash,
-            delay
-        );
+        _timelockIds[proposalId] = _timelock.hashOperationBatch(targets, values, calldatas, 0, descriptionHash);
+        _timelock.scheduleBatch(targets, values, calldatas, 0, descriptionHash, delay);
 
         emit ProposalQueued(proposalId, block.timestamp + delay);
 
@@ -8730,13 +7817,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) internal virtual override {
-        _timelock.executeBatch{value: msg.value}(
-            targets,
-            values,
-            calldatas,
-            0,
-            descriptionHash
-        );
+        _timelock.executeBatch{value: msg.value}(targets, values, calldatas, 0, descriptionHash);
     }
 
     /**
@@ -8752,12 +7833,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) internal virtual override returns (uint256) {
-        uint256 proposalId = super._cancel(
-            targets,
-            values,
-            calldatas,
-            descriptionHash
-        );
+        uint256 proposalId = super._cancel(targets, values, calldatas, descriptionHash);
 
         if (_timelockIds[proposalId] != 0) {
             _timelock.cancel(_timelockIds[proposalId]);
@@ -8780,9 +7856,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
      *
      * CAUTION: It is not recommended to change the timelock while there are other queued governance proposals.
      */
-    function updateTimelock(
-        TimelockController newTimelock
-    ) external virtual onlyGovernance {
+    function updateTimelock(TimelockController newTimelock) external virtual onlyGovernance {
         _updateTimelock(newTimelock);
     }
 
@@ -8814,20 +7888,12 @@ interface IVotes {
     /**
      * @dev Emitted when an account changes their delegate.
      */
-    event DelegateChanged(
-        address indexed delegator,
-        address indexed fromDelegate,
-        address indexed toDelegate
-    );
+    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
     /**
      * @dev Emitted when a token transfer or delegate change results in changes to a delegate's number of votes.
      */
-    event DelegateVotesChanged(
-        address indexed delegate,
-        uint256 previousBalance,
-        uint256 newBalance
-    );
+    event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
 
     /**
      * @dev Returns the current amount of votes that `account` has.
@@ -8838,10 +7904,7 @@ interface IVotes {
      * @dev Returns the amount of votes that `account` had at a specific moment in the past. If the `clock()` is
      * configured to use block numbers, this will return the value at the end of the corresponding block.
      */
-    function getPastVotes(
-        address account,
-        uint256 timepoint
-    ) external view returns (uint256);
+    function getPastVotes(address account, uint256 timepoint) external view returns (uint256);
 
     /**
      * @dev Returns the total supply of votes available at a specific moment in the past. If the `clock()` is
@@ -8851,9 +7914,7 @@ interface IVotes {
      * Votes that have not been delegated are still part of total supply, even though they would not participate in a
      * vote.
      */
-    function getPastTotalSupply(
-        uint256 timepoint
-    ) external view returns (uint256);
+    function getPastTotalSupply(uint256 timepoint) external view returns (uint256);
 
     /**
      * @dev Returns the delegate that `account` has chosen.
@@ -8868,14 +7929,7 @@ interface IVotes {
     /**
      * @dev Delegates votes from signer to `delegatee`.
      */
-    function delegateBySig(
-        address delegatee,
-        uint256 nonce,
-        uint256 expiry,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external;
 }
 
 interface IERC5805 is IERC6372, IVotes {}
@@ -8960,21 +8014,14 @@ library Checkpoints {
      *
      * Returns previous value and new value.
      */
-    function push(
-        Trace224 storage self,
-        uint32 key,
-        uint224 value
-    ) internal returns (uint224, uint224) {
+    function push(Trace224 storage self, uint32 key, uint224 value) internal returns (uint224, uint224) {
         return _insert(self._checkpoints, key, value);
     }
 
     /**
      * @dev Returns the value in the first (oldest) checkpoint with key greater or equal than the search key, or zero if there is none.
      */
-    function lowerLookup(
-        Trace224 storage self,
-        uint32 key
-    ) internal view returns (uint224) {
+    function lowerLookup(Trace224 storage self, uint32 key) internal view returns (uint224) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _lowerBinaryLookup(self._checkpoints, key, 0, len);
         return pos == len ? 0 : _unsafeAccess(self._checkpoints, pos)._value;
@@ -8983,10 +8030,7 @@ library Checkpoints {
     /**
      * @dev Returns the value in the last (most recent) checkpoint with key lower or equal than the search key, or zero if there is none.
      */
-    function upperLookup(
-        Trace224 storage self,
-        uint32 key
-    ) internal view returns (uint224) {
+    function upperLookup(Trace224 storage self, uint32 key) internal view returns (uint224) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, 0, len);
         return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
@@ -8997,10 +8041,7 @@ library Checkpoints {
      *
      * NOTE: This is a variant of {upperLookup} that is optimised to find "recent" checkpoint (checkpoints with high keys).
      */
-    function upperLookupRecent(
-        Trace224 storage self,
-        uint32 key
-    ) internal view returns (uint224) {
+    function upperLookupRecent(Trace224 storage self, uint32 key) internal view returns (uint224) {
         uint256 len = self._checkpoints.length;
 
         uint256 low = 0;
@@ -9032,17 +8073,12 @@ library Checkpoints {
      * @dev Returns whether there is a checkpoint in the structure (i.e. it is not empty), and if so the key and value
      * in the most recent checkpoint.
      */
-    function latestCheckpoint(
-        Trace224 storage self
-    ) internal view returns (bool exists, uint32 _key, uint224 _value) {
+    function latestCheckpoint(Trace224 storage self) internal view returns (bool exists, uint32 _key, uint224 _value) {
         uint256 pos = self._checkpoints.length;
         if (pos == 0) {
             return (false, 0, 0);
         } else {
-            Checkpoint224 memory ckpt = _unsafeAccess(
-                self._checkpoints,
-                pos - 1
-            );
+            Checkpoint224 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
             return (true, ckpt._key, ckpt._value);
         }
     }
@@ -9057,10 +8093,7 @@ library Checkpoints {
     /**
      * @dev Returns checkpoint at given position.
      */
-    function at(
-        Trace224 storage self,
-        uint32 pos
-    ) internal view returns (Checkpoint224 memory) {
+    function at(Trace224 storage self, uint32 pos) internal view returns (Checkpoint224 memory) {
         return self._checkpoints[pos];
     }
 
@@ -9068,11 +8101,7 @@ library Checkpoints {
      * @dev Pushes a (`key`, `value`) pair into an ordered list of checkpoints, either by inserting a new checkpoint,
      * or by updating the last one.
      */
-    function _insert(
-        Checkpoint224[] storage self,
-        uint32 key,
-        uint224 value
-    ) private returns (uint224, uint224) {
+    function _insert(Checkpoint224[] storage self, uint32 key, uint224 value) private returns (uint224, uint224) {
         uint256 pos = self.length;
 
         if (pos > 0) {
@@ -9170,21 +8199,14 @@ library Checkpoints {
      *
      * Returns previous value and new value.
      */
-    function push(
-        Trace160 storage self,
-        uint96 key,
-        uint160 value
-    ) internal returns (uint160, uint160) {
+    function push(Trace160 storage self, uint96 key, uint160 value) internal returns (uint160, uint160) {
         return _insert(self._checkpoints, key, value);
     }
 
     /**
      * @dev Returns the value in the first (oldest) checkpoint with key greater or equal than the search key, or zero if there is none.
      */
-    function lowerLookup(
-        Trace160 storage self,
-        uint96 key
-    ) internal view returns (uint160) {
+    function lowerLookup(Trace160 storage self, uint96 key) internal view returns (uint160) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _lowerBinaryLookup(self._checkpoints, key, 0, len);
         return pos == len ? 0 : _unsafeAccess(self._checkpoints, pos)._value;
@@ -9193,10 +8215,7 @@ library Checkpoints {
     /**
      * @dev Returns the value in the last (most recent) checkpoint with key lower or equal than the search key, or zero if there is none.
      */
-    function upperLookup(
-        Trace160 storage self,
-        uint96 key
-    ) internal view returns (uint160) {
+    function upperLookup(Trace160 storage self, uint96 key) internal view returns (uint160) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, 0, len);
         return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
@@ -9207,10 +8226,7 @@ library Checkpoints {
      *
      * NOTE: This is a variant of {upperLookup} that is optimised to find "recent" checkpoint (checkpoints with high keys).
      */
-    function upperLookupRecent(
-        Trace160 storage self,
-        uint96 key
-    ) internal view returns (uint160) {
+    function upperLookupRecent(Trace160 storage self, uint96 key) internal view returns (uint160) {
         uint256 len = self._checkpoints.length;
 
         uint256 low = 0;
@@ -9242,17 +8258,12 @@ library Checkpoints {
      * @dev Returns whether there is a checkpoint in the structure (i.e. it is not empty), and if so the key and value
      * in the most recent checkpoint.
      */
-    function latestCheckpoint(
-        Trace160 storage self
-    ) internal view returns (bool exists, uint96 _key, uint160 _value) {
+    function latestCheckpoint(Trace160 storage self) internal view returns (bool exists, uint96 _key, uint160 _value) {
         uint256 pos = self._checkpoints.length;
         if (pos == 0) {
             return (false, 0, 0);
         } else {
-            Checkpoint160 memory ckpt = _unsafeAccess(
-                self._checkpoints,
-                pos - 1
-            );
+            Checkpoint160 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
             return (true, ckpt._key, ckpt._value);
         }
     }
@@ -9267,10 +8278,7 @@ library Checkpoints {
     /**
      * @dev Returns checkpoint at given position.
      */
-    function at(
-        Trace160 storage self,
-        uint32 pos
-    ) internal view returns (Checkpoint160 memory) {
+    function at(Trace160 storage self, uint32 pos) internal view returns (Checkpoint160 memory) {
         return self._checkpoints[pos];
     }
 
@@ -9278,11 +8286,7 @@ library Checkpoints {
      * @dev Pushes a (`key`, `value`) pair into an ordered list of checkpoints, either by inserting a new checkpoint,
      * or by updating the last one.
      */
-    function _insert(
-        Checkpoint160[] storage self,
-        uint96 key,
-        uint160 value
-    ) private returns (uint160, uint160) {
+    function _insert(Checkpoint160[] storage self, uint96 key, uint160 value) private returns (uint160, uint160) {
         uint256 pos = self.length;
 
         if (pos > 0) {
@@ -9379,18 +8383,12 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
     /// @custom:oz-retyped-from Checkpoints.History
     Checkpoints.Trace224 private _quorumNumeratorHistory;
 
-    event QuorumNumeratorUpdated(
-        uint256 oldQuorumNumerator,
-        uint256 newQuorumNumerator
-    );
+    event QuorumNumeratorUpdated(uint256 oldQuorumNumerator, uint256 newQuorumNumerator);
 
     /**
      * @dev The quorum set is not a valid fraction.
      */
-    error GovernorInvalidQuorumFraction(
-        uint256 quorumNumerator,
-        uint256 quorumDenominator
-    );
+    error GovernorInvalidQuorumFraction(uint256 quorumNumerator, uint256 quorumDenominator);
 
     /**
      * @dev Initialize quorum as a fraction of the token's total supply.
@@ -9413,24 +8411,18 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
     /**
      * @dev Returns the quorum numerator at a specific timepoint. See {quorumDenominator}.
      */
-    function quorumNumerator(
-        uint256 timepoint
-    ) public view virtual returns (uint256) {
+    function quorumNumerator(uint256 timepoint) public view virtual returns (uint256) {
         // If history is empty, fallback to old storage
         uint256 length = _quorumNumeratorHistory._checkpoints.length;
 
         // Optimistic search, check the latest checkpoint
-        Checkpoints.Checkpoint224 memory latest = _quorumNumeratorHistory
-            ._checkpoints[length - 1];
+        Checkpoints.Checkpoint224 memory latest = _quorumNumeratorHistory._checkpoints[length - 1];
         if (latest._key <= timepoint) {
             return latest._value;
         }
 
         // Otherwise, do the binary search
-        return
-            _quorumNumeratorHistory.upperLookupRecent(
-                SafeCast.toUint32(timepoint)
-            );
+        return _quorumNumeratorHistory.upperLookupRecent(SafeCast.toUint32(timepoint));
     }
 
     /**
@@ -9443,12 +8435,8 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
     /**
      * @dev Returns the quorum for a timepoint, in terms of number of votes: `supply * numerator / denominator`.
      */
-    function quorum(
-        uint256 timepoint
-    ) public view virtual override returns (uint256) {
-        return
-            (token.getPastTotalSupply(timepoint) * quorumNumerator(timepoint)) /
-            quorumDenominator();
+    function quorum(uint256 timepoint) public view virtual override returns (uint256) {
+        return (token.getPastTotalSupply(timepoint) * quorumNumerator(timepoint)) / quorumDenominator();
     }
 
     /**
@@ -9461,9 +8449,7 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
      * - Must be called through a governance proposal.
      * - New numerator must be smaller or equal to the denominator.
      */
-    function updateQuorumNumerator(
-        uint256 newQuorumNumerator
-    ) external virtual onlyGovernance {
+    function updateQuorumNumerator(uint256 newQuorumNumerator) external virtual onlyGovernance {
         _updateQuorumNumerator(newQuorumNumerator);
     }
 
@@ -9476,22 +8462,14 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
      *
      * - New numerator must be smaller or equal to the denominator.
      */
-    function _updateQuorumNumerator(
-        uint256 newQuorumNumerator
-    ) internal virtual {
+    function _updateQuorumNumerator(uint256 newQuorumNumerator) internal virtual {
         uint256 denominator = quorumDenominator();
         if (newQuorumNumerator > denominator) {
-            revert GovernorInvalidQuorumFraction(
-                newQuorumNumerator,
-                denominator
-            );
+            revert GovernorInvalidQuorumFraction(newQuorumNumerator, denominator);
         }
 
         uint256 oldQuorumNumerator = quorumNumerator();
-        _quorumNumeratorHistory.push(
-            SafeCast.toUint32(clock()),
-            SafeCast.toUint224(newQuorumNumerator)
-        );
+        _quorumNumeratorHistory.push(SafeCast.toUint32(clock()), SafeCast.toUint224(newQuorumNumerator));
 
         emit QuorumNumeratorUpdated(oldQuorumNumerator, newQuorumNumerator);
     }
@@ -9534,10 +8512,7 @@ abstract contract Nonces {
     /**
      * @dev Same as {_useNonce} but checking that `nonce` is the next valid for `owner`.
      */
-    function _useCheckedNonce(
-        address owner,
-        uint256 nonce
-    ) internal virtual returns (uint256) {
+    function _useCheckedNonce(address owner, uint256 nonce) internal virtual returns (uint256) {
         uint256 current = _useNonce(owner);
         if (nonce != current) {
             revert InvalidAccountNonce(owner, current);
@@ -9625,18 +8600,12 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
      *
      * - `timepoint` must be in the past. If operating using block numbers, the block must be already mined.
      */
-    function getPastVotes(
-        address account,
-        uint256 timepoint
-    ) public view virtual returns (uint256) {
+    function getPastVotes(address account, uint256 timepoint) public view virtual returns (uint256) {
         uint48 currentTimepoint = clock();
         if (timepoint >= currentTimepoint) {
             revert ERC5805FutureLookup(timepoint, currentTimepoint);
         }
-        return
-            _delegateCheckpoints[account].upperLookupRecent(
-                SafeCast.toUint32(timepoint)
-            );
+        return _delegateCheckpoints[account].upperLookupRecent(SafeCast.toUint32(timepoint));
     }
 
     /**
@@ -9651,15 +8620,12 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
      *
      * - `timepoint` must be in the past. If operating using block numbers, the block must be already mined.
      */
-    function getPastTotalSupply(
-        uint256 timepoint
-    ) public view virtual returns (uint256) {
+    function getPastTotalSupply(uint256 timepoint) public view virtual returns (uint256) {
         uint48 currentTimepoint = clock();
         if (timepoint >= currentTimepoint) {
             revert ERC5805FutureLookup(timepoint, currentTimepoint);
         }
-        return
-            _totalCheckpoints.upperLookupRecent(SafeCast.toUint32(timepoint));
+        return _totalCheckpoints.upperLookupRecent(SafeCast.toUint32(timepoint));
     }
 
     /**
@@ -9699,11 +8665,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
             revert VotesExpiredSignature(expiry);
         }
         address signer = ECDSA.recover(
-            _hashTypedDataV4(
-                keccak256(
-                    abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry)
-                )
-            ),
+            _hashTypedDataV4(keccak256(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
             v,
             r,
             s
@@ -9729,11 +8691,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
      * @dev Transfers, mints, or burns voting units. To register a mint, `from` should be zero. To register a burn, `to`
      * should be zero. Total supply of voting units will be adjusted with mints and burns.
      */
-    function _transferVotingUnits(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {
+    function _transferVotingUnits(address from, address to, uint256 amount) internal virtual {
         if (from == address(0)) {
             _push(_totalCheckpoints, _add, SafeCast.toUint224(amount));
         }
@@ -9746,11 +8704,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
     /**
      * @dev Moves delegated votes from one delegate to another.
      */
-    function _moveDelegateVotes(
-        address from,
-        address to,
-        uint256 amount
-    ) private {
+    function _moveDelegateVotes(address from, address to, uint256 amount) private {
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 (uint256 oldValue, uint256 newValue) = _push(
@@ -9774,9 +8728,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
     /**
      * @dev Get number of checkpoints for `account`.
      */
-    function _numCheckpoints(
-        address account
-    ) internal view virtual returns (uint32) {
+    function _numCheckpoints(address account) internal view virtual returns (uint32) {
         return SafeCast.toUint32(_delegateCheckpoints[account].length());
     }
 
@@ -9795,8 +8747,7 @@ abstract contract Votes is Context, EIP712, Nonces, IERC5805 {
         function(uint224, uint224) view returns (uint224) op,
         uint224 delta
     ) private returns (uint224, uint224) {
-        return
-            store.push(SafeCast.toUint32(clock()), op(store.latest(), delta));
+        return store.push(SafeCast.toUint32(clock()), op(store.latest(), delta));
     }
 
     function _add(uint224 a, uint224 b) private pure returns (uint224) {
@@ -9843,11 +8794,7 @@ interface IERC20Errors {
      * @param balance Current balance for the interacting account.
      * @param needed Minimum amount required to perform a transfer.
      */
-    error ERC20InsufficientBalance(
-        address sender,
-        uint256 balance,
-        uint256 needed
-    );
+    error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed);
 
     /**
      * @dev Indicates a failure with the token `sender`. Used in transfers.
@@ -9867,11 +8814,7 @@ interface IERC20Errors {
      * @param allowance Amount of tokens a `spender` is allowed to operate with.
      * @param needed Minimum amount required to perform a transfer.
      */
-    error ERC20InsufficientAllowance(
-        address spender,
-        uint256 allowance,
-        uint256 needed
-    );
+    error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
     /**
      * @dev Indicates a failure with the `approver` of a token to be approved. Used in approvals.
@@ -9957,12 +8900,7 @@ interface IERC1155Errors {
      * @param balance Current balance for the interacting account.
      * @param needed Minimum amount required to perform a transfer.
      */
-    error ERC1155InsufficientBalance(
-        address sender,
-        uint256 balance,
-        uint256 needed,
-        uint256 tokenId
-    );
+    error ERC1155InsufficientBalance(address sender, uint256 balance, uint256 needed, uint256 tokenId);
 
     /**
      * @dev Indicates a failure with the token `sender`. Used in transfers.
@@ -10020,13 +8958,7 @@ interface IERC1155 is IERC165 {
     /**
      * @dev Emitted when `value` tokens of token type `id` are transferred from `from` to `to` by `operator`.
      */
-    event TransferSingle(
-        address indexed operator,
-        address indexed from,
-        address indexed to,
-        uint256 id,
-        uint256 value
-    );
+    event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value);
 
     /**
      * @dev Equivalent to multiple {TransferSingle} events, where `operator`, `from` and `to` are the same for all
@@ -10044,11 +8976,7 @@ interface IERC1155 is IERC165 {
      * @dev Emitted when `account` grants or revokes permission to `operator` to transfer their tokens, according to
      * `approved`.
      */
-    event ApprovalForAll(
-        address indexed account,
-        address indexed operator,
-        bool approved
-    );
+    event ApprovalForAll(address indexed account, address indexed operator, bool approved);
 
     /**
      * @dev Emitted when the URI for token type `id` changes to `value`, if it is a non-programmatic URI.
@@ -10066,10 +8994,7 @@ interface IERC1155 is IERC165 {
      *
      * - `account` cannot be the zero address.
      */
-    function balanceOf(
-        address account,
-        uint256 id
-    ) external view returns (uint256);
+    function balanceOf(address account, uint256 id) external view returns (uint256);
 
     /**
      * @dev xref:ROOT:erc1155.adoc#batch-operations[Batched] version of {balanceOf}.
@@ -10099,10 +9024,7 @@ interface IERC1155 is IERC165 {
      *
      * See {setApprovalForAll}.
      */
-    function isApprovedForAll(
-        address account,
-        address operator
-    ) external view returns (bool);
+    function isApprovedForAll(address account, address operator) external view returns (bool);
 
     /**
      * @dev Transfers `amount` tokens of token type `id` from `from` to `to`.
@@ -10122,13 +9044,7 @@ interface IERC1155 is IERC165 {
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
      * acceptance magic value.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) external;
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata data) external;
 
     /**
      * @dev xref:ROOT:erc1155.adoc#batch-operations[Batched] version of {safeTransferFrom}.
@@ -10190,10 +9106,7 @@ interface IERC1271 {
      * @param hash      Hash of the data to be signed
      * @param signature Signature byte array associated with _data
      */
-    function isValidSignature(
-        bytes32 hash,
-        bytes memory signature
-    ) external view returns (bytes4 magicValue);
+    function isValidSignature(bytes32 hash, bytes memory signature) external view returns (bytes4 magicValue);
 }
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC1363Receiver.sol)
@@ -10258,10 +9171,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param amount uint256 The amount of tokens to be transferred
      * @return true unless throwing
      */
-    function transferAndCall(
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    function transferAndCall(address to, uint256 amount) external returns (bool);
 
     /**
      * @dev Transfer tokens from `msg.sender` to another address and then call `onTransferReceived` on receiver
@@ -10270,11 +9180,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param data bytes Additional data with no specified format, sent in call to `to`
      * @return true unless throwing
      */
-    function transferAndCall(
-        address to,
-        uint256 amount,
-        bytes memory data
-    ) external returns (bool);
+    function transferAndCall(address to, uint256 amount, bytes memory data) external returns (bool);
 
     /**
      * @dev Transfer tokens from one address to another and then call `onTransferReceived` on receiver
@@ -10283,11 +9189,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param amount uint256 The amount of tokens to be transferred
      * @return true unless throwing
      */
-    function transferFromAndCall(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    function transferFromAndCall(address from, address to, uint256 amount) external returns (bool);
 
     /**
      * @dev Transfer tokens from one address to another and then call `onTransferReceived` on receiver
@@ -10297,12 +9199,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param data bytes Additional data with no specified format, sent in call to `to`
      * @return true unless throwing
      */
-    function transferFromAndCall(
-        address from,
-        address to,
-        uint256 amount,
-        bytes memory data
-    ) external returns (bool);
+    function transferFromAndCall(address from, address to, uint256 amount, bytes memory data) external returns (bool);
 
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender
@@ -10310,10 +9207,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param spender address The address which will spend the funds
      * @param amount uint256 The amount of tokens to be spent
      */
-    function approveAndCall(
-        address spender,
-        uint256 amount
-    ) external returns (bool);
+    function approveAndCall(address spender, uint256 amount) external returns (bool);
 
     /**
      * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender
@@ -10322,11 +9216,7 @@ interface IERC1363 is IERC165, IERC20 {
      * @param amount uint256 The amount of tokens to be spent
      * @param data bytes Additional data with no specified format, sent in call to `spender`
      */
-    function approveAndCall(
-        address spender,
-        uint256 amount,
-        bytes memory data
-    ) external returns (bool);
+    function approveAndCall(address spender, uint256 amount, bytes memory data) external returns (bool);
 }
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC1363Spender.sol)
@@ -10353,11 +9243,7 @@ interface IERC1363Spender {
      * @param data bytes Additional data with no specified format
      * @return `bytes4(keccak256("onApprovalReceived(address,uint256,bytes)"))`unless throwing
      */
-    function onApprovalReceived(
-        address owner,
-        uint256 amount,
-        bytes memory data
-    ) external returns (bytes4);
+    function onApprovalReceived(address owner, uint256 amount, bytes memory data) external returns (bytes4);
 }
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC1820Implementer.sol)
@@ -10375,10 +9261,7 @@ interface IERC1820Implementer {
      *
      * See {IERC1820Registry-setInterfaceImplementer}.
      */
-    function canImplementInterfaceForAddress(
-        bytes32 interfaceHash,
-        address account
-    ) external view returns (bytes32);
+    function canImplementInterfaceForAddress(bytes32 interfaceHash, address account) external view returns (bytes32);
 }
 
 // OpenZeppelin Contracts (last updated v4.8.0) (utils/introspection/IERC1820Registry.sol)
@@ -10398,11 +9281,7 @@ interface IERC1820Implementer {
  * For an in-depth explanation and source code analysis, see the EIP text.
  */
 interface IERC1820Registry {
-    event InterfaceImplementerSet(
-        address indexed account,
-        bytes32 indexed interfaceHash,
-        address indexed implementer
-    );
+    event InterfaceImplementerSet(address indexed account, bytes32 indexed interfaceHash, address indexed implementer);
 
     event ManagerChanged(address indexed account, address indexed newManager);
 
@@ -10448,11 +9327,7 @@ interface IERC1820Registry {
      * queried for support, unless `implementer` is the caller. See
      * {IERC1820Implementer-canImplementInterfaceForAddress}.
      */
-    function setInterfaceImplementer(
-        address account,
-        bytes32 _interfaceHash,
-        address implementer
-    ) external;
+    function setInterfaceImplementer(address account, bytes32 _interfaceHash, address implementer) external;
 
     /**
      * @dev Returns the implementer of `interfaceHash` for `account`. If no such
@@ -10463,19 +9338,14 @@ interface IERC1820Registry {
      *
      * `account` being the zero address is an alias for the caller's address.
      */
-    function getInterfaceImplementer(
-        address account,
-        bytes32 _interfaceHash
-    ) external view returns (address);
+    function getInterfaceImplementer(address account, bytes32 _interfaceHash) external view returns (address);
 
     /**
      * @dev Returns the interface hash for an `interfaceName`, as defined in the
      * corresponding
      * https://eips.ethereum.org/EIPS/eip-1820#interface-name[section of the EIP].
      */
-    function interfaceHash(
-        string calldata interfaceName
-    ) external pure returns (bytes32);
+    function interfaceHash(string calldata interfaceName) external pure returns (bytes32);
 
     /**
      * @notice Updates the cache with whether the contract implements an ERC165 interface or not.
@@ -10493,10 +9363,7 @@ interface IERC1820Registry {
      * @param interfaceId ERC165 interface to check.
      * @return True if `account` implements `interfaceId`, false otherwise.
      */
-    function implementsERC165Interface(
-        address account,
-        bytes4 interfaceId
-    ) external view returns (bool);
+    function implementsERC165Interface(address account, bytes4 interfaceId) external view returns (bool);
 
     /**
      * @notice Checks whether a contract implements an ERC165 interface or not without using or updating the cache.
@@ -10504,10 +9371,7 @@ interface IERC1820Registry {
      * @param interfaceId ERC165 interface to check.
      * @return True if `account` implements `interfaceId`, false otherwise.
      */
-    function implementsERC165InterfaceNoCache(
-        address account,
-        bytes4 interfaceId
-    ) external view returns (bool);
+    function implementsERC165InterfaceNoCache(address account, bytes4 interfaceId) external view returns (bool);
 }
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC1967.sol)
@@ -10581,9 +9445,7 @@ interface IERC2309 {
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC2612.sol)
 
-interface IERC2612 is IERC20Permit {
-
-}
+interface IERC2612 is IERC20Permit {}
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC2981.sol)
 
@@ -10655,10 +9517,7 @@ interface IERC3156FlashLender {
      * @param amount The amount of tokens lent.
      * @return The amount of `token` to be charged for the loan, on top of the returned principal.
      */
-    function flashFee(
-        address token,
-        uint256 amount
-    ) external view returns (uint256);
+    function flashFee(address token, uint256 amount) external view returns (uint256);
 
     /**
      * @dev Initiate a flash loan.
@@ -10686,12 +9545,7 @@ interface IERC3156FlashLender {
  * _Available since v4.7._
  */
 interface IERC4626 is IERC20, IERC20Metadata {
-    event Deposit(
-        address indexed sender,
-        address indexed owner,
-        uint256 assets,
-        uint256 shares
-    );
+    event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares);
 
     event Withdraw(
         address indexed sender,
@@ -10731,9 +9585,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * “average-user’s” price-per-share, meaning what the average user should expect to see when exchanging to and
      * from.
      */
-    function convertToShares(
-        uint256 assets
-    ) external view returns (uint256 shares);
+    function convertToShares(uint256 assets) external view returns (uint256 shares);
 
     /**
      * @dev Returns the amount of assets that the Vault would exchange for the amount of shares provided, in an ideal
@@ -10748,9 +9600,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * “average-user’s” price-per-share, meaning what the average user should expect to see when exchanging to and
      * from.
      */
-    function convertToAssets(
-        uint256 shares
-    ) external view returns (uint256 assets);
+    function convertToAssets(uint256 shares) external view returns (uint256 assets);
 
     /**
      * @dev Returns the maximum amount of the underlying asset that can be deposited into the Vault for the receiver,
@@ -10760,9 +9610,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * - MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of assets that may be deposited.
      * - MUST NOT revert.
      */
-    function maxDeposit(
-        address receiver
-    ) external view returns (uint256 maxAssets);
+    function maxDeposit(address receiver) external view returns (uint256 maxAssets);
 
     /**
      * @dev Allows an on-chain or off-chain user to simulate the effects of their deposit at the current block, given
@@ -10779,9 +9627,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * NOTE: any unfavorable discrepancy between convertToShares and previewDeposit SHOULD be considered slippage in
      * share price or some other type of condition, meaning the depositor will lose assets by depositing.
      */
-    function previewDeposit(
-        uint256 assets
-    ) external view returns (uint256 shares);
+    function previewDeposit(uint256 assets) external view returns (uint256 shares);
 
     /**
      * @dev Mints shares Vault shares to receiver by depositing exactly amount of underlying tokens.
@@ -10794,10 +9640,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      *
      * NOTE: most implementations will require pre-approval of the Vault with the Vault’s underlying asset token.
      */
-    function deposit(
-        uint256 assets,
-        address receiver
-    ) external returns (uint256 shares);
+    function deposit(uint256 assets, address receiver) external returns (uint256 shares);
 
     /**
      * @dev Returns the maximum amount of the Vault shares that can be minted for the receiver, through a mint call.
@@ -10805,9 +9648,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * - MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of shares that may be minted.
      * - MUST NOT revert.
      */
-    function maxMint(
-        address receiver
-    ) external view returns (uint256 maxShares);
+    function maxMint(address receiver) external view returns (uint256 maxShares);
 
     /**
      * @dev Allows an on-chain or off-chain user to simulate the effects of their mint at the current block, given
@@ -10837,10 +9678,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      *
      * NOTE: most implementations will require pre-approval of the Vault with the Vault’s underlying asset token.
      */
-    function mint(
-        uint256 shares,
-        address receiver
-    ) external returns (uint256 assets);
+    function mint(uint256 shares, address receiver) external returns (uint256 assets);
 
     /**
      * @dev Returns the maximum amount of the underlying asset that can be withdrawn from the owner balance in the
@@ -10849,9 +9687,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * - MUST return a limited value if owner is subject to some withdrawal limit or timelock.
      * - MUST NOT revert.
      */
-    function maxWithdraw(
-        address owner
-    ) external view returns (uint256 maxAssets);
+    function maxWithdraw(address owner) external view returns (uint256 maxAssets);
 
     /**
      * @dev Allows an on-chain or off-chain user to simulate the effects of their withdrawal at the current block,
@@ -10869,9 +9705,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * NOTE: any unfavorable discrepancy between convertToShares and previewWithdraw SHOULD be considered slippage in
      * share price or some other type of condition, meaning the depositor will lose assets by depositing.
      */
-    function previewWithdraw(
-        uint256 assets
-    ) external view returns (uint256 shares);
+    function previewWithdraw(uint256 assets) external view returns (uint256 shares);
 
     /**
      * @dev Burns shares from owner and sends exactly assets of underlying tokens to receiver.
@@ -10885,11 +9719,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * Note that some implementations will require pre-requesting to the Vault before a withdrawal may be performed.
      * Those methods should be performed separately.
      */
-    function withdraw(
-        uint256 assets,
-        address receiver,
-        address owner
-    ) external returns (uint256 shares);
+    function withdraw(uint256 assets, address receiver, address owner) external returns (uint256 shares);
 
     /**
      * @dev Returns the maximum amount of Vault shares that can be redeemed from the owner balance in the Vault,
@@ -10916,9 +9746,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * NOTE: any unfavorable discrepancy between convertToAssets and previewRedeem SHOULD be considered slippage in
      * share price or some other type of condition, meaning the depositor will lose assets by redeeming.
      */
-    function previewRedeem(
-        uint256 shares
-    ) external view returns (uint256 assets);
+    function previewRedeem(uint256 shares) external view returns (uint256 assets);
 
     /**
      * @dev Burns exactly shares from owner and sends assets of underlying tokens to receiver.
@@ -10932,11 +9760,7 @@ interface IERC4626 is IERC20, IERC20Metadata {
      * NOTE: some implementations will require pre-requesting to the Vault before a withdrawal may be performed.
      * Those methods should be performed separately.
      */
-    function redeem(
-        uint256 shares,
-        address receiver,
-        address owner
-    ) external returns (uint256 assets);
+    function redeem(uint256 shares, address receiver, address owner) external returns (uint256 assets);
 }
 
 // OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC4906.sol)
@@ -10952,29 +9776,17 @@ interface IERC721 is IERC165 {
     /**
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
      */
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
      */
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
+    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
      */
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool approved
-    );
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
     /**
      * @dev Returns the number of tokens in ``owner``'s account.
@@ -11003,12 +9815,7 @@ interface IERC721 is IERC165 {
      *
      * Emits a {Transfer} event.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes calldata data
-    ) external;
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external;
 
     /**
      * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
@@ -11024,11 +9831,7 @@ interface IERC721 is IERC165 {
      *
      * Emits a {Transfer} event.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
 
     /**
      * @dev Transfers `tokenId` token from `from` to `to`.
@@ -11082,19 +9885,14 @@ interface IERC721 is IERC165 {
      *
      * - `tokenId` must exist.
      */
-    function getApproved(
-        uint256 tokenId
-    ) external view returns (address operator);
+    function getApproved(uint256 tokenId) external view returns (address operator);
 
     /**
      * @dev Returns if the `operator` is allowed to manage all of the assets of `owner`.
      *
      * See {setApprovalForAll}
      */
-    function isApprovedForAll(
-        address owner,
-        address operator
-    ) external view returns (bool);
+    function isApprovedForAll(address owner, address operator) external view returns (bool);
 }
 
 /// @title EIP-721 Metadata Update Extension
@@ -11128,10 +9926,7 @@ interface IERC721Enumerable is IERC721 {
      * @dev Returns a token ID owned by `owner` at a given `index` of its token list.
      * Use along with {balanceOf} to enumerate all of ``owner``'s tokens.
      */
-    function tokenOfOwnerByIndex(
-        address owner,
-        uint256 index
-    ) external view returns (uint256);
+    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256);
 
     /**
      * @dev Returns a token ID at a given `index` of all the tokens stored by the contract.
@@ -11244,42 +10039,24 @@ interface IERC777 {
      *
      * Note that some additional user `data` and `operatorData` can be logged in the event.
      */
-    event Minted(
-        address indexed operator,
-        address indexed to,
-        uint256 amount,
-        bytes data,
-        bytes operatorData
-    );
+    event Minted(address indexed operator, address indexed to, uint256 amount, bytes data, bytes operatorData);
 
     /**
      * @dev Emitted when `operator` destroys `amount` tokens from `account`.
      *
      * Note that some additional user `data` and `operatorData` can be logged in the event.
      */
-    event Burned(
-        address indexed operator,
-        address indexed from,
-        uint256 amount,
-        bytes data,
-        bytes operatorData
-    );
+    event Burned(address indexed operator, address indexed from, uint256 amount, bytes data, bytes operatorData);
 
     /**
      * @dev Emitted when `operator` is made operator for `tokenHolder`.
      */
-    event AuthorizedOperator(
-        address indexed operator,
-        address indexed tokenHolder
-    );
+    event AuthorizedOperator(address indexed operator, address indexed tokenHolder);
 
     /**
      * @dev Emitted when `operator` is revoked its operator status for `tokenHolder`.
      */
-    event RevokedOperator(
-        address indexed operator,
-        address indexed tokenHolder
-    );
+    event RevokedOperator(address indexed operator, address indexed tokenHolder);
 
     /**
      * @dev Returns the name of the token.
@@ -11327,11 +10104,7 @@ interface IERC777 {
      * - if `recipient` is a contract, it must implement the {IERC777Recipient}
      * interface.
      */
-    function send(
-        address recipient,
-        uint256 amount,
-        bytes calldata data
-    ) external;
+    function send(address recipient, uint256 amount, bytes calldata data) external;
 
     /**
      * @dev Destroys `amount` tokens from the caller's account, reducing the
@@ -11355,10 +10128,7 @@ interface IERC777 {
      *
      * See {operatorSend} and {operatorBurn}.
      */
-    function isOperatorFor(
-        address operator,
-        address tokenHolder
-    ) external view returns (bool);
+    function isOperatorFor(address operator, address tokenHolder) external view returns (bool);
 
     /**
      * @dev Make an account an operator of the caller.
@@ -11438,12 +10208,7 @@ interface IERC777 {
      * - `account` must have at least `amount` tokens.
      * - the caller must be an operator for `account`.
      */
-    function operatorBurn(
-        address account,
-        uint256 amount,
-        bytes calldata data,
-        bytes calldata operatorData
-    ) external;
+    function operatorBurn(address account, uint256 amount, bytes calldata data, bytes calldata operatorData) external;
 
     event Sent(
         address indexed operator,
@@ -11469,19 +10234,11 @@ abstract contract ERC2771Context is Context {
         _trustedForwarder = trustedForwarder;
     }
 
-    function isTrustedForwarder(
-        address forwarder
-    ) public view virtual returns (bool) {
+    function isTrustedForwarder(address forwarder) public view virtual returns (bool) {
         return forwarder == _trustedForwarder;
     }
 
-    function _msgSender()
-        internal
-        view
-        virtual
-        override
-        returns (address sender)
-    {
+    function _msgSender() internal view virtual override returns (address sender) {
         if (isTrustedForwarder(msg.sender)) {
             // The assembly code is more direct than the Solidity version using `abi.decode`.
             /// @solidity memory-safe-assembly
@@ -11493,13 +10250,7 @@ abstract contract ERC2771Context is Context {
         }
     }
 
-    function _msgData()
-        internal
-        view
-        virtual
-        override
-        returns (bytes calldata)
-    {
+    function _msgData() internal view virtual override returns (bytes calldata) {
         if (isTrustedForwarder(msg.sender)) {
             return msg.data[:msg.data.length - 20];
         } else {
@@ -11531,9 +10282,7 @@ contract MinimalForwarder is EIP712 {
     }
 
     bytes32 private constant _TYPEHASH =
-        keccak256(
-            "ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)"
-        );
+        keccak256("ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)");
 
     mapping(address => uint256) private _nonces;
 
@@ -11553,10 +10302,7 @@ contract MinimalForwarder is EIP712 {
         return _nonces[from];
     }
 
-    function verify(
-        ForwardRequest calldata req,
-        bytes calldata signature
-    ) public view returns (bool) {
+    function verify(ForwardRequest calldata req, bytes calldata signature) public view returns (bool) {
         address signer = _recover(req, signature);
         (bool correctFrom, bool correctNonce) = _validateReq(req, signer);
         return correctFrom && correctNonce;
@@ -11578,10 +10324,9 @@ contract MinimalForwarder is EIP712 {
 
         _nonces[req.from] = req.nonce + 1;
 
-        (bool success, bytes memory returndata) = req.to.call{
-            gas: req.gas,
-            value: req.value
-        }(abi.encodePacked(req.data, req.from));
+        (bool success, bytes memory returndata) = req.to.call{gas: req.gas, value: req.value}(
+            abi.encodePacked(req.data, req.from)
+        );
 
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.limo/blog/ethereum-gas-dangers/
@@ -11598,23 +10343,10 @@ contract MinimalForwarder is EIP712 {
         return (success, returndata);
     }
 
-    function _recover(
-        ForwardRequest calldata req,
-        bytes calldata signature
-    ) internal view returns (address) {
+    function _recover(ForwardRequest calldata req, bytes calldata signature) internal view returns (address) {
         return
             _hashTypedDataV4(
-                keccak256(
-                    abi.encode(
-                        _TYPEHASH,
-                        req.from,
-                        req.to,
-                        req.value,
-                        req.gas,
-                        req.nonce,
-                        keccak256(req.data)
-                    )
-                )
+                keccak256(abi.encode(_TYPEHASH, req.from, req.to, req.value, req.gas, req.nonce, keccak256(req.data)))
             ).recover(signature);
     }
 
@@ -11632,33 +10364,19 @@ contract MinimalForwarder is EIP712 {
 contract AddressFnPointerMock {
     error CustomRevert();
 
-    function functionCall(
-        address target,
-        bytes memory data
-    ) external returns (bytes memory) {
+    function functionCall(address target, bytes memory data) external returns (bytes memory) {
         return Address.functionCall(target, data, _customRevert);
     }
 
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) external returns (bytes memory) {
-        return
-            Address.functionCallWithValue(target, data, value, _customRevert);
+    function functionCallWithValue(address target, bytes memory data, uint256 value) external returns (bytes memory) {
+        return Address.functionCallWithValue(target, data, value, _customRevert);
     }
 
-    function functionStaticCall(
-        address target,
-        bytes memory data
-    ) external view returns (bytes memory) {
+    function functionStaticCall(address target, bytes memory data) external view returns (bytes memory) {
         return Address.functionStaticCall(target, data, _customRevert);
     }
 
-    function functionDelegateCall(
-        address target,
-        bytes memory data
-    ) external returns (bytes memory) {
+    function functionDelegateCall(address target, bytes memory data) external returns (bytes memory) {
         return Address.functionDelegateCall(target, data, _customRevert);
     }
 
@@ -11667,26 +10385,14 @@ contract AddressFnPointerMock {
         bool success,
         bytes memory returndata
     ) external view returns (bytes memory) {
-        return
-            Address.verifyCallResultFromTarget(
-                target,
-                success,
-                returndata,
-                _customRevert
-            );
+        return Address.verifyCallResultFromTarget(target, success, returndata, _customRevert);
     }
 
-    function verifyCallResult(
-        bool success,
-        bytes memory returndata
-    ) external view returns (bytes memory) {
+    function verifyCallResult(bool success, bytes memory returndata) external view returns (bytes memory) {
         return Address.verifyCallResult(success, returndata, _customRevert);
     }
 
-    function verifyCallResultVoid(
-        bool success,
-        bytes memory returndata
-    ) external view returns (bytes memory) {
+    function verifyCallResultVoid(bool success, bytes memory returndata) external view returns (bytes memory) {
         return Address.verifyCallResult(success, returndata, _customRevertVoid);
     }
 
@@ -11714,10 +10420,7 @@ library Arrays {
      * `array` is expected to be sorted in ascending order, and to contain no
      * repeated elements.
      */
-    function findUpperBound(
-        uint256[] storage array,
-        uint256 element
-    ) internal view returns (uint256) {
+    function findUpperBound(uint256[] storage array, uint256 element) internal view returns (uint256) {
         if (array.length == 0) {
             return 0;
         }
@@ -11750,10 +10453,7 @@ library Arrays {
      *
      * WARNING: Only use if you are certain `pos` is lower than the array length.
      */
-    function unsafeAccess(
-        address[] storage arr,
-        uint256 pos
-    ) internal pure returns (StorageSlot.AddressSlot storage) {
+    function unsafeAccess(address[] storage arr, uint256 pos) internal pure returns (StorageSlot.AddressSlot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
         // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
@@ -11771,10 +10471,7 @@ library Arrays {
      *
      * WARNING: Only use if you are certain `pos` is lower than the array length.
      */
-    function unsafeAccess(
-        bytes32[] storage arr,
-        uint256 pos
-    ) internal pure returns (StorageSlot.Bytes32Slot storage) {
+    function unsafeAccess(bytes32[] storage arr, uint256 pos) internal pure returns (StorageSlot.Bytes32Slot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
         // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
@@ -11792,10 +10489,7 @@ library Arrays {
      *
      * WARNING: Only use if you are certain `pos` is lower than the array length.
      */
-    function unsafeAccess(
-        uint256[] storage arr,
-        uint256 pos
-    ) internal pure returns (StorageSlot.Uint256Slot storage) {
+    function unsafeAccess(uint256[] storage arr, uint256 pos) internal pure returns (StorageSlot.Uint256Slot storage) {
         bytes32 slot;
         // We use assembly to calculate the storage slot of the element at index `pos` of the dynamic array `arr`
         // following https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#mappings-and-dynamic-arrays.
@@ -11813,10 +10507,7 @@ library Arrays {
      *
      * WARNING: Only use if you are certain `pos` is lower than the array length.
      */
-    function unsafeMemoryAccess(
-        uint256[] memory arr,
-        uint256 pos
-    ) internal pure returns (uint256 res) {
+    function unsafeMemoryAccess(uint256[] memory arr, uint256 pos) internal pure returns (uint256 res) {
         assembly {
             res := mload(add(add(arr, 0x20), mul(pos, 0x20)))
         }
@@ -11827,10 +10518,7 @@ library Arrays {
      *
      * WARNING: Only use if you are certain `pos` is lower than the array length.
      */
-    function unsafeMemoryAccess(
-        address[] memory arr,
-        uint256 pos
-    ) internal pure returns (address res) {
+    function unsafeMemoryAccess(address[] memory arr, uint256 pos) internal pure returns (address res) {
         assembly {
             res := mload(add(add(arr, 0x20), mul(pos, 0x20)))
         }
@@ -11899,10 +10587,7 @@ contract CallReceiverMock {
         emit MockFunctionCalled();
     }
 
-    function mockFunctionWithArgs(
-        uint256 a,
-        uint256 b
-    ) public payable returns (string memory) {
+    function mockFunctionWithArgs(uint256 a, uint256 b) public payable returns (string memory) {
         emit MockFunctionCalledWithArgs(a, b);
 
         return "0x1234";
@@ -11936,10 +10621,7 @@ contract CallReceiverMock {
         }
     }
 
-    function mockFunctionWritesStorage(
-        bytes32 slot,
-        bytes32 value
-    ) public returns (string memory) {
+    function mockFunctionWritesStorage(bytes32 slot, bytes32 value) public returns (string memory) {
         assembly {
             sstore(slot, value)
         }
@@ -12012,14 +10694,8 @@ contract CompTimelock {
     mapping(bytes32 => bool) public queuedTransactions;
 
     constructor(address admin_, uint256 delay_) {
-        require(
-            delay_ >= MINIMUM_DELAY,
-            "Timelock::constructor: Delay must exceed minimum delay."
-        );
-        require(
-            delay_ <= MAXIMUM_DELAY,
-            "Timelock::setDelay: Delay must not exceed maximum delay."
-        );
+        require(delay_ >= MINIMUM_DELAY, "Timelock::constructor: Delay must exceed minimum delay.");
+        require(delay_ <= MAXIMUM_DELAY, "Timelock::setDelay: Delay must not exceed maximum delay.");
 
         admin = admin_;
         delay = delay_;
@@ -12028,28 +10704,16 @@ contract CompTimelock {
     receive() external payable {}
 
     function setDelay(uint256 delay_) public {
-        require(
-            msg.sender == address(this),
-            "Timelock::setDelay: Call must come from Timelock."
-        );
-        require(
-            delay_ >= MINIMUM_DELAY,
-            "Timelock::setDelay: Delay must exceed minimum delay."
-        );
-        require(
-            delay_ <= MAXIMUM_DELAY,
-            "Timelock::setDelay: Delay must not exceed maximum delay."
-        );
+        require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
+        require(delay_ >= MINIMUM_DELAY, "Timelock::setDelay: Delay must exceed minimum delay.");
+        require(delay_ <= MAXIMUM_DELAY, "Timelock::setDelay: Delay must not exceed maximum delay.");
         delay = delay_;
 
         emit NewDelay(delay);
     }
 
     function acceptAdmin() public {
-        require(
-            msg.sender == pendingAdmin,
-            "Timelock::acceptAdmin: Call must come from pendingAdmin."
-        );
+        require(msg.sender == pendingAdmin, "Timelock::acceptAdmin: Call must come from pendingAdmin.");
         admin = msg.sender;
         pendingAdmin = address(0);
 
@@ -12057,10 +10721,7 @@ contract CompTimelock {
     }
 
     function setPendingAdmin(address pendingAdmin_) public {
-        require(
-            msg.sender == address(this),
-            "Timelock::setPendingAdmin: Call must come from Timelock."
-        );
+        require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
         pendingAdmin = pendingAdmin_;
 
         emit NewPendingAdmin(pendingAdmin);
@@ -12073,18 +10734,13 @@ contract CompTimelock {
         bytes memory data,
         uint256 eta
     ) public returns (bytes32) {
-        require(
-            msg.sender == admin,
-            "Timelock::queueTransaction: Call must come from admin."
-        );
+        require(msg.sender == admin, "Timelock::queueTransaction: Call must come from admin.");
         require(
             eta >= getBlockTimestamp() + delay,
             "Timelock::queueTransaction: Estimated execution block must satisfy delay."
         );
 
-        bytes32 txHash = keccak256(
-            abi.encode(target, value, signature, data, eta)
-        );
+        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = true;
 
         emit QueueTransaction(txHash, target, value, signature, data, eta);
@@ -12098,14 +10754,9 @@ contract CompTimelock {
         bytes memory data,
         uint256 eta
     ) public {
-        require(
-            msg.sender == admin,
-            "Timelock::cancelTransaction: Call must come from admin."
-        );
+        require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
 
-        bytes32 txHash = keccak256(
-            abi.encode(target, value, signature, data, eta)
-        );
+        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
 
         emit CancelTransaction(txHash, target, value, signature, data, eta);
@@ -12118,26 +10769,12 @@ contract CompTimelock {
         bytes memory data,
         uint256 eta
     ) public payable returns (bytes memory) {
-        require(
-            msg.sender == admin,
-            "Timelock::executeTransaction: Call must come from admin."
-        );
+        require(msg.sender == admin, "Timelock::executeTransaction: Call must come from admin.");
 
-        bytes32 txHash = keccak256(
-            abi.encode(target, value, signature, data, eta)
-        );
-        require(
-            queuedTransactions[txHash],
-            "Timelock::executeTransaction: Transaction hasn't been queued."
-        );
-        require(
-            getBlockTimestamp() >= eta,
-            "Timelock::executeTransaction: Transaction hasn't surpassed time lock."
-        );
-        require(
-            getBlockTimestamp() <= eta + GRACE_PERIOD,
-            "Timelock::executeTransaction: Transaction is stale."
-        );
+        bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
+        require(queuedTransactions[txHash], "Timelock::executeTransaction: Transaction hasn't been queued.");
+        require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
+        require(getBlockTimestamp() <= eta + GRACE_PERIOD, "Timelock::executeTransaction: Transaction is stale.");
 
         queuedTransactions[txHash] = false;
 
@@ -12146,20 +10783,12 @@ contract CompTimelock {
         if (bytes(signature).length == 0) {
             callData = data;
         } else {
-            callData = abi.encodePacked(
-                bytes4(keccak256(bytes(signature))),
-                data
-            );
+            callData = abi.encodePacked(bytes4(keccak256(bytes(signature))), data);
         }
 
         // solium-disable-next-line security/no-call-value
-        (bool success, bytes memory returnData) = target.call{value: value}(
-            callData
-        );
-        require(
-            success,
-            "Timelock::executeTransaction: Transaction execution reverted."
-        );
+        (bool success, bytes memory returnData) = target.call{value: value}(callData);
+        require(success, "Timelock::executeTransaction: Transaction execution reverted.");
 
         emit ExecuteTransaction(txHash, target, value, signature, data, eta);
 
@@ -12191,11 +10820,7 @@ contract ContextMockCaller {
         context.msgSender();
     }
 
-    function callData(
-        ContextMock context,
-        uint256 integerValue,
-        string memory stringValue
-    ) public {
+    function callData(ContextMock context, uint256 integerValue, string memory stringValue) public {
         context.msgData(integerValue, stringValue);
     }
 }
@@ -12244,11 +10869,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
     /**
      * @dev Indicates a failed `decreaseAllowance` request.
      */
-    error ERC20FailedDecreaseAllowance(
-        address spender,
-        uint256 currentAllowance,
-        uint256 requestedDecrease
-    );
+    error ERC20FailedDecreaseAllowance(address spender, uint256 currentAllowance, uint256 requestedDecrease);
 
     /**
      * @dev Sets the values for {name} and {symbol}.
@@ -12315,10 +10936,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      * - `to` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(
-        address to,
-        uint256 amount
-    ) public virtual returns (bool) {
+    function transfer(address to, uint256 amount) public virtual returns (bool) {
         address owner = _msgSender();
         _transfer(owner, to, amount);
         return true;
@@ -12327,10 +10945,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(
-        address owner,
-        address spender
-    ) public view virtual returns (uint256) {
+    function allowance(address owner, address spender) public view virtual returns (uint256) {
         return _allowances[owner][spender];
     }
 
@@ -12344,10 +10959,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(
-        address spender,
-        uint256 amount
-    ) public virtual returns (bool) {
+    function approve(address spender, uint256 amount) public virtual returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, amount);
         return true;
@@ -12369,11 +10981,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      * - the caller must have allowance for ``from``'s tokens of at least
      * `amount`.
      */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public virtual returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) public virtual returns (bool) {
         address spender = _msgSender();
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
@@ -12392,10 +11000,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(
-        address spender,
-        uint256 addedValue
-    ) public virtual returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, allowance(owner, spender) + addedValue);
         return true;
@@ -12415,18 +11020,11 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      * - `spender` must have allowance for the caller of at least
      * `requestedDecrease`.
      */
-    function decreaseAllowance(
-        address spender,
-        uint256 requestedDecrease
-    ) public virtual returns (bool) {
+    function decreaseAllowance(address spender, uint256 requestedDecrease) public virtual returns (bool) {
         address owner = _msgSender();
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance < requestedDecrease) {
-            revert ERC20FailedDecreaseAllowance(
-                spender,
-                currentAllowance,
-                requestedDecrease
-            );
+            revert ERC20FailedDecreaseAllowance(spender, currentAllowance, requestedDecrease);
         }
         unchecked {
             _approve(owner, spender, currentAllowance - requestedDecrease);
@@ -12461,11 +11059,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      *
      * Emits a {Transfer} event.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {
+    function _update(address from, address to, uint256 amount) internal virtual {
         if (from == address(0)) {
             _totalSupply += amount;
         } else {
@@ -12537,11 +11131,7 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      * - `owner` cannot be the zero address.
      * - `spender` cannot be the zero address.
      */
-    function _approve(
-        address owner,
-        address spender,
-        uint256 amount
-    ) internal virtual {
+    function _approve(address owner, address spender, uint256 amount) internal virtual {
         if (owner == address(0)) {
             revert ERC20InvalidApprover(address(0));
         }
@@ -12560,19 +11150,11 @@ abstract contract ERC20 is Context, IERC20, IERC20Metadata, IERC20Errors {
      *
      * Might emit an {Approval} event.
      */
-    function _spendAllowance(
-        address owner,
-        address spender,
-        uint256 amount
-    ) internal virtual {
+    function _spendAllowance(address owner, address spender, uint256 amount) internal virtual {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
             if (currentAllowance < amount) {
-                revert ERC20InsufficientAllowance(
-                    spender,
-                    currentAllowance,
-                    amount
-                );
+                revert ERC20InsufficientAllowance(spender, currentAllowance, amount);
             }
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
@@ -12629,11 +11211,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     /**
      * @dev Attempted to deposit more assets than the max amount for `receiver`.
      */
-    error ERC4626ExceededMaxDeposit(
-        address receiver,
-        uint256 assets,
-        uint256 max
-    );
+    error ERC4626ExceededMaxDeposit(address receiver, uint256 assets, uint256 max);
 
     /**
      * @dev Attempted to mint more shares than the max amount for `receiver`.
@@ -12643,11 +11221,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     /**
      * @dev Attempted to withdraw more assets than the max amount for `receiver`.
      */
-    error ERC4626ExceededMaxWithdraw(
-        address owner,
-        uint256 assets,
-        uint256 max
-    );
+    error ERC4626ExceededMaxWithdraw(address owner, uint256 assets, uint256 max);
 
     /**
      * @dev Attempted to redeem more shares than the max amount for `receiver`.
@@ -12666,11 +11240,10 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     /**
      * @dev Attempts to fetch the asset decimals. A return value of false indicates that the attempt failed in some way.
      */
-    function _tryGetAssetDecimals(
-        IERC20 asset_
-    ) private view returns (bool, uint8) {
-        (bool success, bytes memory encodedDecimals) = address(asset_)
-            .staticcall(abi.encodeCall(IERC20Metadata.decimals, ()));
+    function _tryGetAssetDecimals(IERC20 asset_) private view returns (bool, uint8) {
+        (bool success, bytes memory encodedDecimals) = address(asset_).staticcall(
+            abi.encodeCall(IERC20Metadata.decimals, ())
+        );
         if (success && encodedDecimals.length >= 32) {
             uint256 returnedDecimals = abi.decode(encodedDecimals, (uint256));
             if (returnedDecimals <= type(uint8).max) {
@@ -12687,13 +11260,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
      *
      * See {IERC20Metadata-decimals}.
      */
-    function decimals()
-        public
-        view
-        virtual
-        override(IERC20Metadata, ERC20)
-        returns (uint8)
-    {
+    function decimals() public view virtual override(IERC20Metadata, ERC20) returns (uint8) {
         return _underlyingDecimals + _decimalsOffset();
     }
 
@@ -12708,16 +11275,12 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-convertToShares}. */
-    function convertToShares(
-        uint256 assets
-    ) public view virtual returns (uint256) {
+    function convertToShares(uint256 assets) public view virtual returns (uint256) {
         return _convertToShares(assets, Math.Rounding.Down);
     }
 
     /** @dev See {IERC4626-convertToAssets}. */
-    function convertToAssets(
-        uint256 shares
-    ) public view virtual returns (uint256) {
+    function convertToAssets(uint256 shares) public view virtual returns (uint256) {
         return _convertToAssets(shares, Math.Rounding.Down);
     }
 
@@ -12742,9 +11305,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-previewDeposit}. */
-    function previewDeposit(
-        uint256 assets
-    ) public view virtual returns (uint256) {
+    function previewDeposit(uint256 assets) public view virtual returns (uint256) {
         return _convertToShares(assets, Math.Rounding.Down);
     }
 
@@ -12754,24 +11315,17 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-previewWithdraw}. */
-    function previewWithdraw(
-        uint256 assets
-    ) public view virtual returns (uint256) {
+    function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
         return _convertToShares(assets, Math.Rounding.Up);
     }
 
     /** @dev See {IERC4626-previewRedeem}. */
-    function previewRedeem(
-        uint256 shares
-    ) public view virtual returns (uint256) {
+    function previewRedeem(uint256 shares) public view virtual returns (uint256) {
         return _convertToAssets(shares, Math.Rounding.Down);
     }
 
     /** @dev See {IERC4626-deposit}. */
-    function deposit(
-        uint256 assets,
-        address receiver
-    ) public virtual returns (uint256) {
+    function deposit(uint256 assets, address receiver) public virtual returns (uint256) {
         uint256 maxAssets = maxDeposit(receiver);
         if (assets > maxAssets) {
             revert ERC4626ExceededMaxDeposit(receiver, assets, maxAssets);
@@ -12788,10 +11342,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
      * As opposed to {deposit}, minting is allowed even if the vault is in a state where the price of a share is zero.
      * In this case, the shares will be minted without requiring any assets to be deposited.
      */
-    function mint(
-        uint256 shares,
-        address receiver
-    ) public virtual returns (uint256) {
+    function mint(uint256 shares, address receiver) public virtual returns (uint256) {
         uint256 maxShares = maxMint(receiver);
         if (shares > maxShares) {
             revert ERC4626ExceededMaxMint(receiver, shares, maxShares);
@@ -12804,11 +11355,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-withdraw}. */
-    function withdraw(
-        uint256 assets,
-        address receiver,
-        address owner
-    ) public virtual returns (uint256) {
+    function withdraw(uint256 assets, address receiver, address owner) public virtual returns (uint256) {
         uint256 maxAssets = maxWithdraw(owner);
         if (assets > maxAssets) {
             revert ERC4626ExceededMaxWithdraw(owner, assets, maxAssets);
@@ -12821,11 +11368,7 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     }
 
     /** @dev See {IERC4626-redeem}. */
-    function redeem(
-        uint256 shares,
-        address receiver,
-        address owner
-    ) public virtual returns (uint256) {
+    function redeem(uint256 shares, address receiver, address owner) public virtual returns (uint256) {
         uint256 maxShares = maxRedeem(owner);
         if (shares > maxShares) {
             revert ERC4626ExceededMaxRedeem(owner, shares, maxShares);
@@ -12840,42 +11383,21 @@ abstract contract ERC4626 is ERC20, IERC4626 {
     /**
      * @dev Internal conversion function (from assets to shares) with support for rounding direction.
      */
-    function _convertToShares(
-        uint256 assets,
-        Math.Rounding rounding
-    ) internal view virtual returns (uint256) {
-        return
-            assets.mulDiv(
-                totalSupply() + 10 ** _decimalsOffset(),
-                totalAssets() + 1,
-                rounding
-            );
+    function _convertToShares(uint256 assets, Math.Rounding rounding) internal view virtual returns (uint256) {
+        return assets.mulDiv(totalSupply() + 10 ** _decimalsOffset(), totalAssets() + 1, rounding);
     }
 
     /**
      * @dev Internal conversion function (from shares to assets) with support for rounding direction.
      */
-    function _convertToAssets(
-        uint256 shares,
-        Math.Rounding rounding
-    ) internal view virtual returns (uint256) {
-        return
-            shares.mulDiv(
-                totalAssets() + 1,
-                totalSupply() + 10 ** _decimalsOffset(),
-                rounding
-            );
+    function _convertToAssets(uint256 shares, Math.Rounding rounding) internal view virtual returns (uint256) {
+        return shares.mulDiv(totalAssets() + 1, totalSupply() + 10 ** _decimalsOffset(), rounding);
     }
 
     /**
      * @dev Deposit/mint common workflow.
      */
-    function _deposit(
-        address caller,
-        address receiver,
-        uint256 assets,
-        uint256 shares
-    ) internal virtual {
+    function _deposit(address caller, address receiver, uint256 assets, uint256 shares) internal virtual {
         // If _asset is ERC777, `transferFrom` can trigger a reentrancy BEFORE the transfer happens through the
         // `tokensToSend` hook. On the other hand, the `tokenReceived` hook, that is triggered after the transfer,
         // calls the vault, which is assumed not malicious.
@@ -12924,44 +11446,31 @@ abstract contract ERC4626Fees is ERC4626 {
     using Math for uint256;
 
     /** @dev See {IERC4626-previewDeposit}. */
-    function previewDeposit(
-        uint256 assets
-    ) public view virtual override returns (uint256) {
+    function previewDeposit(uint256 assets) public view virtual override returns (uint256) {
         uint256 fee = _feeOnTotal(assets, _entryFeeBasePoint());
         return super.previewDeposit(assets - fee);
     }
 
     /** @dev See {IERC4626-previewMint}. */
-    function previewMint(
-        uint256 shares
-    ) public view virtual override returns (uint256) {
+    function previewMint(uint256 shares) public view virtual override returns (uint256) {
         uint256 assets = super.previewMint(shares);
         return assets + _feeOnRaw(assets, _entryFeeBasePoint());
     }
 
     /** @dev See {IERC4626-previewWithdraw}. */
-    function previewWithdraw(
-        uint256 assets
-    ) public view virtual override returns (uint256) {
+    function previewWithdraw(uint256 assets) public view virtual override returns (uint256) {
         uint256 fee = _feeOnRaw(assets, _exitFeeBasePoint());
         return super.previewWithdraw(assets + fee);
     }
 
     /** @dev See {IERC4626-previewRedeem}. */
-    function previewRedeem(
-        uint256 shares
-    ) public view virtual override returns (uint256) {
+    function previewRedeem(uint256 shares) public view virtual override returns (uint256) {
         uint256 assets = super.previewRedeem(shares);
         return assets - _feeOnTotal(assets, _exitFeeBasePoint());
     }
 
     /** @dev See {IERC4626-_deposit}. */
-    function _deposit(
-        address caller,
-        address receiver,
-        uint256 assets,
-        uint256 shares
-    ) internal virtual override {
+    function _deposit(address caller, address receiver, uint256 assets, uint256 shares) internal virtual override {
         uint256 fee = _feeOnTotal(assets, _entryFeeBasePoint());
         address recipient = _entryFeeRecipient();
 
@@ -13006,19 +11515,12 @@ abstract contract ERC4626Fees is ERC4626 {
         return address(0);
     }
 
-    function _feeOnRaw(
-        uint256 assets,
-        uint256 feeBasePoint
-    ) private pure returns (uint256) {
+    function _feeOnRaw(uint256 assets, uint256 feeBasePoint) private pure returns (uint256) {
         return assets.mulDiv(feeBasePoint, 1e5, Math.Rounding.Up);
     }
 
-    function _feeOnTotal(
-        uint256 assets,
-        uint256 feeBasePoint
-    ) private pure returns (uint256) {
-        return
-            assets.mulDiv(feeBasePoint, feeBasePoint + 1e5, Math.Rounding.Up);
+    function _feeOnTotal(uint256 assets, uint256 feeBasePoint) private pure returns (uint256) {
+        return assets.mulDiv(feeBasePoint, feeBasePoint + 1e5, Math.Rounding.Up);
     }
 }
 
@@ -13032,12 +11534,7 @@ contract MyGovernor is
     constructor(
         IVotes _token,
         TimelockController _timelock
-    )
-        Governor("MyGovernor")
-        GovernorVotes(_token)
-        GovernorVotesQuorumFraction(4)
-        GovernorTimelockControl(_timelock)
-    {}
+    ) Governor("MyGovernor") GovernorVotes(_token) GovernorVotesQuorumFraction(4) GovernorTimelockControl(_timelock) {}
 
     function votingDelay() public pure override returns (uint256) {
         return 7200; // 1 day
@@ -13055,12 +11552,7 @@ contract MyGovernor is
 
     function state(
         uint256 proposalId
-    )
-        public
-        view
-        override(Governor, IGovernor, GovernorTimelockControl)
-        returns (ProposalState)
-    {
+    ) public view override(Governor, IGovernor, GovernorTimelockControl) returns (ProposalState) {
         return super.state(proposalId);
     }
 
@@ -13069,11 +11561,7 @@ contract MyGovernor is
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    )
-        public
-        override(Governor, GovernorCompatibilityBravo, IGovernor)
-        returns (uint256)
-    {
+    ) public override(Governor, GovernorCompatibilityBravo, IGovernor) returns (uint256) {
         return super.propose(targets, values, calldatas, description);
     }
 
@@ -13082,11 +11570,7 @@ contract MyGovernor is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    )
-        public
-        override(Governor, GovernorCompatibilityBravo, IGovernor)
-        returns (uint256)
-    {
+    ) public override(Governor, GovernorCompatibilityBravo, IGovernor) returns (uint256) {
         return super.cancel(targets, values, calldatas, descriptionHash);
     }
 
@@ -13109,23 +11593,13 @@ contract MyGovernor is
         return super._cancel(targets, values, calldatas, descriptionHash);
     }
 
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (address)
-    {
+    function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
         return super._executor();
     }
 
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        override(Governor, IERC165, GovernorTimelockControl)
-        returns (bool)
-    {
+    ) public view override(Governor, IERC165, GovernorTimelockControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
@@ -13145,9 +11619,7 @@ contract MyGovernor is
 abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
     // solhint-disable-next-line var-name-mixedcase
     bytes32 private constant _PERMIT_TYPEHASH =
-        keccak256(
-            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-        );
+        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     /**
      * @dev Permit deadline has expired.
@@ -13182,16 +11654,7 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
             revert ERC2612ExpiredSignature(deadline);
         }
 
-        bytes32 structHash = keccak256(
-            abi.encode(
-                _PERMIT_TYPEHASH,
-                owner,
-                spender,
-                value,
-                _useNonce(owner),
-                deadline
-            )
-        );
+        bytes32 structHash = keccak256(abi.encode(_PERMIT_TYPEHASH, owner, spender, value, _useNonce(owner), deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
 
@@ -13206,9 +11669,7 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
     /**
      * @dev See {IERC20Permit-nonces}.
      */
-    function nonces(
-        address owner
-    ) public view virtual override(IERC20Permit, Nonces) returns (uint256) {
+    function nonces(address owner) public view virtual override(IERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 
@@ -13256,11 +11717,7 @@ abstract contract ERC20Votes is ERC20, Votes {
      *
      * Emits a {IVotes-DelegateVotesChanged} event.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override {
+    function _update(address from, address to, uint256 amount) internal virtual override {
         super._update(from, to, amount);
         if (from == address(0)) {
             uint256 supply = totalSupply();
@@ -13275,28 +11732,21 @@ abstract contract ERC20Votes is ERC20, Votes {
     /**
      * @dev Returns the balance of `account`.
      */
-    function _getVotingUnits(
-        address account
-    ) internal view virtual override returns (uint256) {
+    function _getVotingUnits(address account) internal view virtual override returns (uint256) {
         return balanceOf(account);
     }
 
     /**
      * @dev Get number of checkpoints for `account`.
      */
-    function numCheckpoints(
-        address account
-    ) public view virtual returns (uint32) {
+    function numCheckpoints(address account) public view virtual returns (uint32) {
         return _numCheckpoints(account);
     }
 
     /**
      * @dev Get the `pos`-th checkpoint for `account`.
      */
-    function checkpoints(
-        address account,
-        uint32 pos
-    ) public view virtual returns (Checkpoints.Checkpoint224 memory) {
+    function checkpoints(address account, uint32 pos) public view virtual returns (Checkpoints.Checkpoint224 memory) {
         return _checkpoints(account, pos);
     }
 }
@@ -13306,26 +11756,17 @@ contract MyToken is ERC20, ERC20Permit, ERC20Votes {
 
     // The functions below are overrides required by Solidity.
 
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    function _update(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._update(from, to, amount);
     }
 
-    function nonces(
-        address owner
-    ) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }
 
 contract MyTokenTimestampBased is ERC20, ERC20Permit, ERC20Votes {
-    constructor()
-        ERC20("MyTokenTimestampBased", "MTK")
-        ERC20Permit("MyTokenTimestampBased")
-    {}
+    constructor() ERC20("MyTokenTimestampBased", "MTK") ERC20Permit("MyTokenTimestampBased") {}
 
     // Overrides IERC6372 functions to make the token & governor timestamp-based
 
@@ -13340,17 +11781,11 @@ contract MyTokenTimestampBased is ERC20, ERC20Permit, ERC20Votes {
 
     // The functions below are overrides required by Solidity.
 
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    function _update(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._update(from, to, amount);
     }
 
-    function nonces(
-        address owner
-    ) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }
@@ -13385,9 +11820,7 @@ abstract contract ERC20Wrapper is ERC20 {
      * @dev See {ERC20-decimals}.
      */
     function decimals() public view virtual override returns (uint8) {
-        try IERC20Metadata(address(_underlying)).decimals() returns (
-            uint8 value
-        ) {
+        try IERC20Metadata(address(_underlying)).decimals() returns (uint8 value) {
             return value;
         } catch {
             return super.decimals();
@@ -13404,10 +11837,7 @@ abstract contract ERC20Wrapper is ERC20 {
     /**
      * @dev Allow a user to deposit underlying tokens and mint the corresponding number of wrapped tokens.
      */
-    function depositFor(
-        address account,
-        uint256 amount
-    ) public virtual returns (bool) {
+    function depositFor(address account, uint256 amount) public virtual returns (bool) {
         address sender = _msgSender();
         if (sender == address(this)) {
             revert ERC20InvalidSender(address(this));
@@ -13420,10 +11850,7 @@ abstract contract ERC20Wrapper is ERC20 {
     /**
      * @dev Allow a user to burn a number of wrapped tokens and withdraw the corresponding number of underlying tokens.
      */
-    function withdrawTo(
-        address account,
-        uint256 amount
-    ) public virtual returns (bool) {
+    function withdrawTo(address account, uint256 amount) public virtual returns (bool) {
         _burn(_msgSender(), amount);
         SafeERC20.safeTransfer(_underlying, account, amount);
         return true;
@@ -13443,34 +11870,19 @@ abstract contract ERC20Wrapper is ERC20 {
 contract MyTokenWrapped is ERC20, ERC20Permit, ERC20Votes, ERC20Wrapper {
     constructor(
         IERC20 wrappedToken
-    )
-        ERC20("MyTokenWrapped", "MTK")
-        ERC20Permit("MyTokenWrapped")
-        ERC20Wrapper(wrappedToken)
-    {}
+    ) ERC20("MyTokenWrapped", "MTK") ERC20Permit("MyTokenWrapped") ERC20Wrapper(wrappedToken) {}
 
     // The functions below are overrides required by Solidity.
 
-    function decimals()
-        public
-        view
-        override(ERC20, ERC20Wrapper)
-        returns (uint8)
-    {
+    function decimals() public view override(ERC20, ERC20Wrapper) returns (uint8) {
         return super.decimals();
     }
 
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    function _update(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._update(from, to, amount);
     }
 
-    function nonces(
-        address owner
-    ) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }
@@ -13500,11 +11912,7 @@ contract DummyImplementation {
         value = _value;
     }
 
-    function initialize(
-        uint256 _value,
-        string memory _text,
-        uint256[] memory _values
-    ) public {
+    function initialize(uint256 _value, string memory _text, uint256[] memory _values) public {
         value = _value;
         text = _text;
         values = _values;
@@ -13534,20 +11942,9 @@ contract DummyImplementationV2 is DummyImplementation {
 }
 
 abstract contract EIP712Verifier is EIP712 {
-    function verify(
-        bytes memory signature,
-        address signer,
-        address mailTo,
-        string memory mailContents
-    ) external view {
+    function verify(bytes memory signature, address signer, address mailTo, string memory mailContents) external view {
         bytes32 digest = _hashTypedDataV4(
-            keccak256(
-                abi.encode(
-                    keccak256("Mail(address to,string contents)"),
-                    mailTo,
-                    keccak256(bytes(mailContents))
-                )
-            )
+            keccak256(abi.encode(keccak256("Mail(address to,string contents)"), mailTo, keccak256(bytes(mailContents))))
         );
         address recoveredSigner = ECDSA.recover(digest, signature);
         require(recoveredSigner == signer);
@@ -13557,27 +11954,15 @@ abstract contract EIP712Verifier is EIP712 {
 contract ERC1271WalletMock is Ownable, IERC1271 {
     constructor(address originalOwner) Ownable(originalOwner) {}
 
-    function isValidSignature(
-        bytes32 hash,
-        bytes memory signature
-    ) public view returns (bytes4 magicValue) {
-        return
-            ECDSA.recover(hash, signature) == owner()
-                ? this.isValidSignature.selector
-                : bytes4(0);
+    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4 magicValue) {
+        return ECDSA.recover(hash, signature) == owner() ? this.isValidSignature.selector : bytes4(0);
     }
 }
 
 contract ERC1271MaliciousMock is IERC1271 {
-    function isValidSignature(
-        bytes32,
-        bytes memory
-    ) public pure returns (bytes4) {
+    function isValidSignature(bytes32, bytes memory) public pure returns (bytes4) {
         assembly {
-            mstore(
-                0,
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-            )
+            mstore(0, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
             return(0, 32)
         }
     }
@@ -13615,9 +12000,7 @@ contract SupportsInterfaceWithLookupMock is IERC165 {
     /**
      * @dev Implement supportsInterface(bytes4) using a lookup table.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
         return _supportedInterfaces[interfaceId];
     }
 
@@ -13625,10 +12008,7 @@ contract SupportsInterfaceWithLookupMock is IERC165 {
      * @dev Private method for registering an interface.
      */
     function _registerInterface(bytes4 interfaceId) internal {
-        require(
-            interfaceId != 0xffffffff,
-            "ERC165InterfacesSupported: invalid interface id"
-        );
+        require(interfaceId != 0xffffffff, "ERC165InterfacesSupported: invalid interface id");
         _supportedInterfaces[interfaceId] = true;
     }
 }
@@ -13644,10 +12024,7 @@ contract ERC165InterfacesSupported is SupportsInterfaceWithLookupMock {
 contract ERC165MaliciousData {
     function supportsInterface(bytes4) public pure returns (bool) {
         assembly {
-            mstore(
-                0,
-                0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-            )
+            mstore(0, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
             return(0, 32)
         }
     }
@@ -13660,9 +12037,7 @@ contract ERC165MissingData {
 contract ERC165NotSupported {}
 
 contract ERC165ReturnBombMock is IERC165 {
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public pure override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
         if (interfaceId == type(IERC165).interfaceId) {
             assembly {
                 mstore(0, 1)
@@ -13681,21 +12056,11 @@ contract ERC2771ContextMock is ContextMock, ERC2771Context {
         emit Sender(_msgSender()); // _msgSender() should be accessible during construction
     }
 
-    function _msgSender()
-        internal
-        view
-        override(Context, ERC2771Context)
-        returns (address)
-    {
+    function _msgSender() internal view override(Context, ERC2771Context) returns (address) {
         return ERC2771Context._msgSender();
     }
 
-    function _msgData()
-        internal
-        view
-        override(Context, ERC2771Context)
-        returns (bytes calldata)
-    {
+    function _msgData() internal view override(Context, ERC2771Context) returns (bytes calldata) {
         return ERC2771Context._msgData();
     }
 }
@@ -13708,8 +12073,7 @@ contract ERC2771ContextMock is ContextMock, ERC2771Context {
  * live networks.
  */
 contract ERC3156FlashBorrowerMock is IERC3156FlashBorrower {
-    bytes32 internal constant _RETURN_VALUE =
-        keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 internal constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
 
     bool immutable _enableApprove;
     bool immutable _enableReturn;
@@ -13731,11 +12095,7 @@ contract ERC3156FlashBorrowerMock is IERC3156FlashBorrower {
     ) public returns (bytes32) {
         require(msg.sender == token);
 
-        emit BalanceOf(
-            token,
-            address(this),
-            IERC20(token).balanceOf(address(this))
-        );
+        emit BalanceOf(token, address(this), IERC20(token).balanceOf(address(this)));
         emit TotalSupply(token, IERC20(token).totalSupply());
 
         if (data.length > 0) {
@@ -13777,43 +12137,23 @@ abstract contract GovernorCompatibilityBravoMock is
 
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        override(IERC165, Governor, GovernorTimelockCompound)
-        returns (bool)
-    {
+    ) public view override(IERC165, Governor, GovernorTimelockCompound) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
     function state(
         uint256 proposalId
-    )
-        public
-        view
-        override(IGovernor, Governor, GovernorTimelockCompound)
-        returns (ProposalState)
-    {
+    ) public view override(IGovernor, Governor, GovernorTimelockCompound) returns (ProposalState) {
         return super.state(proposalId);
     }
 
     function proposalEta(
         uint256 proposalId
-    )
-        public
-        view
-        override(IGovernorTimelock, GovernorTimelockCompound)
-        returns (uint256)
-    {
+    ) public view override(IGovernorTimelock, GovernorTimelockCompound) returns (uint256) {
         return super.proposalEta(proposalId);
     }
 
-    function proposalThreshold()
-        public
-        view
-        override(Governor, GovernorSettings)
-        returns (uint256)
-    {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 
@@ -13822,11 +12162,7 @@ abstract contract GovernorCompatibilityBravoMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    )
-        public
-        override(IGovernor, Governor, GovernorCompatibilityBravo)
-        returns (uint256)
-    {
+    ) public override(IGovernor, Governor, GovernorCompatibilityBravo) returns (uint256) {
         return super.propose(targets, values, calldatas, description);
     }
 
@@ -13835,11 +12171,7 @@ abstract contract GovernorCompatibilityBravoMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 salt
-    )
-        public
-        override(IGovernorTimelock, GovernorTimelockCompound)
-        returns (uint256)
-    {
+    ) public override(IGovernorTimelock, GovernorTimelockCompound) returns (uint256) {
         return super.queue(targets, values, calldatas, salt);
     }
 
@@ -13857,11 +12189,7 @@ abstract contract GovernorCompatibilityBravoMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    )
-        public
-        override(Governor, GovernorCompatibilityBravo, IGovernor)
-        returns (uint256)
-    {
+    ) public override(Governor, GovernorCompatibilityBravo, IGovernor) returns (uint256) {
         return super.cancel(targets, values, calldatas, descriptionHash);
     }
 
@@ -13880,35 +12208,17 @@ abstract contract GovernorCompatibilityBravoMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 salt
-    )
-        internal
-        override(Governor, GovernorTimelockCompound)
-        returns (uint256 proposalId)
-    {
+    ) internal override(Governor, GovernorTimelockCompound) returns (uint256 proposalId) {
         return super._cancel(targets, values, calldatas, salt);
     }
 
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockCompound)
-        returns (address)
-    {
+    function _executor() internal view override(Governor, GovernorTimelockCompound) returns (address) {
         return super._executor();
     }
 }
 
-abstract contract GovernorMock is
-    GovernorSettings,
-    GovernorVotesQuorumFraction,
-    GovernorCountingSimple
-{
-    function proposalThreshold()
-        public
-        view
-        override(Governor, GovernorSettings)
-        returns (uint256)
-    {
+abstract contract GovernorMock is GovernorSettings, GovernorVotesQuorumFraction, GovernorCountingSimple {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 }
@@ -13931,21 +12241,11 @@ abstract contract GovernorPreventLateQuorumMock is
 
     function proposalDeadline(
         uint256 proposalId
-    )
-        public
-        view
-        override(Governor, GovernorPreventLateQuorum)
-        returns (uint256)
-    {
+    ) public view override(Governor, GovernorPreventLateQuorum) returns (uint256) {
         return super.proposalDeadline(proposalId);
     }
 
-    function proposalThreshold()
-        public
-        view
-        override(Governor, GovernorSettings)
-        returns (uint256)
-    {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 
@@ -13974,32 +12274,17 @@ abstract contract GovernorTimelockCompoundMock is
 
     function quorum(
         uint256 blockNumber
-    )
-        public
-        view
-        override(IGovernor, GovernorVotesQuorumFraction)
-        returns (uint256)
-    {
+    ) public view override(IGovernor, GovernorVotesQuorumFraction) returns (uint256) {
         return super.quorum(blockNumber);
     }
 
     function state(
         uint256 proposalId
-    )
-        public
-        view
-        override(Governor, GovernorTimelockCompound)
-        returns (ProposalState)
-    {
+    ) public view override(Governor, GovernorTimelockCompound) returns (ProposalState) {
         return super.state(proposalId);
     }
 
-    function proposalThreshold()
-        public
-        view
-        override(Governor, GovernorSettings)
-        returns (uint256)
-    {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 
@@ -14018,20 +12303,11 @@ abstract contract GovernorTimelockCompoundMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 salt
-    )
-        internal
-        override(Governor, GovernorTimelockCompound)
-        returns (uint256 proposalId)
-    {
+    ) internal override(Governor, GovernorTimelockCompound) returns (uint256 proposalId) {
         return super._cancel(targets, values, calldatas, salt);
     }
 
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockCompound)
-        returns (address)
-    {
+    function _executor() internal view override(Governor, GovernorTimelockCompound) returns (address) {
         return super._executor();
     }
 }
@@ -14050,32 +12326,15 @@ abstract contract GovernorTimelockControlMock is
 
     function quorum(
         uint256 blockNumber
-    )
-        public
-        view
-        override(IGovernor, GovernorVotesQuorumFraction)
-        returns (uint256)
-    {
+    ) public view override(IGovernor, GovernorVotesQuorumFraction) returns (uint256) {
         return super.quorum(blockNumber);
     }
 
-    function state(
-        uint256 proposalId
-    )
-        public
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (ProposalState)
-    {
+    function state(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (ProposalState) {
         return super.state(proposalId);
     }
 
-    function proposalThreshold()
-        public
-        view
-        override(Governor, GovernorSettings)
-        returns (uint256)
-    {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 
@@ -14094,20 +12353,11 @@ abstract contract GovernorTimelockControlMock is
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
-    )
-        internal
-        override(Governor, GovernorTimelockControl)
-        returns (uint256 proposalId)
-    {
+    ) internal override(Governor, GovernorTimelockControl) returns (uint256 proposalId) {
         return super._cancel(targets, values, calldatas, descriptionHash);
     }
 
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (address)
-    {
+    function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
         return super._executor();
     }
 
@@ -14128,10 +12378,7 @@ abstract contract GovernorVoteMocks is GovernorVotes, GovernorCountingSimple {
     }
 }
 
-abstract contract GovernorWithParamsMock is
-    GovernorVotes,
-    GovernorCountingSimple
-{
+abstract contract GovernorWithParamsMock is GovernorVotes, GovernorCountingSimple {
     event CountParams(uint256 uintParam, string strParam);
 
     function quorum(uint256) public pure override returns (uint256) {
@@ -14168,10 +12415,7 @@ abstract contract GovernorWithParamsMock is
         bytes memory params
     ) internal override(Governor, GovernorCountingSimple) {
         if (params.length > 0) {
-            (uint256 _uintParam, string memory _strParam) = abi.decode(
-                params,
-                (uint256, string)
-            );
+            (uint256 _uintParam, string memory _strParam) = abi.decode(params, (uint256, string));
             emit CountParams(_uintParam, _strParam);
         }
         return super._countVote(proposalId, account, support, weight, params);
@@ -14268,10 +12512,7 @@ abstract contract Initializable {
      */
     modifier initializer() {
         bool isTopLevelCall = !_initializing;
-        if (
-            !(isTopLevelCall && _initialized < 1) &&
-            !(address(this).code.length == 0 && _initialized == 1)
-        ) {
+        if (!(isTopLevelCall && _initialized < 1) && !(address(this).code.length == 0 && _initialized == 1)) {
             revert AlreadyInitialized();
         }
         _initialized = 1;
@@ -14495,9 +12736,7 @@ abstract contract Multicall {
      * @dev Receives and executes a batch of function calls on this contract.
      * @custom:oz-upgrades-unsafe-allow-reachable delegatecall
      */
-    function multicall(
-        bytes[] calldata data
-    ) external virtual returns (bytes[] memory results) {
+    function multicall(bytes[] calldata data) external virtual returns (bytes[] memory results) {
         results = new bytes[](data.length);
         for (uint256 i = 0; i < data.length; i++) {
             results[i] = Address.functionDelegateCall(address(this), data[i]);
@@ -14516,10 +12755,7 @@ contract MulticallTest {
     ) external {
         bytes[] memory calls = new bytes[](recipients.length);
         for (uint256 i = 0; i < recipients.length; i++) {
-            calls[i] = abi.encodeCall(
-                multicallToken.transfer,
-                (recipients[i], amounts[i])
-            );
+            calls[i] = abi.encodeCall(multicallToken.transfer, (recipients[i], amounts[i]));
         }
 
         bytes[] memory results = multicallToken.multicall(calls);
@@ -14578,9 +12814,7 @@ contract SampleMother is Initializable, SampleHuman {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleMother_init_unchained(
-        uint256 value
-    ) internal onlyInitializing {
+    function __SampleMother_init_unchained(uint256 value) internal onlyInitializing {
         mother = value;
     }
 }
@@ -14596,17 +12830,13 @@ contract SampleGramps is Initializable, SampleHuman {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleGramps_init(
-        string memory value
-    ) internal onlyInitializing {
+    function __SampleGramps_init(string memory value) internal onlyInitializing {
         __SampleHuman_init();
         __SampleGramps_init_unchained(value);
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleGramps_init_unchained(
-        string memory value
-    ) internal onlyInitializing {
+    function __SampleGramps_init_unchained(string memory value) internal onlyInitializing {
         gramps = value;
     }
 }
@@ -14617,26 +12847,18 @@ contract SampleGramps is Initializable, SampleHuman {
 contract SampleFather is Initializable, SampleGramps {
     uint256 public father;
 
-    function initialize(
-        string memory _gramps,
-        uint256 _father
-    ) public initializer {
+    function initialize(string memory _gramps, uint256 _father) public initializer {
         __SampleFather_init(_gramps, _father);
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleFather_init(
-        string memory _gramps,
-        uint256 _father
-    ) internal onlyInitializing {
+    function __SampleFather_init(string memory _gramps, uint256 _father) internal onlyInitializing {
         __SampleGramps_init(_gramps);
         __SampleFather_init_unchained(_father);
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleFather_init_unchained(
-        uint256 _father
-    ) internal onlyInitializing {
+    function __SampleFather_init_unchained(uint256 _father) internal onlyInitializing {
         father = _father;
     }
 }
@@ -14647,12 +12869,7 @@ contract SampleFather is Initializable, SampleGramps {
 contract SampleChild is Initializable, SampleMother, SampleFather {
     uint256 public child;
 
-    function initialize(
-        uint256 _mother,
-        string memory _gramps,
-        uint256 _father,
-        uint256 _child
-    ) public initializer {
+    function initialize(uint256 _mother, string memory _gramps, uint256 _father, uint256 _child) public initializer {
         __SampleChild_init(_mother, _gramps, _father, _child);
     }
 
@@ -14669,9 +12886,7 @@ contract SampleChild is Initializable, SampleMother, SampleFather {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function __SampleChild_init_unchained(
-        uint256 _child
-    ) internal onlyInitializing {
+    function __SampleChild_init_unchained(uint256 _child) internal onlyInitializing {
         child = _child;
     }
 }
@@ -14889,8 +13104,7 @@ library ERC1967Utils {
      * validated in the constructor.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant IMPLEMENTATION_SLOT =
-        0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+    bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
     /**
      * @dev The `implementation` of the proxy is invalid.
@@ -14921,9 +13135,7 @@ library ERC1967Utils {
         if (newImplementation.code.length == 0) {
             revert ERC1967InvalidImplementation(newImplementation);
         }
-        StorageSlot
-            .getAddressSlot(IMPLEMENTATION_SLOT)
-            .value = newImplementation;
+        StorageSlot.getAddressSlot(IMPLEMENTATION_SLOT).value = newImplementation;
     }
 
     /**
@@ -14941,11 +13153,7 @@ library ERC1967Utils {
      *
      * Emits an {IERC1967-Upgraded} event.
      */
-    function upgradeToAndCall(
-        address newImplementation,
-        bytes memory data,
-        bool forceCall
-    ) internal {
+    function upgradeToAndCall(address newImplementation, bytes memory data, bool forceCall) internal {
         upgradeTo(newImplementation);
         if (data.length > 0 || forceCall) {
             Address.functionDelegateCall(newImplementation, data);
@@ -14958,8 +13166,7 @@ library ERC1967Utils {
      * validated in the constructor.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant ADMIN_SLOT =
-        0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+    bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
     /**
      * @dev Returns the current admin.
@@ -14997,8 +13204,7 @@ library ERC1967Utils {
      * This is bytes32(uint256(keccak256('eip1967.proxy.beacon')) - 1) and is validated in the constructor.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant BEACON_SLOT =
-        0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50;
+    bytes32 internal constant BEACON_SLOT = 0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50;
 
     /**
      * @dev Returns the current beacon.
@@ -15029,18 +13235,11 @@ library ERC1967Utils {
      *
      * Emits an {IERC1967-BeaconUpgraded} event.
      */
-    function upgradeBeaconToAndCall(
-        address newBeacon,
-        bytes memory data,
-        bool forceCall
-    ) internal {
+    function upgradeBeaconToAndCall(address newBeacon, bytes memory data, bool forceCall) internal {
         _setBeacon(newBeacon);
         emit BeaconUpgraded(newBeacon);
         if (data.length > 0 || forceCall) {
-            Address.functionDelegateCall(
-                IBeacon(newBeacon).implementation(),
-                data
-            );
+            Address.functionDelegateCall(IBeacon(newBeacon).implementation(), data);
         }
     }
 }
@@ -15108,13 +13307,7 @@ abstract contract UUPSUpgradeable is IERC1822Proxiable {
      * bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this
      * function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier.
      */
-    function proxiableUUID()
-        external
-        view
-        virtual
-        notDelegated
-        returns (bytes32)
-    {
+    function proxiableUUID() external view virtual notDelegated returns (bytes32) {
         return ERC1967Utils.IMPLEMENTATION_SLOT;
     }
 
@@ -15142,10 +13335,7 @@ abstract contract UUPSUpgradeable is IERC1822Proxiable {
      *
      * @custom:oz-upgrades-unsafe-allow-reachable delegatecall
      */
-    function upgradeToAndCall(
-        address newImplementation,
-        bytes memory data
-    ) public payable virtual onlyProxy {
+    function upgradeToAndCall(address newImplementation, bytes memory data) public payable virtual onlyProxy {
         _authorizeUpgrade(newImplementation);
         _upgradeToAndCallUUPS(newImplementation, data, true);
     }
@@ -15167,14 +13357,8 @@ abstract contract UUPSUpgradeable is IERC1822Proxiable {
      *
      * Emits an {IERC1967-Upgraded} event.
      */
-    function _upgradeToAndCallUUPS(
-        address newImplementation,
-        bytes memory data,
-        bool forceCall
-    ) private {
-        try IERC1822Proxiable(newImplementation).proxiableUUID() returns (
-            bytes32 slot
-        ) {
+    function _upgradeToAndCallUUPS(address newImplementation, bytes memory data, bool forceCall) private {
+        try IERC1822Proxiable(newImplementation).proxiableUUID() returns (bytes32 slot) {
             if (slot != ERC1967Utils.IMPLEMENTATION_SLOT) {
                 revert UUPSUnsupportedProxiableUUID(slot);
             }
@@ -15208,10 +13392,7 @@ contract UUPSUpgradeableUnsafeMock is UUPSUpgradeableMock {
         ERC1967Utils.upgradeToAndCall(newImplementation, bytes(""), false);
     }
 
-    function upgradeToAndCall(
-        address newImplementation,
-        bytes memory data
-    ) public payable override {
+    function upgradeToAndCall(address newImplementation, bytes memory data) public payable override {
         ERC1967Utils.upgradeToAndCall(newImplementation, data, false);
     }
 }
@@ -15332,9 +13513,7 @@ contract ReentrancyMock is ReentrancyGuard {
     function countThisRecursive(uint256 n) public nonReentrant {
         if (n > 0) {
             _count();
-            (bool success, ) = address(this).call(
-                abi.encodeCall(this.countThisRecursive, (n - 1))
-            );
+            (bool success, ) = address(this).call(abi.encodeCall(this.countThisRecursive, (n - 1)));
             require(success, "ReentrancyMock: failed call");
         }
     }
@@ -15564,31 +13743,12 @@ contract ERC1155ReceiverMock is ERC165, IERC1155Receiver {
     bytes4 private _batRetval;
     RevertType private _batReverts;
 
-    event Received(
-        address operator,
-        address from,
-        uint256 id,
-        uint256 value,
-        bytes data,
-        uint256 gas
-    );
-    event BatchReceived(
-        address operator,
-        address from,
-        uint256[] ids,
-        uint256[] values,
-        bytes data,
-        uint256 gas
-    );
+    event Received(address operator, address from, uint256 id, uint256 value, bytes data, uint256 gas);
+    event BatchReceived(address operator, address from, uint256[] ids, uint256[] values, bytes data, uint256 gas);
 
     error ERC1155ReceiverMockError();
 
-    constructor(
-        bytes4 recRetval,
-        RevertType recReverts,
-        bytes4 batRetval,
-        RevertType batReverts
-    ) {
+    constructor(bytes4 recRetval, RevertType recReverts, bytes4 batRetval, RevertType batReverts) {
         _recRetval = recRetval;
         _recReverts = recReverts;
         _batRetval = batRetval;
@@ -15664,8 +13824,7 @@ contract ERC20ExcessDecimalsMock {
  * _Available since v4.1._
  */
 abstract contract ERC20FlashMint is ERC20, IERC3156FlashLender {
-    bytes32 private constant _RETURN_VALUE =
-        keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 private constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
 
     /**
      * @dev The loan token is not valid.
@@ -15699,10 +13858,7 @@ abstract contract ERC20FlashMint is ERC20, IERC3156FlashLender {
      * @param amount The amount of tokens to be loaned.
      * @return The fees applied to the corresponding flash loan.
      */
-    function flashFee(
-        address token,
-        uint256 amount
-    ) public view virtual returns (uint256) {
+    function flashFee(address token, uint256 amount) public view virtual returns (uint256) {
         if (token != address(this)) {
             revert ERC3156UnsupportedToken(token);
         }
@@ -15717,10 +13873,7 @@ abstract contract ERC20FlashMint is ERC20, IERC3156FlashLender {
      * @param amount The amount of tokens to be loaned.
      * @return The fees applied to the corresponding flash loan.
      */
-    function _flashFee(
-        address token,
-        uint256 amount
-    ) internal view virtual returns (uint256) {
+    function _flashFee(address token, uint256 amount) internal view virtual returns (uint256) {
         // silence warning about unused variable without the addition of bytecode.
         token;
         amount;
@@ -15766,10 +13919,7 @@ abstract contract ERC20FlashMint is ERC20, IERC3156FlashLender {
         }
         uint256 fee = flashFee(token, amount);
         _mint(address(receiver), amount);
-        if (
-            receiver.onFlashLoan(msg.sender, token, amount, fee, data) !=
-            _RETURN_VALUE
-        ) {
+        if (receiver.onFlashLoan(msg.sender, token, amount, fee, data) != _RETURN_VALUE) {
             revert ERC3156InvalidReceiver(address(receiver));
         }
         address flashFeeReceiver = _flashFeeReceiver();
@@ -15792,10 +13942,7 @@ abstract contract ERC20FlashMintMock is ERC20FlashMint {
         _flashFeeAmount = amount;
     }
 
-    function _flashFee(
-        address,
-        uint256
-    ) internal view override returns (uint256) {
+    function _flashFee(address, uint256) internal view override returns (uint256) {
         return _flashFeeAmount;
     }
 
@@ -15810,14 +13957,8 @@ abstract contract ERC20FlashMintMock is ERC20FlashMint {
 
 // contract that replicate USDT (0xdac17f958d2ee523a2206206994597c13d831ec7) approval beavior
 abstract contract ERC20ForceApproveMock is ERC20 {
-    function approve(
-        address spender,
-        uint256 amount
-    ) public virtual override returns (bool) {
-        require(
-            amount == 0 || allowance(msg.sender, spender) == 0,
-            "USDT approval failure"
-        );
+    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+        require(amount == 0 || allowance(msg.sender, spender) == 0, "USDT approval failure");
         return super.approve(spender, amount);
     }
 }
@@ -15835,31 +13976,21 @@ contract ERC20Mock is ERC20 {
 }
 
 abstract contract ERC20NoReturnMock is ERC20 {
-    function transfer(
-        address to,
-        uint256 amount
-    ) public override returns (bool) {
+    function transfer(address to, uint256 amount) public override returns (bool) {
         super.transfer(to, amount);
         assembly {
             return(0, 0)
         }
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public override returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
         super.transferFrom(from, to, amount);
         assembly {
             return(0, 0)
         }
     }
 
-    function approve(
-        address spender,
-        uint256 amount
-    ) public override returns (bool) {
+    function approve(address spender, uint256 amount) public override returns (bool) {
         super.approve(spender, amount);
         assembly {
             return(0, 0)
@@ -15908,28 +14039,17 @@ contract ERC20Reentrant is ERC20("TEST", "TST") {
     address private _reenterTarget;
     bytes private _reenterData;
 
-    function scheduleReenter(
-        Type when,
-        address target,
-        bytes calldata data
-    ) external {
+    function scheduleReenter(Type when, address target, bytes calldata data) external {
         _reenterType = when;
         _reenterTarget = target;
         _reenterData = data;
     }
 
-    function functionCall(
-        address target,
-        bytes memory data
-    ) public returns (bytes memory) {
+    function functionCall(address target, bytes memory data) public returns (bytes memory) {
         return Address.functionCall(target, data);
     }
 
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override {
+    function _update(address from, address to, uint256 amount) internal override {
         if (_reenterType == Type.Before) {
             _reenterType = Type.No;
             functionCall(_reenterTarget, _reenterData);
@@ -15947,11 +14067,7 @@ abstract contract ERC20ReturnFalseMock is ERC20 {
         return false;
     }
 
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) public pure override returns (bool) {
+    function transferFrom(address, address, uint256) public pure override returns (bool) {
         return false;
     }
 
@@ -15979,19 +14095,14 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     /**
      * @dev Get the `pos`-th checkpoint for `account`.
      */
-    function checkpoints(
-        address account,
-        uint32 pos
-    ) public view virtual returns (Checkpoint memory) {
+    function checkpoints(address account, uint32 pos) public view virtual returns (Checkpoint memory) {
         return _checkpoints[account][pos];
     }
 
     /**
      * @dev Get number of checkpoints for `account`.
      */
-    function numCheckpoints(
-        address account
-    ) public view virtual returns (uint32) {
+    function numCheckpoints(address account) public view virtual returns (uint32) {
         return SafeCast.toUint32(_checkpoints[account].length);
     }
 
@@ -16019,10 +14130,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
      *
      * - `blockNumber` must have been already mined
      */
-    function getPastVotes(
-        address account,
-        uint256 blockNumber
-    ) public view virtual returns (uint256) {
+    function getPastVotes(address account, uint256 blockNumber) public view virtual returns (uint256) {
         require(blockNumber < block.number, "ERC20Votes: block not yet mined");
         return _checkpointsLookup(_checkpoints[account], blockNumber);
     }
@@ -16035,9 +14143,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
      *
      * - `blockNumber` must have been already mined
      */
-    function getPastTotalSupply(
-        uint256 blockNumber
-    ) public view virtual returns (uint256) {
+    function getPastTotalSupply(uint256 blockNumber) public view virtual returns (uint256) {
         require(blockNumber < block.number, "ERC20Votes: block not yet mined");
         return _checkpointsLookup(_totalSupplyCheckpoints, blockNumber);
     }
@@ -16045,10 +14151,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     /**
      * @dev Lookup a value in a list of (sorted) checkpoints.
      */
-    function _checkpointsLookup(
-        Checkpoint[] storage ckpts,
-        uint256 blockNumber
-    ) private view returns (uint256) {
+    function _checkpointsLookup(Checkpoint[] storage ckpts, uint256 blockNumber) private view returns (uint256) {
         // We run a binary search to look for the earliest checkpoint taken after `blockNumber`.
         //
         // Initially we check if the block is recent to narrow the search range.
@@ -16109,11 +14212,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     ) public virtual {
         require(block.timestamp <= expiry, "ERC20Votes: signature expired");
         address signer = ECDSA.recover(
-            _hashTypedDataV4(
-                keccak256(
-                    abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry)
-                )
-            ),
+            _hashTypedDataV4(keccak256(abi.encode(_DELEGATION_TYPEHASH, delegatee, nonce, expiry))),
             v,
             r,
             s
@@ -16134,18 +14233,11 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
      *
      * Emits a {IVotes-DelegateVotesChanged} event.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override {
+    function _update(address from, address to, uint256 amount) internal virtual override {
         super._update(from, to, amount);
 
         if (from == address(0)) {
-            require(
-                totalSupply() <= _maxSupply(),
-                "ERC20Votes: total supply risks overflowing votes"
-            );
+            require(totalSupply() <= _maxSupply(), "ERC20Votes: total supply risks overflowing votes");
             _writeCheckpoint(_totalSupplyCheckpoints, _add, amount);
         }
 
@@ -16171,27 +14263,15 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
         _moveVotingPower(currentDelegate, delegatee, delegatorBalance);
     }
 
-    function _moveVotingPower(
-        address src,
-        address dst,
-        uint256 amount
-    ) private {
+    function _moveVotingPower(address src, address dst, uint256 amount) private {
         if (src != dst && amount > 0) {
             if (src != address(0)) {
-                (uint256 oldWeight, uint256 newWeight) = _writeCheckpoint(
-                    _checkpoints[src],
-                    _subtract,
-                    amount
-                );
+                (uint256 oldWeight, uint256 newWeight) = _writeCheckpoint(_checkpoints[src], _subtract, amount);
                 emit DelegateVotesChanged(src, oldWeight, newWeight);
             }
 
             if (dst != address(0)) {
-                (uint256 oldWeight, uint256 newWeight) = _writeCheckpoint(
-                    _checkpoints[dst],
-                    _add,
-                    amount
-                );
+                (uint256 oldWeight, uint256 newWeight) = _writeCheckpoint(_checkpoints[dst], _add, amount);
                 emit DelegateVotesChanged(dst, oldWeight, newWeight);
             }
         }
@@ -16205,23 +14285,16 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
         uint256 pos = ckpts.length;
 
         unchecked {
-            Checkpoint memory oldCkpt = pos == 0
-                ? Checkpoint(0, 0)
-                : _unsafeAccess(ckpts, pos - 1);
+            Checkpoint memory oldCkpt = pos == 0 ? Checkpoint(0, 0) : _unsafeAccess(ckpts, pos - 1);
 
             oldWeight = oldCkpt.votes;
             newWeight = op(oldWeight, delta);
 
             if (pos > 0 && oldCkpt.fromBlock == block.number) {
-                _unsafeAccess(ckpts, pos - 1).votes = SafeCast.toUint224(
-                    newWeight
-                );
+                _unsafeAccess(ckpts, pos - 1).votes = SafeCast.toUint224(newWeight);
             } else {
                 ckpts.push(
-                    Checkpoint({
-                        fromBlock: SafeCast.toUint32(block.number),
-                        votes: SafeCast.toUint224(newWeight)
-                    })
+                    Checkpoint({fromBlock: SafeCast.toUint32(block.number), votes: SafeCast.toUint224(newWeight)})
                 );
             }
         }
@@ -16238,10 +14311,7 @@ abstract contract ERC20VotesLegacyMock is IVotes, ERC20Permit {
     /**
      * @dev Access an element of the array without performing bounds check. The position is assumed to be within bounds.
      */
-    function _unsafeAccess(
-        Checkpoint[] storage ckpts,
-        uint256 pos
-    ) private pure returns (Checkpoint storage result) {
+    function _unsafeAccess(Checkpoint[] storage ckpts, uint256 pos) private pure returns (Checkpoint storage result) {
         assembly {
             mstore(0, ckpts.slot)
             result.slot := add(keccak256(0, 0x20), pos)
@@ -16268,9 +14338,7 @@ abstract contract ERC4626LimitsMock is ERC4626 {
 }
 
 contract ERC4626Mock is ERC4626 {
-    constructor(
-        address underlying
-    ) ERC20("ERC4626Mock", "E4626M") ERC4626(IERC20(underlying)) {}
+    constructor(address underlying) ERC20("ERC4626Mock", "E4626M") ERC4626(IERC20(underlying)) {}
 
     function mint(address account, uint256 amount) external {
         _mint(account, amount);
@@ -16311,43 +14379,19 @@ abstract contract ERC4626FeesMock is ERC4626Fees {
         _exitFeeRecipientValue = exitFeeRecipient;
     }
 
-    function _entryFeeBasePoint()
-        internal
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function _entryFeeBasePoint() internal view virtual override returns (uint256) {
         return _entryFeeBasePointValue;
     }
 
-    function _entryFeeRecipient()
-        internal
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function _entryFeeRecipient() internal view virtual override returns (address) {
         return _entryFeeRecipientValue;
     }
 
-    function _exitFeeBasePoint()
-        internal
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function _exitFeeBasePoint() internal view virtual override returns (uint256) {
         return _exitFeeBasePointValue;
     }
 
-    function _exitFeeRecipient()
-        internal
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function _exitFeeRecipient() internal view virtual override returns (address) {
         return _exitFeeRecipientValue;
     }
 }
@@ -16361,13 +14405,7 @@ abstract contract ERC4626FeesMock is ERC4626Fees {
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
  * {ERC721Enumerable}.
  */
-abstract contract ERC721 is
-    Context,
-    ERC165,
-    IERC721,
-    IERC721Metadata,
-    IERC721Errors
-{
+abstract contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Errors {
     using Strings for uint256;
 
     // Token name
@@ -16399,9 +14437,7 @@ abstract contract ERC721 is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
@@ -16446,16 +14482,11 @@ abstract contract ERC721 is
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
         _requireMinted(tokenId);
 
         string memory baseURI = _baseURI();
-        return
-            bytes(baseURI).length > 0
-                ? string.concat(baseURI, tokenId.toString())
-                : "";
+        return bytes(baseURI).length > 0 ? string.concat(baseURI, tokenId.toString()) : "";
     }
 
     /**
@@ -16486,9 +14517,7 @@ abstract contract ERC721 is
     /**
      * @dev See {IERC721-getApproved}.
      */
-    function getApproved(
-        uint256 tokenId
-    ) public view virtual returns (address) {
+    function getApproved(uint256 tokenId) public view virtual returns (address) {
         _requireMinted(tokenId);
 
         return _tokenApprovals[tokenId];
@@ -16504,21 +14533,14 @@ abstract contract ERC721 is
     /**
      * @dev See {IERC721-isApprovedForAll}.
      */
-    function isApprovedForAll(
-        address owner,
-        address operator
-    ) public view virtual returns (bool) {
+    function isApprovedForAll(address owner, address operator) public view virtual returns (bool) {
         return _operatorApprovals[owner][operator];
     }
 
     /**
      * @dev See {IERC721-transferFrom}.
      */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transferFrom(address from, address to, uint256 tokenId) public virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
             revert ERC721InsufficientApproval(_msgSender(), tokenId);
         }
@@ -16529,23 +14551,14 @@ abstract contract ERC721 is
     /**
      * @dev See {IERC721-safeTransferFrom}.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual {
         safeTransferFrom(from, to, tokenId, "");
     }
 
     /**
      * @dev See {IERC721-safeTransferFrom}.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) public virtual {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
             revert ERC721InsufficientApproval(_msgSender(), tokenId);
         }
@@ -16570,12 +14583,7 @@ abstract contract ERC721 is
      *
      * Emits a {Transfer} event.
      */
-    function _safeTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) internal virtual {
+    function _safeTransfer(address from, address to, uint256 tokenId, bytes memory data) internal virtual {
         _transfer(from, to, tokenId);
         if (!_checkOnERC721Received(from, to, tokenId, data)) {
             revert ERC721InvalidReceiver(to);
@@ -16608,14 +14616,9 @@ abstract contract ERC721 is
      *
      * - `tokenId` must exist.
      */
-    function _isApprovedOrOwner(
-        address spender,
-        uint256 tokenId
-    ) internal view virtual returns (bool) {
+    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
-        return (spender == owner ||
-            isApprovedForAll(owner, spender) ||
-            getApproved(tokenId) == spender);
+        return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
     }
 
     /**
@@ -16636,11 +14639,7 @@ abstract contract ERC721 is
      * @dev Same as {xref-ERC721-_safeMint-address-uint256-}[`_safeMint`], with an additional `data` parameter which is
      * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
      */
-    function _safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) internal virtual {
+    function _safeMint(address to, uint256 tokenId, bytes memory data) internal virtual {
         _mint(to, tokenId);
         if (!_checkOnERC721Received(address(0), to, tokenId, data)) {
             revert ERC721InvalidReceiver(to);
@@ -16733,11 +14732,7 @@ abstract contract ERC721 is
      *
      * Emits a {Transfer} event.
      */
-    function _transfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {
+    function _transfer(address from, address to, uint256 tokenId) internal virtual {
         address owner = ownerOf(tokenId);
         if (owner != from) {
             revert ERC721IncorrectOwner(from, tokenId, owner);
@@ -16789,11 +14784,7 @@ abstract contract ERC721 is
      *
      * Emits an {ApprovalForAll} event.
      */
-    function _setApprovalForAll(
-        address owner,
-        address operator,
-        bool approved
-    ) internal virtual {
+    function _setApprovalForAll(address owner, address operator, bool approved) internal virtual {
         if (owner == operator) {
             revert ERC721InvalidOperator(owner);
         }
@@ -16827,14 +14818,7 @@ abstract contract ERC721 is
         bytes memory data
     ) private returns (bool) {
         if (to.code.length > 0) {
-            try
-                IERC721Receiver(to).onERC721Received(
-                    _msgSender(),
-                    from,
-                    tokenId,
-                    data
-                )
-            returns (bytes4 retval) {
+            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
@@ -16865,12 +14849,7 @@ abstract contract ERC721 is
      *
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 firstTokenId,
-        uint256 batchSize
-    ) internal virtual {}
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual {}
 
     /**
      * @dev Hook that is called after any token transfer. This includes minting and burning. If {ERC721Consecutive} is
@@ -16886,12 +14865,7 @@ abstract contract ERC721 is
      *
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 firstTokenId,
-        uint256 batchSize
-    ) internal virtual {}
+    function _afterTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual {}
 
     /**
      * @dev Unsafe write access to the balances, used by extensions that "mint" tokens using an {ownerOf} override.
@@ -16901,10 +14875,7 @@ abstract contract ERC721 is
      * that `ownerOf(tokenId)` is `a`.
      */
     // solhint-disable-next-line func-name-mixedcase
-    function __unsafe_increaseBalance(
-        address account,
-        uint256 amount
-    ) internal {
+    function __unsafe_increaseBalance(address account, uint256 amount) internal {
         _balances[account] += amount;
     }
 }
@@ -16923,10 +14894,7 @@ library BitMaps {
     /**
      * @dev Returns whether the bit at `index` is set.
      */
-    function get(
-        BitMap storage bitmap,
-        uint256 index
-    ) internal view returns (bool) {
+    function get(BitMap storage bitmap, uint256 index) internal view returns (bool) {
         uint256 bucket = index >> 8;
         uint256 mask = 1 << (index & 0xff);
         return bitmap._data[bucket] & mask != 0;
@@ -17028,26 +14996,17 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
      * @dev See {ERC721-_ownerOf}. Override that checks the sequential ownership structure for tokens that have
      * been minted as part of a batch, and not yet transferred.
      */
-    function _ownerOf(
-        uint256 tokenId
-    ) internal view virtual override returns (address) {
+    function _ownerOf(uint256 tokenId) internal view virtual override returns (address) {
         address owner = super._ownerOf(tokenId);
 
         // If token is owned by the core, or beyond consecutive range, return base value
-        if (
-            owner != address(0) ||
-            tokenId > type(uint96).max ||
-            tokenId < _firstConsecutiveId()
-        ) {
+        if (owner != address(0) || tokenId > type(uint96).max || tokenId < _firstConsecutiveId()) {
             return owner;
         }
 
         // Otherwise, check the token was not burned, and fetch ownership from the anchors
         // Note: no need for safe cast, we know that tokenId <= type(uint96).max
-        return
-            _sequentialBurn.get(tokenId)
-                ? address(0)
-                : address(_sequentialOwnership.lowerLookup(uint96(tokenId)));
+        return _sequentialBurn.get(tokenId) ? address(0) : address(_sequentialOwnership.lowerLookup(uint96(tokenId)));
     }
 
     /**
@@ -17066,10 +15025,7 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
      *
      * Emits a {IERC2309-ConsecutiveTransfer} event.
      */
-    function _mintConsecutive(
-        address to,
-        uint96 batchSize
-    ) internal virtual returns (uint96) {
+    function _mintConsecutive(address to, uint96 batchSize) internal virtual returns (uint96) {
         uint96 next = _nextConsecutiveId();
 
         // minting a batch of size 0 is a no-op
@@ -17155,8 +15111,7 @@ abstract contract ERC721Consecutive is IERC2309, ERC721 {
      * if no consecutive tokenId has been minted before.
      */
     function _nextConsecutiveId() private view returns (uint96) {
-        (bool exists, uint96 latestId, ) = _sequentialOwnership
-            .latestCheckpoint();
+        (bool exists, uint96 latestId, ) = _sequentialOwnership.latestCheckpoint();
         return exists ? latestId + 1 : _firstConsecutiveId();
     }
 }
@@ -17198,21 +15153,14 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC721) returns (bool) {
-        return
-            interfaceId == type(IERC721Enumerable).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721) returns (bool) {
+        return interfaceId == type(IERC721Enumerable).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev See {IERC721Enumerable-tokenOfOwnerByIndex}.
      */
-    function tokenOfOwnerByIndex(
-        address owner,
-        uint256 index
-    ) public view virtual returns (uint256) {
+    function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual returns (uint256) {
         if (index >= balanceOf(owner)) {
             revert ERC721OutOfBoundsIndex(owner, index);
         }
@@ -17294,10 +15242,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
      * @param from address representing the previous owner of the given token ID
      * @param tokenId uint256 ID of the token to be removed from the tokens list of the given address
      */
-    function _removeTokenFromOwnerEnumeration(
-        address from,
-        uint256 tokenId
-    ) private {
+    function _removeTokenFromOwnerEnumeration(address from, uint256 tokenId) private {
         // To prevent a gap in from's tokens array, we store the last token in the index of the token to delete, and
         // then delete the last slot (swap and pop).
 
@@ -17343,10 +15288,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
     }
 }
 
-contract ERC721ConsecutiveEnumerableMock is
-    ERC721Consecutive,
-    ERC721Enumerable
-{
+contract ERC721ConsecutiveEnumerableMock is ERC721Consecutive, ERC721Enumerable {
     constructor(
         string memory name,
         string memory symbol,
@@ -17364,22 +15306,11 @@ contract ERC721ConsecutiveEnumerableMock is
         return super.supportsInterface(interfaceId);
     }
 
-    function _ownerOf(
-        uint256 tokenId
-    )
-        internal
-        view
-        virtual
-        override(ERC721, ERC721Consecutive)
-        returns (address)
-    {
+    function _ownerOf(uint256 tokenId) internal view virtual override(ERC721, ERC721Consecutive) returns (address) {
         return super._ownerOf(tokenId);
     }
 
-    function _mint(
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Consecutive) {
+    function _mint(address to, uint256 tokenId) internal virtual override(ERC721, ERC721Consecutive) {
         super._mint(to, tokenId);
     }
 
@@ -17470,9 +15401,7 @@ abstract contract ERC721Votes is ERC721, Votes {
      *
      * WARNING: Overriding this function will likely result in incorrect vote tracking.
      */
-    function _getVotingUnits(
-        address account
-    ) internal view virtual override returns (uint256) {
+    function _getVotingUnits(address account) internal view virtual override returns (uint256) {
         return balanceOf(account);
     }
 }
@@ -17480,11 +15409,7 @@ abstract contract ERC721Votes is ERC721, Votes {
 /**
  * @title ERC721ConsecutiveMock
  */
-contract ERC721ConsecutiveMock is
-    ERC721Consecutive,
-    ERC721Pausable,
-    ERC721Votes
-{
+contract ERC721ConsecutiveMock is ERC721Consecutive, ERC721Pausable, ERC721Votes {
     uint96 private immutable _offset;
 
     constructor(
@@ -17506,32 +15431,15 @@ contract ERC721ConsecutiveMock is
         }
     }
 
-    function _firstConsecutiveId()
-        internal
-        view
-        virtual
-        override
-        returns (uint96)
-    {
+    function _firstConsecutiveId() internal view virtual override returns (uint96) {
         return _offset;
     }
 
-    function _ownerOf(
-        uint256 tokenId
-    )
-        internal
-        view
-        virtual
-        override(ERC721, ERC721Consecutive)
-        returns (address)
-    {
+    function _ownerOf(uint256 tokenId) internal view virtual override(ERC721, ERC721Consecutive) returns (address) {
         return super._ownerOf(tokenId);
     }
 
-    function _mint(
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Consecutive) {
+    function _mint(address to, uint256 tokenId) internal virtual override(ERC721, ERC721Consecutive) {
         super._mint(to, tokenId);
     }
 
@@ -17571,13 +15479,7 @@ contract ERC721ReceiverMock is IERC721Receiver {
     bytes4 private immutable _retval;
     Error private immutable _error;
 
-    event Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes data,
-        uint256 gas
-    );
+    event Received(address operator, address from, uint256 tokenId, bytes data, uint256 gas);
 
     constructor(bytes4 retval, Error error) {
         _retval = retval;
@@ -17617,20 +15519,14 @@ abstract contract ERC721URIStorage is IERC4906, ERC721 {
     /**
      * @dev See {IERC165-supportsInterface}
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC721, IERC165) returns (bool) {
-        return
-            interfaceId == bytes4(0x49064906) ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
+        return interfaceId == bytes4(0x49064906) || super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         _requireMinted(tokenId);
 
         string memory _tokenURI = _tokenURIs[tokenId];
@@ -17657,10 +15553,7 @@ abstract contract ERC721URIStorage is IERC4906, ERC721 {
      *
      * - `tokenId` must exist.
      */
-    function _setTokenURI(
-        uint256 tokenId,
-        string memory _tokenURI
-    ) internal virtual {
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
         if (!_exists(tokenId)) {
             revert ERC721NonexistentToken(tokenId);
         }
@@ -17728,9 +15621,7 @@ abstract contract VotesMock is Votes {
         return _delegate(account, newDelegation);
     }
 
-    function _getVotingUnits(
-        address account
-    ) internal view override returns (uint256) {
+    function _getVotingUnits(address account) internal view override returns (uint256) {
         return _votingUnits[account];
     }
 
@@ -17785,14 +15676,7 @@ abstract contract Proxy {
 
             // Call the implementation.
             // out and outsize are 0 because we don't know the size yet.
-            let result := delegatecall(
-                gas(),
-                implementation,
-                0,
-                calldatasize(),
-                0,
-                0
-            )
+            let result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
 
             // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
@@ -17876,13 +15760,7 @@ contract BeaconProxy is Proxy {
     /**
      * @dev Returns the current implementation address of the associated beacon.
      */
-    function _implementation()
-        internal
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function _implementation() internal view virtual override returns (address) {
         return IBeacon(ERC1967Utils.getBeacon()).implementation();
     }
 }
@@ -17911,10 +15789,7 @@ contract UpgradeableBeacon is IBeacon, Ownable {
     /**
      * @dev Sets the address of the initial implementation, and the initial owner who can upgrade the beacon.
      */
-    constructor(
-        address implementation_,
-        address initialOwner
-    ) Ownable(initialOwner) {
+    constructor(address implementation_, address initialOwner) Ownable(initialOwner) {
         _setImplementation(implementation_);
     }
 
@@ -17986,18 +15861,9 @@ library Clones {
         assembly {
             // Cleans the upper 96 bits of the `implementation` word, then packs the first 3 bytes
             // of the `implementation` address with the bytecode before the address.
-            mstore(
-                0x00,
-                or(
-                    shr(0xe8, shl(0x60, implementation)),
-                    0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000
-                )
-            )
+            mstore(0x00, or(shr(0xe8, shl(0x60, implementation)), 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000))
             // Packs the remaining 17 bytes of `implementation` with the bytecode after the address.
-            mstore(
-                0x20,
-                or(shl(0x78, implementation), 0x5af43d82803e903d91602b57fd5bf3)
-            )
+            mstore(0x20, or(shl(0x78, implementation), 0x5af43d82803e903d91602b57fd5bf3))
             instance := create(0, 0x09, 0x37)
         }
         if (instance == address(0)) {
@@ -18012,26 +15878,14 @@ library Clones {
      * the clone. Using the same `implementation` and `salt` multiple time will revert, since
      * the clones cannot be deployed twice at the same address.
      */
-    function cloneDeterministic(
-        address implementation,
-        bytes32 salt
-    ) internal returns (address instance) {
+    function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {
         /// @solidity memory-safe-assembly
         assembly {
             // Cleans the upper 96 bits of the `implementation` word, then packs the first 3 bytes
             // of the `implementation` address with the bytecode before the address.
-            mstore(
-                0x00,
-                or(
-                    shr(0xe8, shl(0x60, implementation)),
-                    0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000
-                )
-            )
+            mstore(0x00, or(shr(0xe8, shl(0x60, implementation)), 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000))
             // Packs the remaining 17 bytes of `implementation` with the bytecode after the address.
-            mstore(
-                0x20,
-                or(shl(0x78, implementation), 0x5af43d82803e903d91602b57fd5bf3)
-            )
+            mstore(0x20, or(shl(0x78, implementation), 0x5af43d82803e903d91602b57fd5bf3))
             instance := create2(0, 0x09, 0x37, salt)
         }
         if (instance == address(0)) {
@@ -18097,13 +15951,7 @@ contract ERC1967Proxy is Proxy {
      * https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`] RPC call.
      * `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`
      */
-    function _implementation()
-        internal
-        view
-        virtual
-        override
-        returns (address impl)
-    {
+    function _implementation() internal view virtual override returns (address impl) {
         return ERC1967Utils.getImplementation();
     }
 }
@@ -18173,11 +16021,7 @@ contract TransparentUpgradeableProxy is ERC1967Proxy {
      * @dev Initializes an upgradeable proxy managed by `_admin`, backed by the implementation at `_logic`, and
      * optionally initialized with `_data` as explained in {ERC1967Proxy-constructor}.
      */
-    constructor(
-        address _logic,
-        address admin_,
-        bytes memory _data
-    ) payable ERC1967Proxy(_logic, _data) {
+    constructor(address _logic, address admin_, bytes memory _data) payable ERC1967Proxy(_logic, _data) {
         ERC1967Utils.changeAdmin(admin_);
     }
 
@@ -18190,14 +16034,9 @@ contract TransparentUpgradeableProxy is ERC1967Proxy {
             bytes4 selector = msg.sig;
             if (selector == ITransparentUpgradeableProxy.upgradeTo.selector) {
                 ret = _dispatchUpgradeTo();
-            } else if (
-                selector ==
-                ITransparentUpgradeableProxy.upgradeToAndCall.selector
-            ) {
+            } else if (selector == ITransparentUpgradeableProxy.upgradeToAndCall.selector) {
                 ret = _dispatchUpgradeToAndCall();
-            } else if (
-                selector == ITransparentUpgradeableProxy.changeAdmin.selector
-            ) {
+            } else if (selector == ITransparentUpgradeableProxy.changeAdmin.selector) {
                 ret = _dispatchChangeAdmin();
             } else {
                 revert ProxyDeniedAdminAccess();
@@ -18242,10 +16081,7 @@ contract TransparentUpgradeableProxy is ERC1967Proxy {
      * proxied contract.
      */
     function _dispatchUpgradeToAndCall() private returns (bytes memory) {
-        (address newImplementation, bytes memory data) = abi.decode(
-            msg.data[4:],
-            (address, bytes)
-        );
+        (address newImplementation, bytes memory data) = abi.decode(msg.data[4:], (address, bytes));
         ERC1967Utils.upgradeToAndCall(newImplementation, data, true);
 
         return "";
@@ -18279,10 +16115,7 @@ contract ProxyAdmin is Ownable {
      *
      * - This contract must be the current admin of `proxy`.
      */
-    function changeProxyAdmin(
-        ITransparentUpgradeableProxy proxy,
-        address newAdmin
-    ) public virtual onlyOwner {
+    function changeProxyAdmin(ITransparentUpgradeableProxy proxy, address newAdmin) public virtual onlyOwner {
         proxy.changeAdmin(newAdmin);
     }
 
@@ -18293,10 +16126,7 @@ contract ProxyAdmin is Ownable {
      *
      * - This contract must be the admin of `proxy`.
      */
-    function upgrade(
-        ITransparentUpgradeableProxy proxy,
-        address implementation
-    ) public virtual onlyOwner {
+    function upgrade(ITransparentUpgradeableProxy proxy, address implementation) public virtual onlyOwner {
         proxy.upgradeTo(implementation);
     }
 
@@ -18356,11 +16186,7 @@ abstract contract ERC2981 is IERC2981, ERC165 {
     /**
      * @dev The royalty set for an specific `tokenId` is invalid (eg. (numerator / denominator) >= 1).
      */
-    error ERC2981InvalidTokenRoyalty(
-        uint256 tokenId,
-        uint256 numerator,
-        uint256 denominator
-    );
+    error ERC2981InvalidTokenRoyalty(uint256 tokenId, uint256 numerator, uint256 denominator);
 
     /**
      * @dev The royalty receiver for `tokenId` is invalid.
@@ -18370,29 +16196,21 @@ abstract contract ERC2981 is IERC2981, ERC165 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC165) returns (bool) {
-        return
-            interfaceId == type(IERC2981).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC165) returns (bool) {
+        return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
      * @inheritdoc IERC2981
      */
-    function royaltyInfo(
-        uint256 tokenId,
-        uint256 salePrice
-    ) public view virtual returns (address, uint256) {
+    function royaltyInfo(uint256 tokenId, uint256 salePrice) public view virtual returns (address, uint256) {
         RoyaltyInfo memory royalty = _tokenRoyaltyInfo[tokenId];
 
         if (royalty.receiver == address(0)) {
             royalty = _defaultRoyaltyInfo;
         }
 
-        uint256 royaltyAmount = (salePrice * royalty.royaltyFraction) /
-            _feeDenominator();
+        uint256 royaltyAmount = (salePrice * royalty.royaltyFraction) / _feeDenominator();
 
         return (royalty.receiver, royaltyAmount);
     }
@@ -18414,10 +16232,7 @@ abstract contract ERC2981 is IERC2981, ERC165 {
      * - `receiver` cannot be the zero address.
      * - `feeNumerator` cannot be greater than the fee denominator.
      */
-    function _setDefaultRoyalty(
-        address receiver,
-        uint96 feeNumerator
-    ) internal virtual {
+    function _setDefaultRoyalty(address receiver, uint96 feeNumerator) internal virtual {
         uint256 denominator = _feeDenominator();
         if (feeNumerator > denominator) {
             // Royalty fee will exceed the sale price
@@ -18445,19 +16260,11 @@ abstract contract ERC2981 is IERC2981, ERC165 {
      * - `receiver` cannot be the zero address.
      * - `feeNumerator` cannot be greater than the fee denominator.
      */
-    function _setTokenRoyalty(
-        uint256 tokenId,
-        address receiver,
-        uint96 feeNumerator
-    ) internal virtual {
+    function _setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator) internal virtual {
         uint256 denominator = _feeDenominator();
         if (feeNumerator > denominator) {
             // Royalty fee will exceed the sale price
-            revert ERC2981InvalidTokenRoyalty(
-                tokenId,
-                feeNumerator,
-                denominator
-            );
+            revert ERC2981InvalidTokenRoyalty(tokenId, feeNumerator, denominator);
         }
         if (receiver == address(0)) {
             revert ERC2981InvalidTokenRoyaltyReceiver(tokenId, address(0));
@@ -18483,13 +16290,7 @@ abstract contract ERC2981 is IERC2981, ERC165 {
  *
  * _Available since v3.1._
  */
-abstract contract ERC1155 is
-    Context,
-    ERC165,
-    IERC1155,
-    IERC1155MetadataURI,
-    IERC1155Errors
-{
+abstract contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC1155Errors {
     using Arrays for uint256[];
     using Arrays for address[];
 
@@ -18512,9 +16313,7 @@ abstract contract ERC1155 is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
         return
             interfaceId == type(IERC1155).interfaceId ||
             interfaceId == type(IERC1155MetadataURI).interfaceId ||
@@ -18542,10 +16341,7 @@ abstract contract ERC1155 is
      *
      * - `account` cannot be the zero address.
      */
-    function balanceOf(
-        address account,
-        uint256 id
-    ) public view virtual returns (uint256) {
+    function balanceOf(address account, uint256 id) public view virtual returns (uint256) {
         return _balances[id][account];
     }
 
@@ -18567,10 +16363,7 @@ abstract contract ERC1155 is
         uint256[] memory batchBalances = new uint256[](accounts.length);
 
         for (uint256 i = 0; i < accounts.length; ++i) {
-            batchBalances[i] = balanceOf(
-                accounts.unsafeMemoryAccess(i),
-                ids.unsafeMemoryAccess(i)
-            );
+            batchBalances[i] = balanceOf(accounts.unsafeMemoryAccess(i), ids.unsafeMemoryAccess(i));
         }
 
         return batchBalances;
@@ -18586,23 +16379,14 @@ abstract contract ERC1155 is
     /**
      * @dev See {IERC1155-isApprovedForAll}.
      */
-    function isApprovedForAll(
-        address account,
-        address operator
-    ) public view virtual returns (bool) {
+    function isApprovedForAll(address account, address operator) public view virtual returns (bool) {
         return _operatorApprovals[account][operator];
     }
 
     /**
      * @dev See {IERC1155-safeTransferFrom}.
      */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public virtual {
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) public virtual {
         if (from != _msgSender() && !isApprovedForAll(from, _msgSender())) {
             revert ERC1155InsufficientApprovalForAll(_msgSender(), from);
         }
@@ -18655,12 +16439,7 @@ abstract contract ERC1155 is
             if (from != address(0)) {
                 uint256 fromBalance = _balances[id][from];
                 if (fromBalance < amount) {
-                    revert ERC1155InsufficientBalance(
-                        from,
-                        fromBalance,
-                        amount,
-                        id
-                    );
+                    revert ERC1155InsufficientBalance(from, fromBalance, amount, id);
                 }
                 unchecked {
                     _balances[id][from] = fromBalance - amount;
@@ -18677,26 +16456,12 @@ abstract contract ERC1155 is
             uint256 amount = amounts.unsafeMemoryAccess(0);
             emit TransferSingle(operator, from, to, id, amount);
             if (to != address(0)) {
-                _doSafeTransferAcceptanceCheck(
-                    operator,
-                    from,
-                    to,
-                    id,
-                    amount,
-                    data
-                );
+                _doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
             }
         } else {
             emit TransferBatch(operator, from, to, ids, amounts);
             if (to != address(0)) {
-                _doSafeBatchTransferAcceptanceCheck(
-                    operator,
-                    from,
-                    to,
-                    ids,
-                    amounts,
-                    data
-                );
+                _doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
             }
         }
     }
@@ -18713,23 +16478,14 @@ abstract contract ERC1155 is
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
      * acceptance magic value.
      */
-    function _safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal {
+    function _safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) internal {
         if (to == address(0)) {
             revert ERC1155InvalidReceiver(address(0));
         }
         if (from == address(0)) {
             revert ERC1155InvalidSender(address(0));
         }
-        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(
-            id,
-            amount
-        );
+        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(id, amount);
         _update(from, to, ids, amounts, data);
     }
 
@@ -18793,19 +16549,11 @@ abstract contract ERC1155 is
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
      * acceptance magic value.
      */
-    function _mint(
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal {
+    function _mint(address to, uint256 id, uint256 amount, bytes memory data) internal {
         if (to == address(0)) {
             revert ERC1155InvalidReceiver(address(0));
         }
-        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(
-            id,
-            amount
-        );
+        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(id, amount);
         _update(address(0), to, ids, amounts, data);
     }
 
@@ -18820,12 +16568,7 @@ abstract contract ERC1155 is
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
      * acceptance magic value.
      */
-    function _mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal {
+    function _mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal {
         if (to == address(0)) {
             revert ERC1155InvalidReceiver(address(0));
         }
@@ -18846,10 +16589,7 @@ abstract contract ERC1155 is
         if (from == address(0)) {
             revert ERC1155InvalidSender(address(0));
         }
-        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(
-            id,
-            amount
-        );
+        (uint256[] memory ids, uint256[] memory amounts) = _asSingletonArrays(id, amount);
         _update(from, address(0), ids, amounts, "");
     }
 
@@ -18862,11 +16602,7 @@ abstract contract ERC1155 is
      *
      * - `ids` and `amounts` must have the same length.
      */
-    function _burnBatch(
-        address from,
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) internal {
+    function _burnBatch(address from, uint256[] memory ids, uint256[] memory amounts) internal {
         if (from == address(0)) {
             revert ERC1155InvalidSender(address(0));
         }
@@ -18878,11 +16614,7 @@ abstract contract ERC1155 is
      *
      * Emits an {ApprovalForAll} event.
      */
-    function _setApprovalForAll(
-        address owner,
-        address operator,
-        bool approved
-    ) internal virtual {
+    function _setApprovalForAll(address owner, address operator, bool approved) internal virtual {
         if (owner == operator) {
             revert ERC1155InvalidOperator(operator);
         }
@@ -18899,15 +16631,7 @@ abstract contract ERC1155 is
         bytes memory data
     ) private {
         if (to.code.length > 0) {
-            try
-                IERC1155Receiver(to).onERC1155Received(
-                    operator,
-                    from,
-                    id,
-                    amount,
-                    data
-                )
-            returns (bytes4 response) {
+            try IERC1155Receiver(to).onERC1155Received(operator, from, id, amount, data) returns (bytes4 response) {
                 if (response != IERC1155Receiver.onERC1155Received.selector) {
                     // Tokens rejected
                     revert ERC1155InvalidReceiver(to);
@@ -18935,18 +16659,10 @@ abstract contract ERC1155 is
         bytes memory data
     ) private {
         if (to.code.length > 0) {
-            try
-                IERC1155Receiver(to).onERC1155BatchReceived(
-                    operator,
-                    from,
-                    ids,
-                    amounts,
-                    data
-                )
-            returns (bytes4 response) {
-                if (
-                    response != IERC1155Receiver.onERC1155BatchReceived.selector
-                ) {
+            try IERC1155Receiver(to).onERC1155BatchReceived(operator, from, ids, amounts, data) returns (
+                bytes4 response
+            ) {
+                if (response != IERC1155Receiver.onERC1155BatchReceived.selector) {
                     // Tokens rejected
                     revert ERC1155InvalidReceiver(to);
                 }
@@ -18993,23 +16709,15 @@ abstract contract ERC1155 is
  */
 abstract contract ERC1155Burnable is ERC1155 {
     function burn(address account, uint256 id, uint256 value) public virtual {
-        if (
-            account != _msgSender() && !isApprovedForAll(account, _msgSender())
-        ) {
+        if (account != _msgSender() && !isApprovedForAll(account, _msgSender())) {
             revert ERC1155InsufficientApprovalForAll(_msgSender(), account);
         }
 
         _burn(account, id, value);
     }
 
-    function burnBatch(
-        address account,
-        uint256[] memory ids,
-        uint256[] memory values
-    ) public virtual {
-        if (
-            account != _msgSender() && !isApprovedForAll(account, _msgSender())
-        ) {
+    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual {
+        if (account != _msgSender() && !isApprovedForAll(account, _msgSender())) {
             revert ERC1155InsufficientApprovalForAll(_msgSender(), account);
         }
 
@@ -19166,16 +16874,11 @@ abstract contract ERC1155URIStorage is ERC1155 {
      * - if `_tokenURIs[tokenId]` is NOT set, and if the parents do not have a
      *   uri value set, then the result is empty.
      */
-    function uri(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
+    function uri(uint256 tokenId) public view virtual override returns (string memory) {
         string memory tokenURI = _tokenURIs[tokenId];
 
         // If token URI is set, concatenate base URI and tokenURI (via string.concat).
-        return
-            bytes(tokenURI).length > 0
-                ? string.concat(_baseURI, tokenURI)
-                : super.uri(tokenId);
+        return bytes(tokenURI).length > 0 ? string.concat(_baseURI, tokenURI) : super.uri(tokenId);
     }
 
     /**
@@ -19267,11 +16970,7 @@ abstract contract ERC20Capped is ERC20 {
     /**
      * @dev See {ERC20-_update}.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override {
+    function _update(address from, address to, uint256 amount) internal virtual override {
         super._update(from, to, amount);
 
         if (from == address(0)) {
@@ -19307,11 +17006,7 @@ abstract contract ERC20Pausable is ERC20, Pausable {
      *
      * - the contract must not be paused.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override whenNotPaused {
+    function _update(address from, address to, uint256 amount) internal virtual override whenNotPaused {
         super._update(from, to, amount);
     }
 }
@@ -19357,9 +17052,7 @@ abstract contract ERC721Royalty is ERC2981, ERC721 {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC721, ERC2981) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -19398,10 +17091,7 @@ abstract contract ERC721Wrapper is ERC721, IERC721Receiver {
     /**
      * @dev Allow a user to deposit underlying tokens and mint the corresponding tokenIds.
      */
-    function depositFor(
-        address account,
-        uint256[] memory tokenIds
-    ) public virtual returns (bool) {
+    function depositFor(address account, uint256[] memory tokenIds) public virtual returns (bool) {
         uint256 length = tokenIds.length;
         for (uint256 i = 0; i < length; ++i) {
             uint256 tokenId = tokenIds[i];
@@ -19419,10 +17109,7 @@ abstract contract ERC721Wrapper is ERC721, IERC721Receiver {
     /**
      * @dev Allow a user to burn wrapped tokens and withdraw the corresponding tokenIds of the underlying tokens.
      */
-    function withdrawTo(
-        address account,
-        uint256[] memory tokenIds
-    ) public virtual returns (bool) {
+    function withdrawTo(address account, uint256[] memory tokenIds) public virtual returns (bool) {
         uint256 length = tokenIds.length;
         for (uint256 i = 0; i < length; ++i) {
             uint256 tokenId = tokenIds[i];
@@ -19449,12 +17136,7 @@ abstract contract ERC721Wrapper is ERC721, IERC721Receiver {
      * WARNING: Doesn't work with unsafe transfers (eg. {IERC721-transferFrom}). Use {ERC721Wrapper-_recover}
      * for recovering in that scenario.
      */
-    function onERC721Received(
-        address,
-        address from,
-        uint256 tokenId,
-        bytes memory
-    ) public virtual returns (bytes4) {
+    function onERC721Received(address, address from, uint256 tokenId, bytes memory) public virtual returns (bytes4) {
         if (address(underlying()) != _msgSender()) {
             revert ERC721UnsupportedToken(_msgSender());
         }
@@ -19466,10 +17148,7 @@ abstract contract ERC721Wrapper is ERC721, IERC721Receiver {
      * @dev Mint a wrapped token to cover any underlyingToken that would have been transferred by mistake. Internal
      * function that can be exposed with access control if desired.
      */
-    function _recover(
-        address account,
-        uint256 tokenId
-    ) internal virtual returns (uint256) {
+    function _recover(address account, uint256 tokenId) internal virtual returns (uint256) {
         address owner = underlying().ownerOf(tokenId);
         if (owner != address(this)) {
             revert ERC721IncorrectOwner(address(this), tokenId, owner);
@@ -19497,8 +17176,7 @@ library Base64 {
     /**
      * @dev Base64 Encoding/Decoding Table
      */
-    string internal constant _TABLE =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    string internal constant _TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     /**
      * @dev Converts a `bytes` to its Bytes64 `string` representation.
@@ -19548,22 +17226,13 @@ library Base64 {
                 // and finally write it in the result pointer but with a left shift
                 // of 256 (1 byte) - 8 (1 ASCII char) = 248 bits
 
-                mstore8(
-                    resultPtr,
-                    mload(add(tablePtr, and(shr(18, input), 0x3F)))
-                )
+                mstore8(resultPtr, mload(add(tablePtr, and(shr(18, input), 0x3F))))
                 resultPtr := add(resultPtr, 1) // Advance
 
-                mstore8(
-                    resultPtr,
-                    mload(add(tablePtr, and(shr(12, input), 0x3F)))
-                )
+                mstore8(resultPtr, mload(add(tablePtr, and(shr(12, input), 0x3F))))
                 resultPtr := add(resultPtr, 1) // Advance
 
-                mstore8(
-                    resultPtr,
-                    mload(add(tablePtr, and(shr(6, input), 0x3F)))
-                )
+                mstore8(resultPtr, mload(add(tablePtr, and(shr(6, input), 0x3F))))
                 resultPtr := add(resultPtr, 1) // Advance
 
                 mstore8(resultPtr, mload(add(tablePtr, and(input, 0x3F))))
@@ -19627,11 +17296,7 @@ library Create2 {
      * - the factory must have a balance of at least `amount`.
      * - if `amount` is non-zero, `bytecode` must have a `payable` constructor.
      */
-    function deploy(
-        uint256 amount,
-        bytes32 salt,
-        bytes memory bytecode
-    ) internal returns (address addr) {
+    function deploy(uint256 amount, bytes32 salt, bytes memory bytecode) internal returns (address addr) {
         if (address(this).balance < amount) {
             revert Create2InsufficientBalance(address(this).balance, amount);
         }
@@ -19651,10 +17316,7 @@ library Create2 {
      * @dev Returns the address where a contract will be stored if deployed via {deploy}. Any change in the
      * `bytecodeHash` or `salt` will result in a new destination address.
      */
-    function computeAddress(
-        bytes32 salt,
-        bytes32 bytecodeHash
-    ) internal view returns (address) {
+    function computeAddress(bytes32 salt, bytes32 bytecodeHash) internal view returns (address) {
         return computeAddress(salt, bytecodeHash, address(this));
     }
 
@@ -19662,11 +17324,7 @@ library Create2 {
      * @dev Returns the address where a contract will be stored if deployed via {deploy} from a contract located at
      * `deployer`. If `deployer` is this contract's address, returns the same value as {computeAddress}.
      */
-    function computeAddress(
-        bytes32 salt,
-        bytes32 bytecodeHash,
-        address deployer
-    ) internal pure returns (address addr) {
+    function computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer) internal pure returns (address addr) {
         /// @solidity memory-safe-assembly
         assembly {
             let ptr := mload(0x40) // Get free memory pointer
@@ -19719,11 +17377,7 @@ library MerkleProof {
      * sibling hashes on the branch from the leaf to the root of the tree. Each
      * pair of leaves and each pair of pre-images are assumed to be sorted.
      */
-    function verify(
-        bytes32[] memory proof,
-        bytes32 root,
-        bytes32 leaf
-    ) internal pure returns (bool) {
+    function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) internal pure returns (bool) {
         return processProof(proof, leaf) == root;
     }
 
@@ -19732,11 +17386,7 @@ library MerkleProof {
      *
      * _Available since v4.7._
      */
-    function verifyCalldata(
-        bytes32[] calldata proof,
-        bytes32 root,
-        bytes32 leaf
-    ) internal pure returns (bool) {
+    function verifyCalldata(bytes32[] calldata proof, bytes32 root, bytes32 leaf) internal pure returns (bool) {
         return processProofCalldata(proof, leaf) == root;
     }
 
@@ -19748,10 +17398,7 @@ library MerkleProof {
      *
      * _Available since v4.4._
      */
-    function processProof(
-        bytes32[] memory proof,
-        bytes32 leaf
-    ) internal pure returns (bytes32) {
+    function processProof(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32) {
         bytes32 computedHash = leaf;
         for (uint256 i = 0; i < proof.length; i++) {
             computedHash = _hashPair(computedHash, proof[i]);
@@ -19764,10 +17411,7 @@ library MerkleProof {
      *
      * _Available since v4.7._
      */
-    function processProofCalldata(
-        bytes32[] calldata proof,
-        bytes32 leaf
-    ) internal pure returns (bytes32) {
+    function processProofCalldata(bytes32[] calldata proof, bytes32 leaf) internal pure returns (bytes32) {
         bytes32 computedHash = leaf;
         for (uint256 i = 0; i < proof.length; i++) {
             computedHash = _hashPair(computedHash, proof[i]);
@@ -19849,9 +17493,7 @@ library MerkleProof {
         // - depending on the flag, either another value from the "main queue" (merging branches) or an element from the
         //   `proof` array.
         for (uint256 i = 0; i < totalHashes; i++) {
-            bytes32 a = leafPos < leavesLen
-                ? leaves[leafPos++]
-                : hashes[hashPos++];
+            bytes32 a = leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++];
             bytes32 b = proofFlags[i]
                 ? (leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++])
                 : proof[proofPos++];
@@ -19905,9 +17547,7 @@ library MerkleProof {
         // - depending on the flag, either another value from the "main queue" (merging branches) or an element from the
         //   `proof` array.
         for (uint256 i = 0; i < totalHashes; i++) {
-            bytes32 a = leafPos < leavesLen
-                ? leaves[leafPos++]
-                : hashes[hashPos++];
+            bytes32 a = leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++];
             bytes32 b = proofFlags[i]
                 ? (leafPos < leavesLen ? leaves[leafPos++] : hashes[hashPos++])
                 : proof[proofPos++];
@@ -19929,10 +17569,7 @@ library MerkleProof {
         return a < b ? _efficientHash(a, b) : _efficientHash(b, a);
     }
 
-    function _efficientHash(
-        bytes32 a,
-        bytes32 b
-    ) private pure returns (bytes32 value) {
+    function _efficientHash(bytes32 a, bytes32 b) private pure returns (bytes32 value) {
         /// @solidity memory-safe-assembly
         assembly {
             mstore(0x00, a)
@@ -19959,15 +17596,8 @@ library SignatureChecker {
      * NOTE: Unlike ECDSA signatures, contract signatures are revocable, and the outcome of this function can thus
      * change through time. It could return true at block N and false at block N+1 (or the opposite).
      */
-    function isValidSignatureNow(
-        address signer,
-        bytes32 hash,
-        bytes memory signature
-    ) internal view returns (bool) {
-        (address recovered, ECDSA.RecoverError error, ) = ECDSA.tryRecover(
-            hash,
-            signature
-        );
+    function isValidSignatureNow(address signer, bytes32 hash, bytes memory signature) internal view returns (bool) {
+        (address recovered, ECDSA.RecoverError error, ) = ECDSA.tryRecover(hash, signature);
         return
             (error == ECDSA.RecoverError.NoError && recovered == signer) ||
             isValidERC1271SignatureNow(signer, hash, signature);
@@ -19990,8 +17620,7 @@ library SignatureChecker {
         );
         return (success &&
             result.length >= 32 &&
-            abi.decode(result, (bytes32)) ==
-            bytes32(IERC1271.isValidSignature.selector));
+            abi.decode(result, (bytes32)) == bytes32(IERC1271.isValidSignature.selector));
     }
 }
 
@@ -20015,10 +17644,7 @@ library ERC165Checker {
         // Any contract that implements ERC165 must explicitly indicate support of
         // InterfaceId_ERC165 and explicitly indicate non-support of InterfaceId_Invalid
         return
-            supportsERC165InterfaceUnchecked(
-                account,
-                type(IERC165).interfaceId
-            ) &&
+            supportsERC165InterfaceUnchecked(account, type(IERC165).interfaceId) &&
             !supportsERC165InterfaceUnchecked(account, _INTERFACE_ID_INVALID);
     }
 
@@ -20028,14 +17654,9 @@ library ERC165Checker {
      *
      * See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        address account,
-        bytes4 interfaceId
-    ) internal view returns (bool) {
+    function supportsInterface(address account, bytes4 interfaceId) internal view returns (bool) {
         // query support of both ERC165 as per the spec and support of _interfaceId
-        return
-            supportsERC165(account) &&
-            supportsERC165InterfaceUnchecked(account, interfaceId);
+        return supportsERC165(account) && supportsERC165InterfaceUnchecked(account, interfaceId);
     }
 
     /**
@@ -20059,10 +17680,7 @@ library ERC165Checker {
         if (supportsERC165(account)) {
             // query support of each interface in interfaceIds
             for (uint256 i = 0; i < interfaceIds.length; i++) {
-                interfaceIdsSupported[i] = supportsERC165InterfaceUnchecked(
-                    account,
-                    interfaceIds[i]
-                );
+                interfaceIdsSupported[i] = supportsERC165InterfaceUnchecked(account, interfaceIds[i]);
             }
         }
 
@@ -20078,10 +17696,7 @@ library ERC165Checker {
      *
      * See {IERC165-supportsInterface}.
      */
-    function supportsAllInterfaces(
-        address account,
-        bytes4[] memory interfaceIds
-    ) internal view returns (bool) {
+    function supportsAllInterfaces(address account, bytes4[] memory interfaceIds) internal view returns (bool) {
         // query support of ERC165 itself
         if (!supportsERC165(account)) {
             return false;
@@ -20113,29 +17728,16 @@ library ERC165Checker {
      *
      * Interface identification is specified in ERC-165.
      */
-    function supportsERC165InterfaceUnchecked(
-        address account,
-        bytes4 interfaceId
-    ) internal view returns (bool) {
+    function supportsERC165InterfaceUnchecked(address account, bytes4 interfaceId) internal view returns (bool) {
         // prepare call
-        bytes memory encodedParams = abi.encodeCall(
-            IERC165.supportsInterface,
-            (interfaceId)
-        );
+        bytes memory encodedParams = abi.encodeCall(IERC165.supportsInterface, (interfaceId));
 
         // perform static call
         bool success;
         uint256 returnSize;
         uint256 returnValue;
         assembly {
-            success := staticcall(
-                30000,
-                account,
-                add(encodedParams, 0x20),
-                mload(encodedParams),
-                0x00,
-                0x20
-            )
+            success := staticcall(30000, account, add(encodedParams, 0x20), mload(encodedParams), 0x00, 0x20)
             returnSize := returndatasize()
             returnValue := mload(0x00)
         }
@@ -20216,11 +17818,7 @@ library EnumerableMap {
      * Returns true if the key was added to the map, that is if it was not
      * already present.
      */
-    function set(
-        Bytes32ToBytes32Map storage map,
-        bytes32 key,
-        bytes32 value
-    ) internal returns (bool) {
+    function set(Bytes32ToBytes32Map storage map, bytes32 key, bytes32 value) internal returns (bool) {
         map._values[key] = value;
         return map._keys.add(key);
     }
@@ -20230,10 +17828,7 @@ library EnumerableMap {
      *
      * Returns true if the key was removed from the map, that is if it was present.
      */
-    function remove(
-        Bytes32ToBytes32Map storage map,
-        bytes32 key
-    ) internal returns (bool) {
+    function remove(Bytes32ToBytes32Map storage map, bytes32 key) internal returns (bool) {
         delete map._values[key];
         return map._keys.remove(key);
     }
@@ -20241,19 +17836,14 @@ library EnumerableMap {
     /**
      * @dev Returns true if the key is in the map. O(1).
      */
-    function contains(
-        Bytes32ToBytes32Map storage map,
-        bytes32 key
-    ) internal view returns (bool) {
+    function contains(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bool) {
         return map._keys.contains(key);
     }
 
     /**
      * @dev Returns the number of key-value pairs in the map. O(1).
      */
-    function length(
-        Bytes32ToBytes32Map storage map
-    ) internal view returns (uint256) {
+    function length(Bytes32ToBytes32Map storage map) internal view returns (uint256) {
         return map._keys.length();
     }
 
@@ -20267,10 +17857,7 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        Bytes32ToBytes32Map storage map,
-        uint256 index
-    ) internal view returns (bytes32, bytes32) {
+    function at(Bytes32ToBytes32Map storage map, uint256 index) internal view returns (bytes32, bytes32) {
         bytes32 key = map._keys.at(index);
         return (key, map._values[key]);
     }
@@ -20279,10 +17866,7 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(
-        Bytes32ToBytes32Map storage map,
-        bytes32 key
-    ) internal view returns (bool, bytes32) {
+    function tryGet(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bool, bytes32) {
         bytes32 value = map._values[key];
         if (value == bytes32(0)) {
             return (contains(map, key), bytes32(0));
@@ -20298,10 +17882,7 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(
-        Bytes32ToBytes32Map storage map,
-        bytes32 key
-    ) internal view returns (bytes32) {
+    function get(Bytes32ToBytes32Map storage map, bytes32 key) internal view returns (bytes32) {
         bytes32 value = map._values[key];
         if (value == 0 && !contains(map, key)) {
             revert EnumerableMapNonexistentKey(key);
@@ -20317,9 +17898,7 @@ library EnumerableMap {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the map grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function keys(
-        Bytes32ToBytes32Map storage map
-    ) internal view returns (bytes32[] memory) {
+    function keys(Bytes32ToBytes32Map storage map) internal view returns (bytes32[] memory) {
         return map._keys.values();
     }
 
@@ -20336,11 +17915,7 @@ library EnumerableMap {
      * Returns true if the key was added to the map, that is if it was not
      * already present.
      */
-    function set(
-        UintToUintMap storage map,
-        uint256 key,
-        uint256 value
-    ) internal returns (bool) {
+    function set(UintToUintMap storage map, uint256 key, uint256 value) internal returns (bool) {
         return set(map._inner, bytes32(key), bytes32(value));
     }
 
@@ -20349,20 +17924,14 @@ library EnumerableMap {
      *
      * Returns true if the key was removed from the map, that is if it was present.
      */
-    function remove(
-        UintToUintMap storage map,
-        uint256 key
-    ) internal returns (bool) {
+    function remove(UintToUintMap storage map, uint256 key) internal returns (bool) {
         return remove(map._inner, bytes32(key));
     }
 
     /**
      * @dev Returns true if the key is in the map. O(1).
      */
-    function contains(
-        UintToUintMap storage map,
-        uint256 key
-    ) internal view returns (bool) {
+    function contains(UintToUintMap storage map, uint256 key) internal view returns (bool) {
         return contains(map._inner, bytes32(key));
     }
 
@@ -20382,10 +17951,7 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        UintToUintMap storage map,
-        uint256 index
-    ) internal view returns (uint256, uint256) {
+    function at(UintToUintMap storage map, uint256 index) internal view returns (uint256, uint256) {
         (bytes32 key, bytes32 value) = at(map._inner, index);
         return (uint256(key), uint256(value));
     }
@@ -20394,10 +17960,7 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(
-        UintToUintMap storage map,
-        uint256 key
-    ) internal view returns (bool, uint256) {
+    function tryGet(UintToUintMap storage map, uint256 key) internal view returns (bool, uint256) {
         (bool success, bytes32 value) = tryGet(map._inner, bytes32(key));
         return (success, uint256(value));
     }
@@ -20409,10 +17972,7 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(
-        UintToUintMap storage map,
-        uint256 key
-    ) internal view returns (uint256) {
+    function get(UintToUintMap storage map, uint256 key) internal view returns (uint256) {
         return uint256(get(map._inner, bytes32(key)));
     }
 
@@ -20424,9 +17984,7 @@ library EnumerableMap {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the map grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function keys(
-        UintToUintMap storage map
-    ) internal view returns (uint256[] memory) {
+    function keys(UintToUintMap storage map) internal view returns (uint256[] memory) {
         bytes32[] memory store = keys(map._inner);
         uint256[] memory result;
 
@@ -20451,11 +18009,7 @@ library EnumerableMap {
      * Returns true if the key was added to the map, that is if it was not
      * already present.
      */
-    function set(
-        UintToAddressMap storage map,
-        uint256 key,
-        address value
-    ) internal returns (bool) {
+    function set(UintToAddressMap storage map, uint256 key, address value) internal returns (bool) {
         return set(map._inner, bytes32(key), bytes32(uint256(uint160(value))));
     }
 
@@ -20464,29 +18018,21 @@ library EnumerableMap {
      *
      * Returns true if the key was removed from the map, that is if it was present.
      */
-    function remove(
-        UintToAddressMap storage map,
-        uint256 key
-    ) internal returns (bool) {
+    function remove(UintToAddressMap storage map, uint256 key) internal returns (bool) {
         return remove(map._inner, bytes32(key));
     }
 
     /**
      * @dev Returns true if the key is in the map. O(1).
      */
-    function contains(
-        UintToAddressMap storage map,
-        uint256 key
-    ) internal view returns (bool) {
+    function contains(UintToAddressMap storage map, uint256 key) internal view returns (bool) {
         return contains(map._inner, bytes32(key));
     }
 
     /**
      * @dev Returns the number of elements in the map. O(1).
      */
-    function length(
-        UintToAddressMap storage map
-    ) internal view returns (uint256) {
+    function length(UintToAddressMap storage map) internal view returns (uint256) {
         return length(map._inner);
     }
 
@@ -20499,10 +18045,7 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        UintToAddressMap storage map,
-        uint256 index
-    ) internal view returns (uint256, address) {
+    function at(UintToAddressMap storage map, uint256 index) internal view returns (uint256, address) {
         (bytes32 key, bytes32 value) = at(map._inner, index);
         return (uint256(key), address(uint160(uint256(value))));
     }
@@ -20511,10 +18054,7 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(
-        UintToAddressMap storage map,
-        uint256 key
-    ) internal view returns (bool, address) {
+    function tryGet(UintToAddressMap storage map, uint256 key) internal view returns (bool, address) {
         (bool success, bytes32 value) = tryGet(map._inner, bytes32(key));
         return (success, address(uint160(uint256(value))));
     }
@@ -20526,10 +18066,7 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(
-        UintToAddressMap storage map,
-        uint256 key
-    ) internal view returns (address) {
+    function get(UintToAddressMap storage map, uint256 key) internal view returns (address) {
         return address(uint160(uint256(get(map._inner, bytes32(key)))));
     }
 
@@ -20541,9 +18078,7 @@ library EnumerableMap {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the map grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function keys(
-        UintToAddressMap storage map
-    ) internal view returns (uint256[] memory) {
+    function keys(UintToAddressMap storage map) internal view returns (uint256[] memory) {
         bytes32[] memory store = keys(map._inner);
         uint256[] memory result;
 
@@ -20568,11 +18103,7 @@ library EnumerableMap {
      * Returns true if the key was added to the map, that is if it was not
      * already present.
      */
-    function set(
-        AddressToUintMap storage map,
-        address key,
-        uint256 value
-    ) internal returns (bool) {
+    function set(AddressToUintMap storage map, address key, uint256 value) internal returns (bool) {
         return set(map._inner, bytes32(uint256(uint160(key))), bytes32(value));
     }
 
@@ -20581,29 +18112,21 @@ library EnumerableMap {
      *
      * Returns true if the key was removed from the map, that is if it was present.
      */
-    function remove(
-        AddressToUintMap storage map,
-        address key
-    ) internal returns (bool) {
+    function remove(AddressToUintMap storage map, address key) internal returns (bool) {
         return remove(map._inner, bytes32(uint256(uint160(key))));
     }
 
     /**
      * @dev Returns true if the key is in the map. O(1).
      */
-    function contains(
-        AddressToUintMap storage map,
-        address key
-    ) internal view returns (bool) {
+    function contains(AddressToUintMap storage map, address key) internal view returns (bool) {
         return contains(map._inner, bytes32(uint256(uint160(key))));
     }
 
     /**
      * @dev Returns the number of elements in the map. O(1).
      */
-    function length(
-        AddressToUintMap storage map
-    ) internal view returns (uint256) {
+    function length(AddressToUintMap storage map) internal view returns (uint256) {
         return length(map._inner);
     }
 
@@ -20616,10 +18139,7 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        AddressToUintMap storage map,
-        uint256 index
-    ) internal view returns (address, uint256) {
+    function at(AddressToUintMap storage map, uint256 index) internal view returns (address, uint256) {
         (bytes32 key, bytes32 value) = at(map._inner, index);
         return (address(uint160(uint256(key))), uint256(value));
     }
@@ -20628,14 +18148,8 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(
-        AddressToUintMap storage map,
-        address key
-    ) internal view returns (bool, uint256) {
-        (bool success, bytes32 value) = tryGet(
-            map._inner,
-            bytes32(uint256(uint160(key)))
-        );
+    function tryGet(AddressToUintMap storage map, address key) internal view returns (bool, uint256) {
+        (bool success, bytes32 value) = tryGet(map._inner, bytes32(uint256(uint160(key))));
         return (success, uint256(value));
     }
 
@@ -20646,10 +18160,7 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(
-        AddressToUintMap storage map,
-        address key
-    ) internal view returns (uint256) {
+    function get(AddressToUintMap storage map, address key) internal view returns (uint256) {
         return uint256(get(map._inner, bytes32(uint256(uint160(key)))));
     }
 
@@ -20661,9 +18172,7 @@ library EnumerableMap {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the map grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function keys(
-        AddressToUintMap storage map
-    ) internal view returns (address[] memory) {
+    function keys(AddressToUintMap storage map) internal view returns (address[] memory) {
         bytes32[] memory store = keys(map._inner);
         address[] memory result;
 
@@ -20688,11 +18197,7 @@ library EnumerableMap {
      * Returns true if the key was added to the map, that is if it was not
      * already present.
      */
-    function set(
-        Bytes32ToUintMap storage map,
-        bytes32 key,
-        uint256 value
-    ) internal returns (bool) {
+    function set(Bytes32ToUintMap storage map, bytes32 key, uint256 value) internal returns (bool) {
         return set(map._inner, key, bytes32(value));
     }
 
@@ -20701,29 +18206,21 @@ library EnumerableMap {
      *
      * Returns true if the key was removed from the map, that is if it was present.
      */
-    function remove(
-        Bytes32ToUintMap storage map,
-        bytes32 key
-    ) internal returns (bool) {
+    function remove(Bytes32ToUintMap storage map, bytes32 key) internal returns (bool) {
         return remove(map._inner, key);
     }
 
     /**
      * @dev Returns true if the key is in the map. O(1).
      */
-    function contains(
-        Bytes32ToUintMap storage map,
-        bytes32 key
-    ) internal view returns (bool) {
+    function contains(Bytes32ToUintMap storage map, bytes32 key) internal view returns (bool) {
         return contains(map._inner, key);
     }
 
     /**
      * @dev Returns the number of elements in the map. O(1).
      */
-    function length(
-        Bytes32ToUintMap storage map
-    ) internal view returns (uint256) {
+    function length(Bytes32ToUintMap storage map) internal view returns (uint256) {
         return length(map._inner);
     }
 
@@ -20736,10 +18233,7 @@ library EnumerableMap {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(
-        Bytes32ToUintMap storage map,
-        uint256 index
-    ) internal view returns (bytes32, uint256) {
+    function at(Bytes32ToUintMap storage map, uint256 index) internal view returns (bytes32, uint256) {
         (bytes32 key, bytes32 value) = at(map._inner, index);
         return (key, uint256(value));
     }
@@ -20748,10 +18242,7 @@ library EnumerableMap {
      * @dev Tries to returns the value associated with `key`. O(1).
      * Does not revert if `key` is not in the map.
      */
-    function tryGet(
-        Bytes32ToUintMap storage map,
-        bytes32 key
-    ) internal view returns (bool, uint256) {
+    function tryGet(Bytes32ToUintMap storage map, bytes32 key) internal view returns (bool, uint256) {
         (bool success, bytes32 value) = tryGet(map._inner, key);
         return (success, uint256(value));
     }
@@ -20763,10 +18254,7 @@ library EnumerableMap {
      *
      * - `key` must be in the map.
      */
-    function get(
-        Bytes32ToUintMap storage map,
-        bytes32 key
-    ) internal view returns (uint256) {
+    function get(Bytes32ToUintMap storage map, bytes32 key) internal view returns (uint256) {
         return uint256(get(map._inner, key));
     }
 
@@ -20778,9 +18266,7 @@ library EnumerableMap {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the map grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function keys(
-        Bytes32ToUintMap storage map
-    ) internal view returns (bytes32[] memory) {
+    function keys(Bytes32ToUintMap storage map) internal view returns (bytes32[] memory) {
         bytes32[] memory store = keys(map._inner);
         bytes32[] memory result;
 
