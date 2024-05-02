@@ -1,5 +1,5 @@
 use alloy_json_abi::{Function, JsonAbi, Param, StateMutability};
-use alloy_primitives::{Address, B256, I256, U256};
+use alloy_primitives::{IcanAddress, B256, I256, U256};
 use alloy_sol_types::{sol, SolCall, SolError, SolEvent, SolStruct};
 use pretty_assertions::assert_eq;
 use std::borrow::Cow;
@@ -51,7 +51,7 @@ fn seaport() {
     use Seaport::*;
 
     // Constructor with a single argument
-    let _ = constructorCall { conduitController: Address::ZERO };
+    let _ = constructorCall { conduitController: IcanAddress::ZERO };
 
     // BasicOrderType is a uint8 UDVT
     let _ = BasicOrderType::from(0u8);
@@ -95,8 +95,8 @@ fn uniswap_v3_position() {
     sol!(UniswapV3Position, "../json-abi/tests/abi/UniswapV3Position.json");
 
     let _ = UniswapV3Position::getLiquidityByRangeCall {
-        pool_: Address::ZERO,
-        self_: Address::ZERO,
+        pool_: IcanAddress::ZERO,
+        self_: IcanAddress::ZERO,
         lowerTick_: 0,
         upperTick_: 0,
     };
@@ -105,8 +105,11 @@ fn uniswap_v3_position() {
         "getLiquidityByRange(address,address,int24,int24)"
     );
 
-    let _ =
-        UniswapV3Position::getPositionIdCall { self_: Address::ZERO, lowerTick_: 0, upperTick_: 0 };
+    let _ = UniswapV3Position::getPositionIdCall {
+        self_: IcanAddress::ZERO,
+        lowerTick_: 0,
+        upperTick_: 0,
+    };
     assert_eq!(
         UniswapV3Position::getPositionIdCall::SIGNATURE,
         "getPositionId(address,int24,int24)"
@@ -120,7 +123,7 @@ fn double_exponent_interest_setter() {
     // https://etherscan.io/address/0xef2ed07cc7a0825ced8ac1a67f88a0e17414fa6c#code
     sol!(DoubleExponentInterestSetter, "../json-abi/tests/abi/DoubleExponentInterestSetter.json");
     let _ = DoubleExponentInterestSetter::getInterestRateCall {
-        _0: Address::ZERO,
+        _0: IcanAddress::ZERO,
         borrowWei: U256::ZERO,
         supplyWei: U256::ZERO,
     };
@@ -132,9 +135,9 @@ fn double_exponent_interest_setter() {
 fn uniswap_v2_factory() {
     sol!(UniswapV2Factory, "../json-abi/tests/abi/UniswapV2Factory.json");
     let _ = UniswapV2Factory::PairCreated {
-        token0: Address::ZERO,
-        token1: Address::ZERO,
-        pair: Address::ZERO,
+        token0: IcanAddress::ZERO,
+        token1: IcanAddress::ZERO,
+        pair: IcanAddress::ZERO,
         _3: U256::ZERO,
     };
 }
@@ -195,7 +198,7 @@ fn zrx_token() {
     // https://etherscan.io/address/0xe41d2489571d322189246dafa5ebde1f4699f498#code
     sol!(ZRXToken, "../json-abi/tests/abi/ZRXToken.json");
 
-    let _ = ZRXToken::approveCall { _spender: Address::ZERO, _value: U256::ZERO };
+    let _ = ZRXToken::approveCall { _spender: IcanAddress::ZERO, _value: U256::ZERO };
     assert_eq!(ZRXToken::approveCall::SIGNATURE, "approve(address,uint256)");
 }
 
@@ -208,8 +211,8 @@ fn balancer_v2_vault() {
 
     let _ = BalancerV2Vault::PoolBalanceChanged {
         poolId: B256::ZERO,
-        liquidityProvider: Address::ZERO,
-        tokens: vec![Address::ZERO],
+        liquidityProvider: IcanAddress::ZERO,
+        tokens: vec![IcanAddress::ZERO],
         deltas: vec![I256::ZERO],
         protocolFeeAmounts: vec![U256::ZERO],
     };

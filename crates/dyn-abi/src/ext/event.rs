@@ -80,7 +80,7 @@ mod tests {
 
     use super::*;
     use alloy_json_abi::EventParam;
-    use alloy_primitives::{address, b256, bytes, hex, sha3, Signed};
+    use alloy_primitives::{b256, bytes, cAddress, hex, sha3, Signed};
 
     #[test]
     fn empty() {
@@ -127,7 +127,7 @@ mod tests {
                 [
                     b256!("0000000000000000000000000000000000000000000000000000000000000000"),
                     b256!("0000000000000000000000000000000000000000000000000000000000000002"),
-                    b256!("0000000000000000000000001111111111111111111111111111111111111111"),
+                    b256!("0000000000000000000011111111111111111111111111111111111111111111"),
                     b256!("00000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
                     b256!("00000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"),
                     b256!("00000000000000000ccccccccccccccccccccccccccccccccccccccccccccccc"),
@@ -135,7 +135,7 @@ mod tests {
                 &hex!(
                     "
                     0000000000000000000000000000000000000000000000000000000000000003
-                    0000000000000000000000002222222222222222222222222222222222222222
+                    0000000000000000000022222222222222222222222222222222222222222222
                 "
                 ),
                 false,
@@ -151,7 +151,7 @@ mod tests {
                     )),
                     256
                 ),
-                DynSolValue::Address(address!("2222222222222222222222222222222222222222")),
+                DynSolValue::Address(cAddress!("22222222222222222222222222222222222222222222")),
             ]
         );
         assert_eq!(
@@ -163,7 +163,7 @@ mod tests {
                     )),
                     256
                 ),
-                DynSolValue::Address(address!("1111111111111111111111111111111111111111")),
+                DynSolValue::Address(cAddress!("11111111111111111111111111111111111111111111")),
                 DynSolValue::FixedBytes(
                     b256!("00000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
                     32
@@ -189,7 +189,7 @@ mod tests {
 
         let log = LogData::new_unchecked(
             vec![
-                b256!("cf74b4e62f836eeedcd6f92120ffb5afea90e6fa490d36f8b81075e2a7de0cf7"),
+                b256!("49a967fd3d1cd36b64fbd62eaa348dacf1e6195803fe2438497b6db5faa16b3c"),
                 b256!("0000000000000000000000000000000000000000000000000000000000012321"),
             ],
             bytes!(

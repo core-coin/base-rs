@@ -329,7 +329,7 @@ pub fn decode_sequence<'de, T: TokenSeq<'de>>(data: &'de [u8], validate: bool) -
 mod tests {
     use crate::{sol, sol_data, utils::pad_usize, SolType, SolValue};
     use alloc::string::ToString;
-    use alloy_primitives::{address, bytes, hex, Address, B256, U256};
+    use alloy_primitives::{address, bytes, cAddress, hex, IcanAddress, B256, U256};
 
     #[test]
     fn dynamic_array_of_dynamic_arrays() {
@@ -341,13 +341,13 @@ mod tests {
     		0000000000000000000000000000000000000000000000000000000000000040
     		0000000000000000000000000000000000000000000000000000000000000080
     		0000000000000000000000000000000000000000000000000000000000000001
-    		0000000000000000000000001111111111111111111111111111111111111111
+    		0000000000000000000011111111111111111111111111111111111111111111
     		0000000000000000000000000000000000000000000000000000000000000001
-    		0000000000000000000000002222222222222222222222222222222222222222
+    		0000000000000000000022222222222222222222222222222222222222222222
     	"
         );
 
-        let ty = vec![vec![Address::repeat_byte(0x11)], vec![Address::repeat_byte(0x22)]];
+        let ty = vec![vec![IcanAddress::repeat_byte(0x11)], vec![IcanAddress::repeat_byte(0x22)]];
         assert_eq!(MyTy::abi_encode_params(&ty), encoded);
 
         let decoded = MyTy::abi_decode_params(&encoded, false).unwrap();
@@ -362,13 +362,13 @@ mod tests {
 
         let encoded = hex!(
             "
-    		0000000000000000000000001111111111111111111111111111111111111111
-    		0000000000000000000000002222222222222222222222222222222222222222
+    		0000000000000000000011111111111111111111111111111111111111111111
+    		0000000000000000000022222222222222222222222222222222222222222222
     		1111111111111111111111111111111111111111111111111111111111111111
     	"
         );
-        let address1 = Address::from([0x11u8; 20]);
-        let address2 = Address::from([0x22u8; 20]);
+        let address1 = IcanAddress::from([0x11u8; 22]);
+        let address2 = IcanAddress::from([0x22u8; 22]);
         let uint = U256::from_be_bytes::<32>([0x11u8; 32]);
         let expected = (address1, address2, uint);
         let decoded = MyTy::abi_decode_sequence(&encoded, true).unwrap();
@@ -463,16 +463,16 @@ mod tests {
     		0000000000000000000000000000000000000000000000000000000000000020
     		1111111111111111111111111111111111111111111111111111111111111111
     		0000000000000000000000000000000000000000000000000000000000000080
-    		0000000000000000000000001111111111111111111111111111111111111111
-    		0000000000000000000000002222222222222222222222222222222222222222
+    		0000000000000000000011111111111111111111111111111111111111111111
+    		0000000000000000000022222222222222222222222222222222222222222222
     		0000000000000000000000000000000000000000000000000000000000000009
     		6761766f66796f726b0000000000000000000000000000000000000000000000
     	"
         );
         let uint = U256::from_be_bytes::<32>([0x11u8; 32]);
         let string = "gavofyork".to_string();
-        let address1 = Address::from([0x11u8; 20]);
-        let address2 = Address::from([0x22u8; 20]);
+        let address1 = IcanAddress::from([0x11u8; 22]);
+        let address2 = IcanAddress::from([0x22u8; 22]);
         let expected = (uint, string, address1, address2);
 
         let decoded = MyTy::abi_decode(&encoded, true).unwrap();
@@ -493,10 +493,10 @@ mod tests {
 
         let encoded = hex!(
             "
-    		0000000000000000000000002222222222222222222222222222222222222222
+    		0000000000000000000022222222222222222222222222222222222222222222
     		00000000000000000000000000000000000000000000000000000000000000a0
-    		0000000000000000000000003333333333333333333333333333333333333333
-    		0000000000000000000000004444444444444444444444444444444444444444
+    		0000000000000000000033333333333333333333333333333333333333333333
+    		0000000000000000000044444444444444444444444444444444444444444444
     		0000000000000000000000000000000000000000000000000000000000000000
     		0000000000000000000000000000000000000000000000000000000000000001
     		0000000000000000000000000000000000000000000000000000000000000060
@@ -507,13 +507,13 @@ mod tests {
     		6379626f72670000000000000000000000000000000000000000000000000000
     	"
         );
-        let address1 = Address::from([0x22u8; 20]);
+        let address1 = IcanAddress::from([0x22u8; 22]);
         let bool1 = true;
         let string1 = "spaceship".to_string();
         let string2 = "cyborg".to_string();
         let tuple = (bool1, string1, string2);
-        let address2 = Address::from([0x33u8; 20]);
-        let address3 = Address::from([0x44u8; 20]);
+        let address2 = IcanAddress::from([0x33u8; 22]);
+        let address3 = IcanAddress::from([0x44u8; 22]);
         let bool2 = false;
         let expected = (address1, tuple, address2, address3, bool2);
 
@@ -534,21 +534,21 @@ mod tests {
 
         let encoded = hex!(
             "
-    		0000000000000000000000001111111111111111111111111111111111111111
-    		0000000000000000000000002222222222222222222222222222222222222222
+    		0000000000000000000011111111111111111111111111111111111111111111
+    		0000000000000000000022222222222222222222222222222222222222222222
     		0000000000000000000000000000000000000000000000000000000000000001
     		0000000000000000000000000000000000000000000000000000000000000000
-    		0000000000000000000000003333333333333333333333333333333333333333
-    		0000000000000000000000004444444444444444444444444444444444444444
+    		0000000000000000000033333333333333333333333333333333333333333333
+    		0000000000000000000044444444444444444444444444444444444444444444
     	"
         );
-        let address1 = Address::from([0x11u8; 20]);
-        let address2 = Address::from([0x22u8; 20]);
+        let address1 = IcanAddress::from([0x11u8; 22]);
+        let address2 = IcanAddress::from([0x22u8; 22]);
         let bool1 = true;
         let bool2 = false;
         let tuple = (address2, bool1, bool2);
-        let address3 = Address::from([0x33u8; 20]);
-        let address4 = Address::from([0x44u8; 20]);
+        let address3 = IcanAddress::from([0x33u8; 22]);
+        let address4 = IcanAddress::from([0x44u8; 22]);
 
         let expected = (address1, tuple, address3, address4);
 
@@ -618,7 +618,7 @@ mod tests {
         assert_eq!(
             MyTy::abi_decode_params(&encoded, false).unwrap(),
             (
-                address!("8497afefdc5ac170a664a231f6efb25526ef813f"),
+                cAddress!("00008497afefdc5ac170a664a231f6efb25526ef813f"),
                 B256::repeat_byte(0x01),
                 [0x02; 4].into(),
                 "0x0000001F".into(),
@@ -672,7 +672,7 @@ mod tests {
 
     #[test]
     fn decode_verify_bytes() {
-        type MyTy = (sol_data::Address, sol_data::FixedBytes<20>);
+        type MyTy = (sol_data::Address, sol_data::FixedBytes<22>);
         type MyTy2 = (sol_data::Address, sol_data::Address);
 
         let input = hex!(

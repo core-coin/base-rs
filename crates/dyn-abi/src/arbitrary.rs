@@ -10,7 +10,7 @@
 #![allow(clippy::arc_with_non_send_sync)]
 
 use crate::{DynSolType, DynSolValue};
-use alloy_primitives::{Address, Function, B256, I256, U256};
+use alloy_primitives::{IcanAddress, Function, B256, I256, U256};
 use arbitrary::{size_hint, Unstructured};
 use core::ops::RangeInclusive;
 use proptest::{
@@ -408,7 +408,7 @@ impl DynSolValue {
     pub fn type_strategy(ty: &DynSolType) -> SBoxedStrategy<Self> {
         match ty {
             DynSolType::Bool => any::<bool>().prop_map(Self::Bool).sboxed(),
-            DynSolType::Address => any::<Address>().prop_map(Self::Address).sboxed(),
+            DynSolType::Address => any::<IcanAddress>().prop_map(Self::Address).sboxed(),
             DynSolType::Function => any::<Function>().prop_map(Self::Function).sboxed(),
             &DynSolType::Int(sz) => {
                 any::<I256>().prop_map(move |x| Self::Int(adjust_int(x, sz), sz)).sboxed()
@@ -461,7 +461,7 @@ impl DynSolValue {
     fn leaf() -> impl Strategy<Value = Self> {
         prop_oneof![
             any::<bool>().prop_map(Self::Bool),
-            any::<Address>().prop_map(Self::Address),
+            any::<IcanAddress>().prop_map(Self::Address),
             int_strategy::<I256>().prop_map(|(x, sz)| Self::Int(adjust_int(x, sz), sz)),
             int_strategy::<U256>().prop_map(|(x, sz)| Self::Uint(adjust_uint(x, sz), sz)),
             (any::<B256>(), 1..=32usize).prop_map(|(x, sz)| Self::FixedBytes(adjust_fb(x, sz), sz)),

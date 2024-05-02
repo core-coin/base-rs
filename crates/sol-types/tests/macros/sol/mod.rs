@@ -1,4 +1,4 @@
-use alloy_primitives::{b256, bytes, hex, sha3, Address, I256, U256};
+use alloy_primitives::{b256, bytes, hex, sha3, Address, IcanAddress, I256, U256};
 use alloy_sol_types::{sol, SolCall, SolError, SolEvent, SolStruct, SolType};
 use serde::Serialize;
 use serde_json::Value;
@@ -51,7 +51,7 @@ fn e2e() {
     MyTuple::abi_encode(&(a.clone(), [0; 32]));
     MyStruct::abi_encode(&a);
 
-    LateBinding::<MyStruct>::abi_encode(&(vec![a.clone(), a.clone()], Address::default()));
+    LateBinding::<MyStruct>::abi_encode(&(vec![a.clone(), a.clone()], IcanAddress::default()));
 
     MyStruct2::abi_encode(&MyStruct2 { a, b: [0; 32].into(), c: vec![] });
 
@@ -94,14 +94,14 @@ fn function() {
         basic: U256::from(1),
         string_: "Hello World".to_owned(),
         longBytes: bytes![0; 36],
-        array: vec![Address::ZERO, Address::ZERO, Address::ZERO],
+        array: vec![IcanAddress::ZERO, IcanAddress::ZERO, IcanAddress::ZERO],
         fixedArray: [true, false],
-        struct_: CustomStruct { a: Address::ZERO, b: 2 },
+        struct_: CustomStruct { a: IcanAddress::ZERO, b: 2 },
         structArray: vec![
-            CustomStruct { a: Address::ZERO, b: 3 },
-            CustomStruct { a: Address::ZERO, b: 4 },
-            CustomStruct { a: Address::ZERO, b: 5 },
-            CustomStruct { a: Address::ZERO, b: 6 },
+            CustomStruct { a: IcanAddress::ZERO, b: 3 },
+            CustomStruct { a: IcanAddress::ZERO, b: 4 },
+            CustomStruct { a: IcanAddress::ZERO, b: 5 },
+            CustomStruct { a: IcanAddress::ZERO, b: 6 },
         ],
     };
     let encoded = call.abi_encode();
@@ -469,7 +469,7 @@ fn rust_keywords() {
     use r#dyn::*;
 
     let _ = r#const { r#unsafe: true, r#box: Default::default() };
-    let m = modCall { r#impl: Address::ZERO };
+    let m = modCall { r#impl: IcanAddress::ZERO };
     let _ = dynCalls::r#mod(m);
     let _ = modReturn { is: true, r#fn: false };
     assert_eq!(r#const::NAME, "const");
@@ -641,9 +641,9 @@ fn event_tokenize_fields() {
         event PairCreated(address indexed token0, address indexed token1, address pair, uint256);
     }
     let _ = PairCreated {
-        token0: Address::ZERO,
-        token1: Address::ZERO,
-        pair: Address::ZERO,
+        token0: IcanAddress::ZERO,
+        token1: IcanAddress::ZERO,
+        pair: IcanAddress::ZERO,
         _3: U256::ZERO,
     };
 }

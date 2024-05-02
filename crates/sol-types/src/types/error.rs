@@ -146,7 +146,7 @@ impl SolError for Revert {
     type Token<'a> = (PackedSeqToken<'a>,);
 
     const SIGNATURE: &'static str = "Error(string)";
-    const SELECTOR: [u8; 4] = [0x08, 0xc3, 0x79, 0xa0];
+    const SELECTOR: [u8; 4] = [0x4e, 0x40, 0x1c, 0xbe];
 
     #[inline]
     fn new(tuple: <Self::Parameters<'_> as SolType>::RustType) -> Self {
@@ -272,7 +272,7 @@ impl SolError for Panic {
     type Token<'a> = (WordToken,);
 
     const SIGNATURE: &'static str = "Panic(uint256)";
-    const SELECTOR: [u8; 4] = [0x4e, 0x48, 0x7b, 0x71];
+    const SELECTOR: [u8; 4] = [0x4b, 0x1f, 0x2c, 0xe3];
 
     #[inline]
     fn new(tuple: <Self::Parameters<'_> as SolType>::RustType) -> Self {
@@ -421,7 +421,7 @@ mod tests {
     use super::*;
     use crate::{sol, types::interface::SolInterface};
     use alloc::string::ToString;
-    use alloy_primitives::{address, hex, sha3};
+    use alloy_primitives::{cAddress, hex, sha3};
 
     #[test]
     fn revert_encoding() {
@@ -464,7 +464,7 @@ mod tests {
         // Solc 0.5.X/0.5.16 adds a random 0x80 byte which makes reserialization check fail.
         // https://github.com/Uniswap/v2-core/blob/ee547b17853e71ed4e0101ccfd52e70d5acded58/contracts/UniswapV2Pair.sol#L178
         // https://github.com/paradigmxyz/evm-inspectors/pull/12
-        let bytes = hex!("08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000024556e697377617056323a20494e53554646494349454e545f494e5055545f414d4f554e5400000000000000000000000000000000000000000000000000000080");
+        let bytes = hex!("4e401cbe00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000024556e697377617056323a20494e53554646494349454e545f494e5055545f414d4f554e5400000000000000000000000000000000000000000000000000000080");
 
         Revert::abi_decode(&bytes, true).unwrap_err();
 
@@ -499,13 +499,13 @@ mod tests {
             }
         }
 
-        let data = hex!("8758782b000000000000000000000000a48388222c7ee7daefde5d0b9c99319995c4a990");
+        let data = hex!("d5e29942000000000000000000000000a48388222c7ee7daefde5d0b9c99319995c4a990");
         assert_eq!(decode_revert_reason(&data), None);
 
         let C::CErrors::SenderAddressError(decoded) = C::CErrors::abi_decode(&data, true).unwrap();
         assert_eq!(
             decoded,
-            C::SenderAddressError { _0: address!("a48388222c7ee7daefde5d0b9c99319995c4a990") }
+            C::SenderAddressError { _0: cAddress!("0000a48388222c7ee7daefde5d0b9c99319995c4a990") }
         );
     }
 }

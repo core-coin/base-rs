@@ -1,6 +1,6 @@
 use crate::{dynamic::ty::as_tuple, DynSolType, DynSolValue, Result};
 use alloc::vec::Vec;
-use alloy_primitives::{Address, Function, Sign, I256, U256};
+use alloy_primitives::{Function, IcanAddress, Sign, I256, U256};
 use alloy_sol_types::Word;
 use core::fmt;
 use hex::FromHexError;
@@ -30,7 +30,7 @@ impl DynSolType {
     ///   - unit: same as [Solidity ether units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#ether-units)
     ///   - decimals with more digits than the unit's exponent value are not allowed
     /// - [`FixedBytes`](DynSolType::FixedBytes): `(0x)?[0-9A-Fa-f]{$0*2}`
-    /// - [`Address`](DynSolType::Address): `(0x)?[0-9A-Fa-f]{40}`
+    /// - [`IcanAddress`](DynSolType::Address): `[0-9A-Fa-f]{44}`
     /// - [`Function`](DynSolType::Function): `(0x)?[0-9A-Fa-f]{48}`
     /// - [`Bytes`](DynSolType::Bytes): `(0x)?[0-9A-Fa-f]+`
     /// - [`String`](DynSolType::String): `.*`
@@ -455,7 +455,7 @@ fn fixed_bytes<'i>(len: usize) -> impl Parser<&'i str, Word, ContextError> {
 }
 
 #[inline]
-fn address(input: &mut &str) -> PResult<Address> {
+fn address(input: &mut &str) -> PResult<IcanAddress> {
     trace("address", hex_str.try_map(hex::FromHex::from_hex)).parse_next(input)
 }
 
@@ -502,7 +502,7 @@ mod tests {
         boxed::Box,
         string::{String, ToString},
     };
-    use alloy_primitives::address;
+    use alloy_primitives::{address, cAddress};
     use core::str::FromStr;
 
     #[track_caller]
@@ -913,16 +913,18 @@ mod tests {
         assert!(DynSolType::Address.coerce_str("000000000000000000000000000000000000000").is_err());
         // 40
         assert_eq!(
-            DynSolType::Address.coerce_str("0000000000000000000000000000000000000000").unwrap(),
-            DynSolValue::Address(Address::ZERO)
+            DynSolType::Address.coerce_str("00000000000000000000000000000000000000000000").unwrap(),
+            DynSolValue::Address(IcanAddress::ZERO)
         );
         assert_eq!(
-            DynSolType::Address.coerce_str("0x1111111111111111111111111111111111111111").unwrap(),
-            DynSolValue::Address(Address::new([0x11; 20]))
+            DynSolType::Address
+                .coerce_str("0x11111111111111111111111111111111111111111111")
+                .unwrap(),
+            DynSolValue::Address(IcanAddress::new([0x11; 22]))
         );
         assert_eq!(
-            DynSolType::Address.coerce_str("2222222222222222222222222222222222222222").unwrap(),
-            DynSolValue::Address(Address::new([0x22; 20]))
+            DynSolType::Address.coerce_str("22222222222222222222222222222222222222222222").unwrap(),
+            DynSolValue::Address(IcanAddress::new([0x22; 22]))
         );
     }
 
@@ -1225,12 +1227,12 @@ mod tests {
                 DynSolType::Array(Box::new(DynSolType::Tuple(vec![DynSolType::Address]))),
                 DynSolType::Uint(256),
             ])
-            .coerce_str("([(5c9d55b78febcc2061715ba4f57ecf8ea2711f2c)],2)")
+            .coerce_str("([(00005c9d55b78febcc2061715ba4f57ecf8ea2711f2c)],2)")
             .unwrap(),
             DynSolValue::Tuple(vec![
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![DynSolValue::Address(address!(
-                    "5c9d55b78febcc2061715ba4f57ecf8ea2711f2c"
-                ))])]),
+                DynSolValue::Array(vec![DynSolValue::Tuple(vec![DynSolValue::Address(
+                    cAddress!("00005c9d55b78febcc2061715ba4f57ecf8ea2711f2c")
+                )])]),
                 DynSolValue::Uint(U256::from(2), 256),
             ])
         );

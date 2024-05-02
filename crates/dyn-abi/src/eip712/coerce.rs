@@ -3,7 +3,7 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use alloy_primitives::{Address, Function, I256, U256};
+use alloy_primitives::{Function, IcanAddress, I256, U256};
 
 impl DynSolType {
     /// Coerce a [`serde_json::Value`] to a [`DynSolValue`] via this type.
@@ -88,7 +88,7 @@ fn fixed_bytes(n: usize, value: &serde_json::Value) -> Option<Word> {
     None
 }
 
-fn address(value: &serde_json::Value) -> Option<Address> {
+fn address(value: &serde_json::Value) -> Option<IcanAddress> {
     value.as_str().and_then(|s| s.parse().ok())
 }
 
@@ -203,16 +203,16 @@ mod tests {
                 "from": {
                     "name": "Cow",
                     "wallets": [
-                        "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                        "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
+                        "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+                        "0x0000DeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
                     ]
                 },
                 "to": [{
                     "name": "Bob",
                     "wallets": [
-                        "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-                        "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-                        "0xB0B0b0b0b0b0B000000000000000000000000000",
+                        "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+                        "0x0000B0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
+                        "0x0000B0B0b0b0b0b0B000000000000000000000000000",
                     ]
                 }]
             }
@@ -257,10 +257,14 @@ mod tests {
                             DynSolValue::String("Cow".to_string()),
                             vec![
                                 DynSolValue::Address(
-                                    "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826".parse().unwrap()
+                                    "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+                                        .parse()
+                                        .unwrap()
                                 ),
                                 DynSolValue::Address(
-                                    "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF".parse().unwrap()
+                                    "0x0000DeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF"
+                                        .parse()
+                                        .unwrap()
                                 ),
                             ]
                             .into()
@@ -273,13 +277,19 @@ mod tests {
                             DynSolValue::String("Bob".to_string()),
                             vec![
                                 DynSolValue::Address(
-                                    "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB".parse().unwrap()
+                                    "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+                                        .parse()
+                                        .unwrap()
                                 ),
                                 DynSolValue::Address(
-                                    "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57".parse().unwrap()
+                                    "0x0000B0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57"
+                                        .parse()
+                                        .unwrap()
                                 ),
                                 DynSolValue::Address(
-                                    "0xB0B0b0b0b0b0B000000000000000000000000000".parse().unwrap()
+                                    "0x0000B0B0b0b0b0b0B000000000000000000000000000"
+                                        .parse()
+                                        .unwrap()
                                 ),
                             ]
                             .into()

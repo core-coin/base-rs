@@ -277,7 +277,7 @@ mod tests {
                 "name": "example.metamask.io",
                 "version": "1",
                 "chainId": 1,
-                "verifyingContract": "0x0000000000000000000000000000000000000000"
+                "verifyingContract": "0x00000000000000000000000000000000000000000000"
             },
             "message": {}
         });
@@ -287,7 +287,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "122d1c8ef94b76dad44dcb03fa772361e20855c63311a15d5afe02d1b38f6077",
+            "505585ce924e1dc5140fce76e0681ef7e730f2870aa96fb19cc5e036afef4c3e",
         );
     }
 
@@ -307,7 +307,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "8d4a3f4082945b7879e2b55f181c31a77c8c0a464b70669458abbaaf99de4c38",
+            "7d4a0cd49838372fa662b615b99de586cd874c83a1e4c4cb2cc1bac42d9c104a",
         );
     }
 
@@ -347,15 +347,15 @@ mod tests {
                 "from": {
                     "name": "Cow",
                     "wallet": [
-                        "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                        "0xDD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+                        "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+                        "0x0000DD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
                     ]
                 },
                 "to": [
                     {
                         "name": "Bob",
                         "wallet": [
-                            "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+                            "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
                         ]
                     }
                 ],
@@ -368,7 +368,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "80a3aeb51161cfc47884ddf8eac0d2343d6ae640efe78b6a69be65e3045c1321",
+            "98dbf9dacc3f0d7829f196a2bb060c80d1e8c3d62999799945dd6416832fd0bf",
         );
     }
 
@@ -406,7 +406,7 @@ mod tests {
                 "name": "example.metamask.io",
                 "version": "1",
                 "chainId": "1",
-                "verifyingContract": "0x0000000000000000000000000000000000000000"
+                "verifyingContract": "0x00000000000000000000000000000000000000000000"
             },
             "message": {
                 "data": "Hello!"
@@ -418,7 +418,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "232cd3ec058eb935a709f093e3536ce26cc9e8e193584b0881992525f6236eef",
+            "cbbcd3d22e97bb870f8662d0baf73f3c37dcaab4d0a460af63e78aaa8dbd0c55",
         );
     }
 
@@ -457,11 +457,11 @@ mod tests {
             "message": {
                 "from": {
                     "name": "Cow",
-                    "wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+                    "wallet": "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
                 },
                 "to": {
                     "name": "Bob",
-                    "wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+                    "wallet": "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
                 },
                 "contents": "Hello, Bob!"
             }
@@ -472,7 +472,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "25c3d40a39e639a4d0b6e4d2ace5e1281e039c88494d97d8d08f99a6ea75d775",
+            "be504c79df6f0a61fbafb0d84827b301d2e888d9e578eea504654f73e33705be",
         );
     }
 
@@ -634,19 +634,19 @@ mod tests {
             "domain": {
                 "name": "Seaport",
                 "version": "1.1",
-                "chainId": "1",
-                "verifyingContract": "0x00000000006c3852cbEf3e08E8dF289169EdE581"
+                "networkId": "1",
+                "verifyingContract": "0x000000000000006c3852cbEf3e08E8dF289169EdE581"
             },
             "message": {
-                "offerer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                "offerer": "0x0000f39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 "offer": [
                     {
-                        "token": "0xA604060890923Ff400e8c6f5290461A83AEDACec"
+                        "token": "0x0000A604060890923Ff400e8c6f5290461A83AEDACec"
                     }
                 ],
                 "startTime": "1658645591",
                 "endTime": "1659250386",
-                "zone": "0x004C00500000aD104D7DBd00e3ae0A5C00560C00",
+                "zone": "0x0000004C00500000aD104D7DBd00e3ae0A5C00560C00",
                 "zoneHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
                 "salt": "16178208897136618",
                 "conduitKey": "0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000",
@@ -660,7 +660,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "0b8aa9f3712df0034bc29fe5b24dd88cfdba02c7f499856ab24632e2969709a8",
+            "d74c6ac12d70617592bde8bf77c9cc7475668622799ced9be59fc32300e5e0a8",
         );
     }
 
@@ -701,11 +701,11 @@ mod tests {
 
         let sender = Person {
             name: "Cow".to_string(),
-            wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826".parse().unwrap(),
+            wallet: "0x0000CD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826".parse().unwrap(),
         };
         let recipient = Person {
             name: "Bob".to_string(),
-            wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB".parse().unwrap(),
+            wallet: "0x0000bBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB".parse().unwrap(),
         };
         let mail = Mail { from: sender, to: recipient, contents: "Hello, Bob!".to_string() };
 
@@ -714,7 +714,7 @@ mod tests {
         let hash = typed_data.eip712_signing_hash().unwrap();
         assert_eq!(
             hex::encode(&hash[..]),
-            "25c3d40a39e639a4d0b6e4d2ace5e1281e039c88494d97d8d08f99a6ea75d775",
+            "be504c79df6f0a61fbafb0d84827b301d2e888d9e578eea504654f73e33705be",
         );
     }
 }

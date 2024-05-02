@@ -583,14 +583,14 @@ mod tests {
         // sorted by selector
         assert_eq!(
             C::CErrors::SELECTORS,
-            [sel("Err3(string)"), sel("Err2(uint256)"), sel("Err1()")]
+            [sel("Err1()"), sel("Err3(string)"), sel("Err2(uint256)")]
         );
         assert_eq!(
             ContractError::<C::CErrors>::selectors().collect::<Vec<_>>(),
             [
+                sel("Err1()"),
                 sel("Err3(string)"),
                 sel("Err2(uint256)"),
-                sel("Err1()"),
                 sel("Error(string)"),
                 sel("Panic(uint256)"),
             ],
