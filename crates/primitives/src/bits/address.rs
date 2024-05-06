@@ -127,12 +127,10 @@ impl Address {
     /// let address = address!("d8da6bf26964af9d7eed9e03e53415d37aa96045");
     ///
     /// let checksummed = address.to_ican(1);
-    /// assert_eq!(checksummed,
-    /// address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").to_ican(1));
+    /// assert_eq!(checksummed, address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").to_ican(1));
     ///
     /// let checksummed = address.to_ican(3);
-    /// assert_eq!(checksummed,
-    /// address!("D8Da6bf26964Af9d7EEd9e03e53415d37AA96045").to_ican(3));
+    /// assert_eq!(checksummed, address!("D8Da6bf26964Af9d7EEd9e03e53415d37AA96045").to_ican(3));
     /// ```
     #[inline]
     #[must_use]

@@ -1,6 +1,6 @@
 use crate::SolValue;
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{sha3, IcanAddress, FixedBytes, B256, U256};
+use alloy_primitives::{sha3, FixedBytes, IcanAddress, B256, U256};
 
 /// EIP-712 domain attributes used in determining the domain separator.
 ///
