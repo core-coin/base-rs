@@ -5,11 +5,10 @@ use alloc::{boxed::Box, collections::TryReserveError, vec::Vec};
 use core::{fmt, mem::MaybeUninit};
 
 mod units;
+use tiny_keccak::Hasher as _;
 pub use units::{
     format_ether, format_units, parse_ether, parse_units, ParseUnits, Unit, UnitsError,
 };
-use tiny_keccak::Hasher as _;
-
 
 #[doc(hidden)]
 #[deprecated(since = "0.5.0", note = "use `Unit::ETHER.wei()` instead")]

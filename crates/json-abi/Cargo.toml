@@ -21,7 +21,7 @@ serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
-ethabi = "18"
+ethabi = { git = "https://github.com/core-coin/coreabi"}
 pretty_assertions.workspace = true
 serde_json.workspace = true
 

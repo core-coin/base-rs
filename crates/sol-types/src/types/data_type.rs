@@ -1503,9 +1503,7 @@ mod tests {
         let value = (RustIcanAddress::with_last_byte(1), U256::from(2), 3u32, -3i32, 3u32, -3i32);
 
         let res =
-            <sol! { (Address, uint160, uint24, int24, uint32, int32) }>::abi_encode_packed(
-                &value,
-            );
+            <sol! { (Address, uint160, uint24, int24, uint32, int32) }>::abi_encode_packed(&value);
         let expected = hex!(
             "00000000000000000000000000000000000000000001"
             "0000000000000000000000000000000000000002"

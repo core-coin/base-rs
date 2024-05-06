@@ -10,7 +10,7 @@
 #![allow(clippy::arc_with_non_send_sync)]
 
 use crate::{DynSolType, DynSolValue};
-use alloy_primitives::{IcanAddress, Function, B256, I256, U256};
+use alloy_primitives::{Function, IcanAddress, B256, I256, U256};
 use arbitrary::{size_hint, Unstructured};
 use core::ops::RangeInclusive;
 use proptest::{

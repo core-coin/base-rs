@@ -158,8 +158,8 @@ impl IcanAddress {
     /// let address = address!("8ba1f109551bD432803012645Ac136ddd64DBA72");
     /// let salt = b256!("7c5ea36004851c764c44143b1dcb59679b11c9a68e5f41497f6cf3d480715331");
     /// let init_code = bytes!("6394198df16000526103ff60206004601c335afa6040516060f3");
-    /// let expected = address!("533ae9d683B10C02EbDb05471642F85230071FC3");
-    /// assert_eq!(address.create2_from_code(salt, init_code), expected);
+    /// let expected = address!("21b11dd568ef8d9421c483c968e3100862c1bde3").to_ican(1);
+    /// assert_eq!(address.to_ican(1).create2_from_code(salt, init_code), expected);
     /// ```
     #[must_use]
     pub fn create2_from_code<S, C>(&self, salt: S, init_code: C) -> Self
@@ -186,10 +186,10 @@ impl IcanAddress {
     ///
     /// ```
     /// # use alloy_primitives::{address, b256, Address};
-    /// let address = address!("5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f");
+    /// let address = address!("5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f").to_ican(1);
     /// let salt = b256!("2b2f5776e38002e0c013d0d89828fdb06fee595ea2d5ed4b194e3883e823e350");
     /// let init_code_hash = b256!("96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f");
-    /// let expected = address!("0d4a11d5EEaaC28EC3F61d100daF4d40471f1852");
+    /// let expected = address!("c799315156c5a36726b12f4ad7221d162d7d4c55").to_ican(1);
     /// assert_eq!(address.create2(salt, init_code_hash), expected);
     /// ```
     #[must_use]

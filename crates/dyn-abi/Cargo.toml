@@ -39,7 +39,7 @@ proptest = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
-ethabi = "18"
+ethabi = { git = "https://github.com/core-coin/coreabi"}
 rand = "0.8"
 serde_json = { workspace = true }
 

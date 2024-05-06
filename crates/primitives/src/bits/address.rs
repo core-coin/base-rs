@@ -60,34 +60,6 @@ wrap_fixed_bytes!(
     /// [`Display`] formats the address using its [EIP-55] checksum
     /// ([`to_checksum`]).
     /// Use [`Debug`] to display the raw bytes without the checksum.
-    ///
-    /// [EIP-55]: https://eips.ethereum.org/EIPS/eip-55
-    /// [`Debug`]: fmt::Debug
-    /// [`Display`]: fmt::Display
-    /// [`to_checksum`]: Address::to_checksum
-    ///
-    /// # Examples
-    ///
-    /// Parsing and formatting:
-    ///
-    /// ```
-    /// use alloy_primitives::{address, Address};
-    ///
-    /// let checksummed = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
-    /// let expected = address!("d8da6bf26964af9d7eed9e03e53415d37aa96045");
-    /// let address = Address::parse_checksummed(checksummed, None).expect("valid checksum");
-    /// assert_eq!(address, expected);
-    ///
-    /// // Format the address with the checksum
-    /// assert_eq!(address.to_string(), checksummed);
-    /// assert_eq!(address.to_checksum(None), checksummed);
-    ///
-    /// // Format the compressed checksummed address
-    /// assert_eq!(format!("{address:#}"), "0xd8dA…6045");
-    ///
-    /// // Format the address without the checksum
-    /// assert_eq!(format!("{address:?}"), "0xd8da6bf26964af9d7eed9e03e53415d37aa96045");
-    /// ```
     pub struct Address<20>;
 );
 
@@ -147,26 +119,18 @@ impl Address {
         FixedBytes(word)
     }
 
-    /// Encodes an Ethereum address to its [EIP-55] checksum into a heap-allocated string.
-    ///
-    /// You can optionally specify an [EIP-155 chain ID] to encode the address
-    /// using [EIP-1191].
-    ///
-    /// [EIP-55]: https://eips.ethereum.org/EIPS/eip-55
-    /// [EIP-155 chain ID]: https://eips.ethereum.org/EIPS/eip-155
-    /// [EIP-1191]: https://eips.ethereum.org/EIPS/eip-1191
+    /// Encodes an Ethereum address to Ican Address
     ///
     /// # Examples
-    ///
     /// ```
     /// # use alloy_primitives::{address, Address};
     /// let address = address!("d8da6bf26964af9d7eed9e03e53415d37aa96045");
     ///
-    /// let checksummed: String = address.to_checksum(None);
-    /// assert_eq!(checksummed, "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+    /// let checksummed = address.to_ican(1);
+    /// assert_eq!(checksummed, address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").to_ican(1));
     ///
-    /// let checksummed: String = address.to_checksum(Some(1));
-    /// assert_eq!(checksummed, "0xD8Da6bf26964Af9d7EEd9e03e53415d37AA96045");
+    /// let checksummed = address.to_ican(3);
+    /// assert_eq!(checksummed, address!("D8Da6bf26964Af9d7EEd9e03e53415d37AA96045").to_ican(3));
     /// ```
     #[inline]
     #[must_use]

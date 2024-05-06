@@ -19,11 +19,10 @@ fn ethabi_encode(c: &mut Criterion) {
         });
     });
 
-    //todo::error2215 uncomment when we will have 22 addresses in ethabi crate
-    // g.bench_function("struct", |b| {
-    //     let tokens = encode_struct_input_tokens();
-    //     b.iter(|| ethabi::encode(black_box(&tokens)));
-    // });
+    g.bench_function("struct", |b| {
+        let tokens = encode_struct_input_tokens();
+        b.iter(|| ethabi::encode(black_box(&tokens)));
+    });
 
     g.finish();
 }
@@ -152,24 +151,23 @@ fn encode_struct_input() -> Input {
     }
 }
 
-//todo::error2215 uncomment when we will have 22 addresses in ethabi crate
-// fn encode_struct_input_tokens() -> [ethabi::Token; 8] {
-//     let input = encode_struct_input();
-//     [
-//         ethabi::Token::Address(input.tokenIn.0 .0.into()),
-//         ethabi::Token::Address(input.tokenOut.0 .0.into()),
-//         ethabi::Token::Uint(input.fee.into()),
-//         ethabi::Token::Address(input.recipient.0 .0.into()),
-//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.deadline.to_be_bytes_vec())),
-//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.amountIn.to_be_bytes_vec())),
-//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(
-//             &input.amountOutMinimum.to_be_bytes_vec(),
-//         )),
-//         ethabi::Token::Uint(ethabi::Uint::from_big_endian(
-//             &input.sqrtPriceLimitX96.to_be_bytes_vec(),
-//         )),
-//     ]
-// }
+fn encode_struct_input_tokens() -> [ethabi::Token; 8] {
+    let input = encode_struct_input();
+    [
+        ethabi::Token::Address(input.tokenIn.0 .0.into()),
+        ethabi::Token::Address(input.tokenOut.0 .0.into()),
+        ethabi::Token::Uint(input.fee.into()),
+        ethabi::Token::Address(input.recipient.0 .0.into()),
+        ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.deadline.to_be_bytes_vec())),
+        ethabi::Token::Uint(ethabi::Uint::from_big_endian(&input.amountIn.to_be_bytes_vec())),
+        ethabi::Token::Uint(ethabi::Uint::from_big_endian(
+            &input.amountOutMinimum.to_be_bytes_vec(),
+        )),
+        ethabi::Token::Uint(ethabi::Uint::from_big_endian(
+            &input.sqrtPriceLimitX96.to_be_bytes_vec(),
+        )),
+    ]
+}
 
 fn encode_struct_sol_values() -> [DynSolValue; 8] {
     let input = encode_struct_input();
