@@ -69,6 +69,7 @@ proptest-derive = "0.4"
 rand = { version = "0.8", default-features = false }
 ruint = { git = "https://github.com/Kuly14/uint.git",  default-features = false, features = ["alloc"] }
 ruint-macro = { git = "https://github.com/Kuly14/uint.git",  default-features = false }
+libgoldilocks = { git = "https://github.com/core-coin/ed448-rs.git"}
 winnow = { version = "0.6", default-features = false, features = ["alloc"] }
 postgres-types = "0.2.6"
 allocative = { version = "0.3.2", default-features = false }

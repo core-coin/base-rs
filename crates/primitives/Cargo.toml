@@ -23,6 +23,7 @@ hex-literal.workspace = true
 hex.workspace = true
 itoa.workspace = true
 ruint.workspace = true
+libgoldilocks.workspace = true
 tiny-keccak = { workspace = true, features = ["sha3"] }
 
 # macros
@@ -46,6 +47,7 @@ rand = { workspace = true, optional = true, features = ["getrandom"] }
 
 # k256
 k256 = { workspace = true, optional = true, features = ["ecdsa"] }
+
 
 # arbitrary
 arbitrary = { workspace = true, optional = true }
