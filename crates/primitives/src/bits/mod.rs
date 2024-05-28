@@ -2,7 +2,6 @@
 mod macros;
 
 mod sig;
-pub use sig::B1368;
 
 mod address;
 pub use address::{Address, AddressError};

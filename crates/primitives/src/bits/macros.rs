@@ -64,6 +64,7 @@ macro_rules! wrap_fixed_bytes {
                 $extra_derives,
             )*
         )]
+        /// A fixed-size byte array.
         #[repr(transparent)]
         $vis struct $name(#[into_iterator(owned, ref, ref_mut)] pub $crate::FixedBytes<$n>);
 

@@ -22,6 +22,7 @@
 #[macro_use]
 extern crate alloc;
 
+use cfg_if as _;
 use tiny_keccak as _;
 
 #[cfg(feature = "postgres")]
@@ -47,7 +48,7 @@ mod bytes_;
 pub use self::bytes_::Bytes;
 
 mod crypto;
-pub use crypto::{private::PrivateKey, public::PublicKey};
+pub use crypto::{PrivateKey, PublicKey};
 
 mod common;
 pub use common::TxKind;
@@ -65,11 +66,11 @@ mod signature;
 pub use signature::{to_eip155_v, Parity, SignatureError};
 
 /// An ECDSA Signature, consisting of V, R, and S.
-#[cfg(feature = "k256")]
-pub type Signature = signature::Signature<k256::ecdsa::Signature>;
+// #[cfg(feature = "k256")]
+// pub type Signature = signature::Signature<k256::ecdsa::Signature>;
 
 /// An ECDSA Signature, consisting of V, R, and S.
-#[cfg(not(feature = "k256"))]
+// #[cfg(not(feature = "k256"))]
 pub type Signature = signature::Signature<()>;
 
 pub mod utils;

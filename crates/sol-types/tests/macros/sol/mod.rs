@@ -1,4 +1,4 @@
-use alloy_primitives::{b256, bytes, hex, sha3, Address, IcanAddress, I256, U256};
+use alloy_primitives::{b256, bytes, hex, sha3, IcanAddress, I256, U256};
 use alloy_sol_types::{sol, SolCall, SolError, SolEvent, SolStruct, SolType};
 use serde::Serialize;
 use serde_json::Value;

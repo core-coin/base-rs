@@ -9,7 +9,7 @@
 
 use crate::abi;
 use alloc::{borrow::Cow, boxed::Box, collections::TryReserveError, string::String};
-use alloy_primitives::LogData;
+use alloy_primitives::{LogData, PublicKey};
 use core::fmt;
 
 /// ABI result type.
