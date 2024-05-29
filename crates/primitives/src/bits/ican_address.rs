@@ -1,4 +1,7 @@
-use crate::{sha3, Address, FixedBytes};
+use crate::{
+    crypto::{PrivateKey, PublicKey},
+    sha3, Address, FixedBytes,
+};
 use core::{borrow::Borrow, fmt, panic, str};
 use ruint::aliases::U176;
 
@@ -100,13 +103,13 @@ impl IcanAddress {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, Address};
-    /// let sender = address!("b20a608c624Ca5003905aA834De7156C68b2E1d0");
+    /// # use alloy_primitives::{cAddress, IcanAddress};
+    /// let sender = cAddress!("cb00b20a608c624Ca5003905aA834De7156C68b2E1d0");
     ///
-    /// let expected = address!("00000000219ab540356cBB839Cbe05303d7705Fa");
+    /// let expected = cAddress!("cb13e6ff992542059347e59e8e393af8adefa71fd4e6");
     /// assert_eq!(sender.create(0), expected);
     ///
-    /// let expected = address!("e33c6e89e69d085897f98e92b06ebd541d1daa99");
+    /// let expected = cAddress!("cb21b71cb5f6596d0f00925879048271562115bf9e84");
     /// assert_eq!(sender.create(1), expected);
     /// ```
     #[cfg(feature = "rlp")]
@@ -229,36 +232,34 @@ impl IcanAddress {
     ///
     /// # Panics
     ///
-    /// If the input is not exactly 64 bytes
+    /// If the input is not exactly 57 bytes
     pub fn from_raw_public_key(pubkey: &[u8], network_id: u64) -> Self {
-        assert_eq!(pubkey.len(), 64, "raw public key must be 64 bytes");
+        assert_eq!(pubkey.len(), 57, "raw public key must be 57 bytes");
         let digest = sha3(pubkey);
         Address::from_slice(&digest[12..]).to_ican(network_id)
     }
 
-    /// Converts an ECDSA verifying key to its corresponding Ethereum address.
+    /// Converts an Ed448 public key to its corresponding Ican address.
     #[inline]
-    #[cfg(feature = "k256")]
     #[doc(alias = "from_verifying_key")]
-    pub fn from_public_key(pubkey: &k256::ecdsa::VerifyingKey) -> Self {
-        use k256::elliptic_curve::sec1::ToEncodedPoint;
-        let affine: &k256::AffinePoint = pubkey.as_ref();
-        let encoded = affine.to_encoded_point(false);
-        Self::from_raw_public_key(&encoded.as_bytes()[1..])
+    pub fn from_public_key(pubkey: &PublicKey, network_id: u64) -> Self {
+        Self::from_raw_public_key(&pubkey.to_bytes(), network_id)
     }
 
-    /// Converts an ECDSA signing key to its corresponding Ethereum address.
+    /// Converts an Ed448 private key to its corresponding Ican address.
     #[inline]
-    #[cfg(feature = "k256")]
     #[doc(alias = "from_signing_key")]
-    pub fn from_private_key(private_key: &k256::ecdsa::SigningKey) -> Self {
-        Self::from_public_key(private_key.verifying_key())
+    pub fn from_private_key(private_key: &PrivateKey, network_id: u64) -> Self {
+        Self::from_public_key(&private_key.public_key(), network_id)
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Address;
+    use crate::{
+        crypto::{PrivateKey, PublicKey},
+        Address,
+    };
 
     // https://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
     #[test]
@@ -331,6 +332,52 @@ mod tests {
             assert_eq!(expected, from.create2(salt, init_code_hash));
             assert_eq!(expected, from.create2_from_code(salt, init_code));
         }
+    }
+
+    #[test]
+    fn from_raw_public_key() {
+        let pubkey = hex::decode("315484db568379ce94f9c894e3e6e4c7ee216676b713ca892d9b26746ae902a772e217a6a8bb493ce2bb313cf0cb66e76765d4c45ec6b68600").unwrap();
+        let expected =
+            "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
+        assert_eq!(IcanAddress::from_raw_public_key(&pubkey, 1), expected);
+    }
+
+    #[test]
+    fn from_public_key() {
+        let pubkey = PublicKey::from_bytes(
+            &hex::decode("315484db568379ce94f9c894e3e6e4c7ee216676b713ca892d9b26746ae902a772e217a6a8bb493ce2bb313cf0cb66e76765d4c45ec6b68600").unwrap(),
+        )
+        .unwrap();
+        let expected =
+            "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
+        assert_eq!(IcanAddress::from_public_key(&pubkey, 1), expected);
+    }
+
+    #[test]
+    fn from_private_key() {
+        // proper mainnet address
+        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let expected =
+            "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
+        assert_eq!(IcanAddress::from_private_key(&private_key, 1), expected);
+
+        // proper devin address
+        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let expected =
+            "ab03a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
+        assert_eq!(IcanAddress::from_private_key(&private_key, 3), expected);
+
+        // wrong private key
+        let wrong_private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let expected =
+            "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc4".parse::<IcanAddress>().unwrap();
+        assert_ne!(IcanAddress::from_private_key(&wrong_private_key, 1), expected);
+
+        // wrong address
+        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let wrong_expected =
+            "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc4".parse::<IcanAddress>().unwrap();
+        assert_ne!(IcanAddress::from_private_key(&private_key, 1), wrong_expected);
     }
 
     //

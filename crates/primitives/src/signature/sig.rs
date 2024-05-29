@@ -1,8 +1,4 @@
-use crate::{
-    hex,
-    signature::{Parity, SignatureError},
-    B1368, U256,
-};
+use crate::{hex, signature::SignatureError, B1368};
 use alloc::vec::Vec;
 use core::str::FromStr;
 
@@ -62,7 +58,6 @@ impl From<crate::Signature> for Vec<u8> {
     }
 }
 
-
 #[cfg(feature = "rlp")]
 impl crate::Signature {
     pub fn decode_rlp_sig(buf: &mut &[u8]) -> Result<Self, alloy_rlp::Error> {
@@ -84,10 +79,7 @@ impl Signature<()> {
     #[inline]
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, SignatureError> {
         let sig = B1368::from_slice(bytes);
-        Ok(Self {
-            inner: (),
-            sig,
-        })
+        Ok(Self { inner: (), sig })
     }
 }
 
@@ -113,7 +105,7 @@ impl<S> Signature<S> {
     #[inline]
     pub fn as_bytes(&self) -> [u8; 171] {
         let mut sig = [0u8; 171];
-        sig.copy_from_slice(&self.sig.as_slice());
+        sig.copy_from_slice(self.sig.as_slice());
         sig
     }
 
@@ -182,10 +174,29 @@ impl serde::Serialize for crate::Signature {
     }
 }
 
-
 #[cfg(test)]
 #[allow(unused_imports)]
 mod tests {
+    use crate::B1368;
+    use core::str::FromStr;
+
+    #[test]
+    fn test_from_str() {
+        let sig = crate::Signature::from_str(
+            "ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580",
+        );
+        assert!(sig.is_ok());
+        assert_eq!(sig.unwrap().sig().len(), 171);
+    }
+
+    #[test]
+    fn signature_inner() {
+        let sig: Result<crate::signature::Signature<()>, crate::SignatureError> = crate::Signature::from_str(
+            "ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580",
+        );
+        let inner: B1368 = B1368::from_str("ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580").unwrap();
+        assert_eq!(sig.unwrap().sig().0, inner.0);
+    }
     // use super::*;
     // use std::str::FromStr;
     //
@@ -273,7 +284,8 @@ mod tests {
     //     let serialized = serde_json::to_string(&signature).unwrap();
     //     assert_eq!(
     //         serialized,
-    //         r#"{"r":"0xc569c92f176a3be1a6352dd5005bfc751dcb32f57623dd2a23693e64bf4447b0","s":"0x1a891b566d369e79b7a66eecab1e008831e22daa15f91a0a0cf4f9f28f47ee05","yParity":"0x1"}"#
+    //         r#"{"r":"0xc569c92f176a3be1a6352dd5005bfc751dcb32f57623dd2a23693e64bf4447b0","s":"
+    // 0x1a891b566d369e79b7a66eecab1e008831e22daa15f91a0a0cf4f9f28f47ee05","yParity":"0x1"}"#
     //     );
     // }
     //
@@ -290,7 +302,9 @@ mod tests {
     //     )
     //     .unwrap();
     //
-    //     let expected = r#"{"r":"0xc569c92f176a3be1a6352dd5005bfc751dcb32f57623dd2a23693e64bf4447b0","s":"0x1a891b566d369e79b7a66eecab1e008831e22daa15f91a0a0cf4f9f28f47ee05","yParity":"0x1"}"#;
+    //     let expected =
+    // r#"{"r":"0xc569c92f176a3be1a6352dd5005bfc751dcb32f57623dd2a23693e64bf4447b0","s":"
+    // 0x1a891b566d369e79b7a66eecab1e008831e22daa15f91a0a0cf4f9f28f47ee05","yParity":"0x1"}"#;
     //
     //     let serialized = serde_json::to_string(&signature).unwrap();
     //     assert_eq!(serialized, expected);
@@ -316,7 +330,10 @@ mod tests {
     // #[test]
     // fn signature_rlp_decode() {
     //     // Given a hex-encoded byte sequence
-    //     let bytes = crate::hex!("f84301a048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a010002cef538bc0c8e21c46080634a93e082408b0ad93f4a7207e63ec5463793d");
+    //     let bytes =
+    // crate::hex!("
+    // f84301a048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a010002cef538bc0c8e21c46080634a93e082408b0ad93f4a7207e63ec5463793d"
+    // );
     //
     //     // Decode the byte sequence into a Signature instance
     //     let result = Signature::decode(&mut &bytes[..]).unwrap();
@@ -332,7 +349,10 @@ mod tests {
     // #[test]
     // fn signature_rlp_encode() {
     //     // Given a Signature instance
-    //     let sig = Signature::from_str("48b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c8041b").unwrap();
+    //     let sig =
+    // Signature::from_str("
+    // 48b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c8041b"
+    // ).unwrap();
     //
     //     // Initialize an empty buffer
     //     let mut buf = vec![];
@@ -341,7 +361,9 @@ mod tests {
     //     sig.encode(&mut buf);
     //
     //     // Define the expected hex-encoded string
-    //     let expected = "f8431ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804";
+    //     let expected =
+    // "f8431ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804"
+    // ;
     //
     //     // Assert that the encoded buffer matches the expected hex-encoded string
     //     assert_eq!(hex::encode(&buf), expected);
@@ -351,7 +373,10 @@ mod tests {
     // #[test]
     // fn signature_rlp_length() {
     //     // Given a Signature instance
-    //     let sig = Signature::from_str("48b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c8041b").unwrap();
+    //     let sig =
+    // Signature::from_str("
+    // 48b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c8041b"
+    // ).unwrap();
     //
     //     // Assert that the length of the Signature matches the expected length
     //     assert_eq!(sig.length(), 69);

@@ -1,4 +1,5 @@
-use crate::PublicKey;
+use super::PublicKey;
+use alloc::string::String;
 use libgoldilocks::goldilocks::PrivateKey as GoldilocksPrivateKey;
 
 /// Base-rs wrapper for goldilocks ed448 private key.
@@ -14,7 +15,7 @@ impl PrivateKey {
     }
 
     /// Get the inner private key
-    pub fn key(&self) -> GoldilocksPrivateKey {
+    pub const fn key(&self) -> GoldilocksPrivateKey {
         self.inner
     }
 
@@ -24,7 +25,7 @@ impl PrivateKey {
     }
 
     /// Serialize the private key into a byte array.
-    pub fn to_bytes(&self) -> [u8; 57] {
+    pub const fn to_bytes(&self) -> [u8; 57] {
         self.inner
     }
 
@@ -38,7 +39,7 @@ impl PrivateKey {
 
     /// Return private key as hex string
     pub fn to_hex(&self) -> String {
-        hex::encode(&self.inner)
+        hex::encode(self.inner)
     }
 
     /// Get public key from private key
@@ -60,7 +61,7 @@ impl PrivateKey {
 
 #[cfg(test)]
 mod tests {
-    use crate::{PrivateKey, PublicKey};
+    use super::{PrivateKey, PublicKey};
 
     #[test]
     fn test_decode() {

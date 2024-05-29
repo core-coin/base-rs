@@ -1,7 +1,7 @@
 use crate::{aliases::U160, utils::sha3, FixedBytes, IcanAddress};
 use core::{
     borrow::Borrow,
-    fmt::{self, Display, Write},
+    fmt::{self, Display},
     str,
 };
 use ruint::aliases::U256;
@@ -151,11 +151,11 @@ impl Address {
         let mut x = U256::from(1);
         for _ in 0..44 {
             let t = v & U256::from(0x0f);
-            s = s + t * x;
+            s += t * x;
             x *= U256::from(10) + U256::from(90) * (t / U256::from(10));
             v >>= 4;
         }
-        s = s % U256::from(97);
+        s %= U256::from(97);
         s = U256::from(98) - s;
         s = (s % U256::from(10)) + (s / U256::from(10)) * U256::from(16);
         let result: U256 = value_new + (s << 160) + (network_prefix << 168);

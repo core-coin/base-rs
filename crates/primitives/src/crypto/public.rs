@@ -1,4 +1,7 @@
+use alloc::string::String;
 use libgoldilocks::{errors::LibgoldilockErrors, goldilocks::PublicKey as GoldilocksPublicKey};
+
+use crate::Signature;
 
 /// Base-rs wrapper for goldilocks ed448 public key.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -13,7 +16,7 @@ impl PublicKey {
     }
 
     /// Serialize the public key into a byte array.
-    pub fn to_bytes(&self) -> [u8; 57] {
+    pub const fn to_bytes(&self) -> [u8; 57] {
         self.inner
     }
 
@@ -33,18 +36,16 @@ impl PublicKey {
     }
 
     /// Verify a message with the public key
-    pub fn verify(
-        &self,
-        message: &[u8],
-        signature: &[u8; 171],
-    ) -> Result<bool, LibgoldilockErrors> {
-        libgoldilocks::goldilocks::ed448_verify(&self.inner, &signature[..114], message)
+    pub fn verify(&self, message: &[u8], signature: Signature) -> Result<bool, LibgoldilockErrors> {
+        libgoldilocks::goldilocks::ed448_verify(&self.inner, &signature.as_bytes(), message)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{PrivateKey, PublicKey};
+    use crate::signature::Signature;
+
+    use super::PublicKey;
 
     #[test]
     fn test_decode() {
@@ -95,7 +96,7 @@ mod tests {
         ])
         .unwrap();
         let message = b"hello world";
-        let signature = [
+        let signature = Signature::from_bytes(&[
             // Signature
             0x11, 0x12, 0x0b, 0x07, 0x9b, 0xad, 0xd1, 0xcd, 0x24, 0xd6, 0x3d, 0x1a, 0xe6, 0xbe,
             0x36, 0x94, 0xbd, 0x9b, 0xe6, 0x25, 0xfc, 0xa8, 0x11, 0x3a, 0x81, 0xab, 0x98, 0x8c,
@@ -111,8 +112,8 @@ mod tests {
             0xc8, 0x96, 0xc0, 0xc3, 0xdd, 0x28, 0xa9, 0xbb, 0x50, 0x65, 0xe0, 0x67, 0x25, 0xc8,
             0xf9, 0xe3, 0xf7, 0xc2, 0xc6, 0xbb, 0xad, 0x49, 0x00, 0xb7, 0x44, 0x7e, 0xcf, 0x98,
             0x80,
-        ];
+        ]);
 
-        assert_eq!(pk_hex.verify(message, &signature), Ok(true));
+        assert_eq!(pk_hex.verify(message, signature.unwrap()), Ok(true));
     }
 }
