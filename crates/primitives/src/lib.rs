@@ -47,9 +47,6 @@ pub use bits::{
 mod bytes_;
 pub use self::bytes_::Bytes;
 
-mod crypto;
-pub use crypto::{PrivateKey, PublicKey};
-
 mod common;
 pub use common::TxKind;
 

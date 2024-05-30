@@ -48,7 +48,6 @@ rand = { workspace = true, optional = true, features = ["getrandom"] }
 # k256
 k256 = { workspace = true, optional = true, features = ["ecdsa"] }
 
-
 # arbitrary
 arbitrary = { workspace = true, optional = true }
 derive_arbitrary = { workspace = true, optional = true }

@@ -1,8 +1,6 @@
-use crate::{
-    crypto::{PrivateKey, PublicKey},
-    sha3, Address, FixedBytes,
-};
+use crate::{sha3, Address, FixedBytes};
 use core::{borrow::Borrow, fmt, panic, str};
+use libgoldilocks::{SigningKey, VerifyingKey};
 use ruint::aliases::U176;
 
 wrap_fixed_bytes!(
@@ -242,24 +240,21 @@ impl IcanAddress {
     /// Converts an Ed448 public key to its corresponding Ican address.
     #[inline]
     #[doc(alias = "from_verifying_key")]
-    pub fn from_public_key(pubkey: &PublicKey, network_id: u64) -> Self {
-        Self::from_raw_public_key(&pubkey.to_bytes(), network_id)
+    pub fn from_public_key(pubkey: &VerifyingKey, network_id: u64) -> Self {
+        Self::from_raw_public_key(pubkey.as_bytes(), network_id)
     }
 
     /// Converts an Ed448 private key to its corresponding Ican address.
     #[inline]
     #[doc(alias = "from_signing_key")]
-    pub fn from_private_key(private_key: &PrivateKey, network_id: u64) -> Self {
-        Self::from_public_key(&private_key.public_key(), network_id)
+    pub fn from_private_key(private_key: &SigningKey, network_id: u64) -> Self {
+        Self::from_public_key(private_key.verifying_key(), network_id)
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        crypto::{PrivateKey, PublicKey},
-        Address,
-    };
+    use crate::Address;
 
     // https://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
     #[test]
@@ -344,10 +339,7 @@ mod tests {
 
     #[test]
     fn from_public_key() {
-        let pubkey = PublicKey::from_bytes(
-            &hex::decode("315484db568379ce94f9c894e3e6e4c7ee216676b713ca892d9b26746ae902a772e217a6a8bb493ce2bb313cf0cb66e76765d4c45ec6b68600").unwrap(),
-        )
-        .unwrap();
+        let pubkey = VerifyingKey::from_str("315484db568379ce94f9c894e3e6e4c7ee216676b713ca892d9b26746ae902a772e217a6a8bb493ce2bb313cf0cb66e76765d4c45ec6b68600");
         let expected =
             "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
         assert_eq!(IcanAddress::from_public_key(&pubkey, 1), expected);
@@ -356,25 +348,25 @@ mod tests {
     #[test]
     fn from_private_key() {
         // proper mainnet address
-        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let private_key = SigningKey::from_str("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e");
         let expected =
             "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
         assert_eq!(IcanAddress::from_private_key(&private_key, 1), expected);
 
         // proper devin address
-        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let private_key = SigningKey::from_str("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e");
         let expected =
             "ab03a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc5".parse::<IcanAddress>().unwrap();
         assert_eq!(IcanAddress::from_private_key(&private_key, 3), expected);
 
         // wrong private key
-        let wrong_private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let wrong_private_key = SigningKey::from_str("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e");
         let expected =
             "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc4".parse::<IcanAddress>().unwrap();
         assert_ne!(IcanAddress::from_private_key(&wrong_private_key, 1), expected);
 
         // wrong address
-        let private_key = PrivateKey::from_hex("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e").unwrap();
+        let private_key = SigningKey::from_str("69bb68c3a00a0cd9cbf2cab316476228c758329bbfe0b1759e8634694a9497afea05bcbf24e2aa0627eac4240484bb71de646a9296872a3c0e");
         let wrong_expected =
             "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc4".parse::<IcanAddress>().unwrap();
         assert_ne!(IcanAddress::from_private_key(&private_key, 1), wrong_expected);
