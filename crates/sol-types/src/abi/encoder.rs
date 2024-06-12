@@ -61,9 +61,7 @@ impl Encoder {
 
         // SAFETY: `#[repr(transparent)] FixedBytes<N>([u8; N])`
         crate::impl_core::into_flattened::<u8, 32>(unsafe {
-            mem::transmute::<std::vec::Vec<alloy_primitives::FixedBytes<32>>, std::vec::Vec<[u8; 32]>>(
-                self.buf,
-            )
+            mem::transmute::<Vec<alloy_primitives::FixedBytes<32>>, Vec<[u8; 32]>>(self.buf)
         })
     }
 
