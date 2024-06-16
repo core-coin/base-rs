@@ -1,16 +1,16 @@
 use crate::{hex, signature::SignatureError, B1368};
 use alloc::vec::Vec;
 use core::str::FromStr;
+use serde::{Deserialize, Serialize};
 
 /// An Ethereum ECDSA signature.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Signature<T> {
-    /// Memoized ecdsa signature (if any)
-    inner: T,
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct Signature {
     sig: B1368,
 }
 
-impl<'a> TryFrom<&'a [u8]> for Signature<()> {
+impl<'a> TryFrom<&'a [u8]> for Signature {
     type Error = SignatureError;
 
     fn try_from(bytes: &'a [u8]) -> Result<Self, Self::Error> {
@@ -21,7 +21,7 @@ impl<'a> TryFrom<&'a [u8]> for Signature<()> {
     }
 }
 
-impl FromStr for Signature<()> {
+impl FromStr for Signature {
     type Err = SignatureError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -70,26 +70,7 @@ impl crate::Signature {
     }
 }
 
-impl Signature<()> {
-    /// Parses a signature from a byte slice, with a v value
-    ///
-    /// # Panics
-    ///
-    /// If the slice is not at least 64 bytes long.
-    #[inline]
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self, SignatureError> {
-        let sig = B1368::from_slice(bytes);
-        Ok(Self { inner: (), sig })
-    }
-}
-
-impl<S> Signature<S> {
-    /// Returns the inner ECDSA signature.
-    #[inline]
-    pub const fn inner(&self) -> &S {
-        &self.inner
-    }
-
+impl Signature {
     /// Returns the `r` component of this signature.
     #[inline]
     pub const fn sig(&self) -> B1368 {
@@ -107,6 +88,12 @@ impl<S> Signature<S> {
         let mut sig = [0u8; 171];
         sig.copy_from_slice(self.sig.as_slice());
         sig
+    }
+
+    #[inline]
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, SignatureError> {
+        let sig = B1368::from_slice(bytes);
+        Ok(Self { sig })
     }
 
     /// Length of RLP RS field encoding
@@ -150,33 +137,10 @@ impl alloy_rlp::Decodable for crate::Signature {
     }
 }
 
-#[cfg(feature = "serde")]
-impl serde::Serialize for crate::Signature {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        // if the serializer is human readable, serialize as a map, otherwise as a tuple
-        if serializer.is_human_readable() {
-            use serde::ser::SerializeMap;
-
-            let mut map = serializer.serialize_map(Some(1))?;
-
-            map.serialize_entry("sig", &self.sig)?;
-            map.end()
-        } else {
-            use serde::ser::SerializeTuple;
-
-            let mut tuple = serializer.serialize_tuple(1)?;
-            tuple.serialize_element(&self.sig)?;
-            tuple.end()
-        }
-    }
-}
-
 #[cfg(test)]
 #[allow(unused_imports)]
 mod tests {
+    use super::*;
     use crate::B1368;
     use core::str::FromStr;
 
@@ -191,14 +155,12 @@ mod tests {
 
     #[test]
     fn signature_inner() {
-        let sig: Result<crate::signature::Signature<()>, crate::SignatureError> = crate::Signature::from_str(
+        let sig: Result<crate::signature::Signature, crate::SignatureError> = crate::Signature::from_str(
             "ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580",
         );
         let inner: B1368 = B1368::from_str("ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580").unwrap();
         assert_eq!(sig.unwrap().sig().0, inner.0);
     }
-    // use super::*;
-    // use std::str::FromStr;
     //
     // #[cfg(feature = "rlp")]
     // use alloy_rlp::{Decodable, Encodable};
