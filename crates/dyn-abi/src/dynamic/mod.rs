@@ -1,14 +1,14 @@
 mod error;
-pub use error::{DecodedError, DynSolError};
+pub use error::{DecodedError, DynYlmError};
 
 mod event;
-pub use event::{DecodedEvent, DynSolEvent};
+pub use event::{DecodedEvent, DynYlmEvent};
 
 pub(crate) mod ty;
-pub use ty::DynSolType;
+pub use ty::DynYlmType;
 
 mod token;
 pub use token::DynToken;
 
 mod value;
-pub use value::DynSolValue;
+pub use value::DynYlmValue;

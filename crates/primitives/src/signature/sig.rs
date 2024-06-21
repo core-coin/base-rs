@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 use core::str::FromStr;
 use serde::{Deserialize, Serialize};
 
-/// An Ethereum ECDSA signature.
+/// An Core ECDSA signature.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Signature {

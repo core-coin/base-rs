@@ -1,4 +1,4 @@
-use alloy_json_abi::{
+use base_json_abi::{
     AbiItem, Event, EventParam, Function,
     InternalType::{Other, Struct},
     Param, StateMutability,

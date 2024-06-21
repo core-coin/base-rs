@@ -6,10 +6,10 @@ resolver = "2"
 version = "0.7.0"
 edition = "2021"
 rust-version = "1.65"
-authors = ["Alloy Contributors"]
+authors = ["Base-rs Contributors"]
 license = "MIT OR Apache-2.0"
-homepage = "https://github.com/alloy-rs/core"
-repository = "https://github.com/alloy-rs/core"
+homepage = "https://github.com/core-coin/base-rs"
+repository = "https://github.com/core-coin/base-rs"
 exclude = ["tests"]
 
 [workspace.metadata.docs.rs]
@@ -18,15 +18,15 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [workspace.dependencies]
 # workspace crates
-alloy-core = { version = "0.7.0", path = "crates/core", default-features = false }
-alloy-dyn-abi = { version = "0.7.0", path = "crates/dyn-abi", default-features = false }
-alloy-json-abi = { version = "0.7.0", path = "crates/json-abi", default-features = false }
-alloy-primitives = { version = "0.7.0", path = "crates/primitives", default-features = false }
-alloy-sol-macro = { version = "0.7.0", path = "crates/sol-macro", default-features = false }
-alloy-sol-macro-input = { version = "0.7.0", path = "crates/sol-macro-input", default-features = false }
-alloy-sol-type-parser = { version = "0.7.0", path = "crates/sol-type-parser", default-features = false }
-alloy-sol-types = { version = "0.7.0", path = "crates/sol-types", default-features = false }
-syn-solidity = { version = "0.7.0", path = "crates/syn-solidity", default-features = false }
+base-core = { version = "0.7.0", path = "crates/core", default-features = false }
+base-dyn-abi = { version = "0.7.0", path = "crates/dyn-abi", default-features = false }
+base-json-abi = { version = "0.7.0", path = "crates/json-abi", default-features = false }
+base-primitives = { version = "0.7.0", path = "crates/primitives", default-features = false }
+base-ylm-macro = { version = "0.7.0", path = "crates/ylm-macro", default-features = false }
+base-ylm-macro-input = { version = "0.7.0", path = "crates/ylm-macro-input", default-features = false }
+base-ylm-type-parser = { version = "0.7.0", path = "crates/ylm-type-parser", default-features = false }
+base-ylm-types = { version = "0.7.0", path = "crates/ylm-types", default-features = false }
+syn-ylem = { version = "0.7.0", path = "crates/syn-ylem", default-features = false }
 
 # serde
 serde = { version = "1.0", default-features = false, features = ["alloc"] }

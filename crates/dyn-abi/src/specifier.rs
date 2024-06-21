@@ -1,42 +1,42 @@
-//! Contains utilities for parsing Solidity types.
+//! Contains utilities for parsing Ylem types.
 //!
-//! This is a simple representation of Solidity type grammar.
+//! This is a simple representation of Ylem type grammar.
 
-use crate::{DynSolType, Result};
+use crate::{DynYlmType, Result};
 use alloc::vec::Vec;
-use alloy_json_abi::{EventParam, Param};
+use base_json_abi::{EventParam, Param};
 use parser::{ParameterSpecifier, Parameters, RootType, TupleSpecifier, TypeSpecifier, TypeStem};
 
 #[cfg(feature = "eip712")]
-use alloy_json_abi::InternalType;
+use base_json_abi::InternalType;
 
-/// Trait for items that can be resolved to `DynSol_____`, i.e. they speicify
-/// some Solidity interface item.
+/// Trait for items that can be resolved to `DynYlm_____`, i.e. they speicify
+/// some Ylem interface item.
 ///
 /// The `Specifier` trait is implemented by types that can be resolved into
-/// Solidity interace items, e.g. [`DynSolType`] or [`DynSolEvent`](crate::DynSolEvent).
+/// Ylem interace items, e.g. [`DynYlmType`] or [`DynYlmEvent`](crate::DynYlmEvent).
 ///
-/// ABI and related systems have many different ways of specifying Solidity interfaces.
+/// ABI and related systems have many different ways of specifying Ylem interfaces.
 /// This trait provides a single pattern for resolving those encodings into
-/// Solidity interface items.
+/// Ylem interface items.
 ///
-/// `Specifier<DynSolType>` is implemented for all the [`parser`] types, the
+/// `Specifier<DynYlmType>` is implemented for all the [`parser`] types, the
 /// [`Param`] and [`EventParam`] structs, and [`str`]. The [`str`]
-/// implementation calls [`DynSolType::parse`].
+/// implementation calls [`DynYlmType::parse`].
 ///
 /// # Examples
 ///
 /// ```
-/// # use alloy_dyn_abi::{DynSolType, Specifier};
-/// # use alloy_sol_type_parser::{RootType, TypeSpecifier};
+/// # use base_dyn_abi::{DynYlmType, Specifier};
+/// # use base_ylm_type_parser::{RootType, TypeSpecifier};
 /// let my_ty = TypeSpecifier::parse("bool")?.resolve()?;
-/// assert_eq!(my_ty, DynSolType::Bool);
+/// assert_eq!(my_ty, DynYlmType::Bool);
 ///
 /// let my_ty = RootType::parse("uint256")?.resolve()?;
-/// assert_eq!(my_ty, DynSolType::Uint(256));
+/// assert_eq!(my_ty, DynYlmType::Uint(256));
 ///
-/// assert_eq!("bytes32".resolve()?, DynSolType::FixedBytes(32));
-/// # Ok::<_, alloy_dyn_abi::Error>(())
+/// assert_eq!("bytes32".resolve()?, DynYlmType::FixedBytes(32));
+/// # Ok::<_, base_dyn_abi::Error>(())
 /// ```
 
 pub trait Specifier<T> {
@@ -44,28 +44,28 @@ pub trait Specifier<T> {
     fn resolve(&self) -> Result<T>;
 }
 
-impl Specifier<DynSolType> for str {
+impl Specifier<DynYlmType> for str {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
-        DynSolType::parse(self)
+    fn resolve(&self) -> Result<DynYlmType> {
+        DynYlmType::parse(self)
     }
 }
 
-impl Specifier<DynSolType> for RootType<'_> {
-    fn resolve(&self) -> Result<DynSolType> {
+impl Specifier<DynYlmType> for RootType<'_> {
+    fn resolve(&self) -> Result<DynYlmType> {
         match self.span() {
-            "address" => Ok(DynSolType::Address),
-            "function" => Ok(DynSolType::Function),
-            "bool" => Ok(DynSolType::Bool),
-            "string" => Ok(DynSolType::String),
-            "bytes" => Ok(DynSolType::Bytes),
-            "uint" => Ok(DynSolType::Uint(256)),
-            "int" => Ok(DynSolType::Int(256)),
+            "address" => Ok(DynYlmType::Address),
+            "function" => Ok(DynYlmType::Function),
+            "bool" => Ok(DynYlmType::Bool),
+            "string" => Ok(DynYlmType::String),
+            "bytes" => Ok(DynYlmType::Bytes),
+            "uint" => Ok(DynYlmType::Uint(256)),
+            "int" => Ok(DynYlmType::Int(256)),
             name => {
                 if let Some(sz) = name.strip_prefix("bytes") {
                     if let Ok(sz) = sz.parse() {
                         if sz != 0 && sz <= 32 {
-                            return Ok(DynSolType::FixedBytes(sz));
+                            return Ok(DynYlmType::FixedBytes(sz));
                         }
                     }
                     return Err(parser::Error::invalid_size(name).into());
@@ -79,9 +79,9 @@ impl Specifier<DynSolType> for RootType<'_> {
                     if let Ok(sz) = sz.parse() {
                         if sz != 0 && sz <= 256 && sz % 8 == 0 {
                             return if is_uint {
-                                Ok(DynSolType::Uint(sz))
+                                Ok(DynYlmType::Uint(sz))
                             } else {
-                                Ok(DynSolType::Int(sz))
+                                Ok(DynYlmType::Int(sz))
                             };
                         }
                     }
@@ -94,16 +94,16 @@ impl Specifier<DynSolType> for RootType<'_> {
     }
 }
 
-impl Specifier<DynSolType> for TupleSpecifier<'_> {
+impl Specifier<DynYlmType> for TupleSpecifier<'_> {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
-        tuple(&self.types).map(DynSolType::Tuple)
+    fn resolve(&self) -> Result<DynYlmType> {
+        tuple(&self.types).map(DynYlmType::Tuple)
     }
 }
 
-impl Specifier<DynSolType> for TypeStem<'_> {
+impl Specifier<DynYlmType> for TypeStem<'_> {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
+    fn resolve(&self) -> Result<DynYlmType> {
         match self {
             Self::Root(root) => root.resolve(),
             Self::Tuple(tuple) => tuple.resolve(),
@@ -111,29 +111,29 @@ impl Specifier<DynSolType> for TypeStem<'_> {
     }
 }
 
-impl Specifier<DynSolType> for TypeSpecifier<'_> {
-    fn resolve(&self) -> Result<DynSolType> {
+impl Specifier<DynYlmType> for TypeSpecifier<'_> {
+    fn resolve(&self) -> Result<DynYlmType> {
         self.stem.resolve().map(|ty| ty.array_wrap_from_iter(self.sizes.iter().copied()))
     }
 }
 
-impl Specifier<DynSolType> for ParameterSpecifier<'_> {
+impl Specifier<DynYlmType> for ParameterSpecifier<'_> {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
+    fn resolve(&self) -> Result<DynYlmType> {
         self.ty.resolve()
     }
 }
 
-impl Specifier<DynSolType> for Parameters<'_> {
+impl Specifier<DynYlmType> for Parameters<'_> {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
-        tuple(&self.params).map(DynSolType::Tuple)
+    fn resolve(&self) -> Result<DynYlmType> {
+        tuple(&self.params).map(DynYlmType::Tuple)
     }
 }
 
-impl Specifier<DynSolType> for Param {
+impl Specifier<DynYlmType> for Param {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
+    fn resolve(&self) -> Result<DynYlmType> {
         resolve_param(
             &self.ty,
             &self.components,
@@ -143,9 +143,9 @@ impl Specifier<DynSolType> for Param {
     }
 }
 
-impl Specifier<DynSolType> for EventParam {
+impl Specifier<DynYlmType> for EventParam {
     #[inline]
-    fn resolve(&self) -> Result<DynSolType> {
+    fn resolve(&self) -> Result<DynYlmType> {
         resolve_param(
             &self.ty,
             &self.components,
@@ -159,7 +159,7 @@ fn resolve_param(
     ty: &str,
     components: &[Param],
     #[cfg(feature = "eip712")] it: Option<&InternalType>,
-) -> Result<DynSolType> {
+) -> Result<DynYlmType> {
     let ty = TypeSpecifier::parse(ty)?;
 
     // type is simple, and we can resolve it via the specifier
@@ -172,23 +172,23 @@ fn resolve_param(
 
     #[cfg(feature = "eip712")]
     let resolved = if let Some((_, name)) = it.and_then(|i| i.as_struct()) {
-        DynSolType::CustomStruct {
+        DynYlmType::CustomStruct {
             // skip array sizes, since we have them already from parsing `ty`
             name: name.split('[').next().unwrap().into(),
             prop_names: components.iter().map(|c| c.name.clone()).collect(),
             tuple,
         }
     } else {
-        DynSolType::Tuple(tuple)
+        DynYlmType::Tuple(tuple)
     };
 
     #[cfg(not(feature = "eip712"))]
-    let resolved = DynSolType::Tuple(tuple);
+    let resolved = DynYlmType::Tuple(tuple);
 
     Ok(resolved.array_wrap_from_iter(ty.sizes))
 }
 
-fn tuple<T: Specifier<DynSolType>>(slice: &[T]) -> Result<Vec<DynSolType>> {
+fn tuple<T: Specifier<DynYlmType>>(slice: &[T]) -> Result<Vec<DynYlmType>> {
     let mut types = Vec::with_capacity(slice.len());
     for ty in slice {
         types.push(ty.resolve()?);
@@ -199,9 +199,9 @@ fn tuple<T: Specifier<DynSolType>>(slice: &[T]) -> Result<Vec<DynSolType>> {
 macro_rules! deref_impls {
     ($($(#[$attr:meta])* [$($gen:tt)*] $t:ty),+ $(,)?) => {$(
         $(#[$attr])*
-        impl<$($gen)*> Specifier<DynSolType> for $t {
+        impl<$($gen)*> Specifier<DynYlmType> for $t {
             #[inline]
-            fn resolve(&self) -> Result<DynSolType> {
+            fn resolve(&self) -> Result<DynYlmType> {
                 (**self).resolve()
             }
         }
@@ -210,12 +210,12 @@ macro_rules! deref_impls {
 
 deref_impls! {
     [] alloc::string::String,
-    [T: ?Sized + Specifier<DynSolType>] &T,
-    [T: ?Sized + Specifier<DynSolType>] &mut T,
-    [T: ?Sized + Specifier<DynSolType>] alloc::boxed::Box<T>,
-    [T: ?Sized + alloc::borrow::ToOwned + Specifier<DynSolType>] alloc::borrow::Cow<'_, T>,
-    [T: ?Sized + Specifier<DynSolType>] alloc::rc::Rc<T>,
-    [T: ?Sized + Specifier<DynSolType>] alloc::sync::Arc<T>,
+    [T: ?Sized + Specifier<DynYlmType>] &T,
+    [T: ?Sized + Specifier<DynYlmType>] &mut T,
+    [T: ?Sized + Specifier<DynYlmType>] alloc::boxed::Box<T>,
+    [T: ?Sized + alloc::borrow::ToOwned + Specifier<DynYlmType>] alloc::borrow::Cow<'_, T>,
+    [T: ?Sized + Specifier<DynYlmType>] alloc::rc::Rc<T>,
+    [T: ?Sized + Specifier<DynYlmType>] alloc::sync::Arc<T>,
 }
 
 #[cfg(test)]
@@ -223,7 +223,7 @@ mod tests {
     use super::*;
     use alloc::boxed::Box;
 
-    fn parse(s: &str) -> Result<DynSolType> {
+    fn parse(s: &str) -> Result<DynYlmType> {
         s.parse()
     }
 
@@ -243,15 +243,15 @@ mod tests {
 
     #[test]
     fn it_parses_tuples() {
-        assert_eq!(parse("(bool,)"), Ok(DynSolType::Tuple(vec![DynSolType::Bool])));
+        assert_eq!(parse("(bool,)"), Ok(DynYlmType::Tuple(vec![DynYlmType::Bool])));
         assert_eq!(
             parse("(uint256,uint256)"),
-            Ok(DynSolType::Tuple(vec![DynSolType::Uint(256), DynSolType::Uint(256)]))
+            Ok(DynYlmType::Tuple(vec![DynYlmType::Uint(256), DynYlmType::Uint(256)]))
         );
         assert_eq!(
             parse("(uint256,uint256)[2]"),
-            Ok(DynSolType::FixedArray(
-                Box::new(DynSolType::Tuple(vec![DynSolType::Uint(256), DynSolType::Uint(256)])),
+            Ok(DynYlmType::FixedArray(
+                Box::new(DynYlmType::Tuple(vec![DynYlmType::Uint(256), DynYlmType::Uint(256)])),
                 2
             ))
         );
@@ -261,77 +261,77 @@ mod tests {
     fn nested_tuples() {
         assert_eq!(
             parse("(bool,(uint256,uint256))"),
-            Ok(DynSolType::Tuple(vec![
-                DynSolType::Bool,
-                DynSolType::Tuple(vec![DynSolType::Uint(256), DynSolType::Uint(256)])
+            Ok(DynYlmType::Tuple(vec![
+                DynYlmType::Bool,
+                DynYlmType::Tuple(vec![DynYlmType::Uint(256), DynYlmType::Uint(256)])
             ]))
         );
         assert_eq!(
             parse("(((bool),),)"),
-            Ok(DynSolType::Tuple(vec![DynSolType::Tuple(vec![DynSolType::Tuple(vec![
-                DynSolType::Bool
+            Ok(DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![
+                DynYlmType::Bool
             ])])]))
         );
     }
 
     #[test]
     fn empty_tuples() {
-        assert_eq!(parse("()"), Ok(DynSolType::Tuple(vec![])));
+        assert_eq!(parse("()"), Ok(DynYlmType::Tuple(vec![])));
         assert_eq!(
             parse("((),())"),
-            Ok(DynSolType::Tuple(vec![DynSolType::Tuple(vec![]), DynSolType::Tuple(vec![])]))
+            Ok(DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![]), DynYlmType::Tuple(vec![])]))
         );
         assert_eq!(
             parse("((()))"),
-            Ok(DynSolType::Tuple(vec![DynSolType::Tuple(vec![DynSolType::Tuple(vec![])])]))
+            Ok(DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![])])]))
         );
     }
 
     #[test]
     fn it_parses_simple_types() {
-        assert_eq!(parse("uint256"), Ok(DynSolType::Uint(256)));
-        assert_eq!(parse("uint8"), Ok(DynSolType::Uint(8)));
-        assert_eq!(parse("uint"), Ok(DynSolType::Uint(256)));
-        assert_eq!(parse("address"), Ok(DynSolType::Address));
-        assert_eq!(parse("bool"), Ok(DynSolType::Bool));
-        assert_eq!(parse("string"), Ok(DynSolType::String));
-        assert_eq!(parse("bytes"), Ok(DynSolType::Bytes));
-        assert_eq!(parse("bytes32"), Ok(DynSolType::FixedBytes(32)));
+        assert_eq!(parse("uint256"), Ok(DynYlmType::Uint(256)));
+        assert_eq!(parse("uint8"), Ok(DynYlmType::Uint(8)));
+        assert_eq!(parse("uint"), Ok(DynYlmType::Uint(256)));
+        assert_eq!(parse("address"), Ok(DynYlmType::Address));
+        assert_eq!(parse("bool"), Ok(DynYlmType::Bool));
+        assert_eq!(parse("string"), Ok(DynYlmType::String));
+        assert_eq!(parse("bytes"), Ok(DynYlmType::Bytes));
+        assert_eq!(parse("bytes32"), Ok(DynYlmType::FixedBytes(32)));
     }
 
     #[test]
     fn it_parses_complex_solidity_types() {
-        assert_eq!(parse("uint256[]"), Ok(DynSolType::Array(Box::new(DynSolType::Uint(256)))));
+        assert_eq!(parse("uint256[]"), Ok(DynYlmType::Array(Box::new(DynYlmType::Uint(256)))));
         assert_eq!(
             parse("uint256[2]"),
-            Ok(DynSolType::FixedArray(Box::new(DynSolType::Uint(256)), 2))
+            Ok(DynYlmType::FixedArray(Box::new(DynYlmType::Uint(256)), 2))
         );
         assert_eq!(
             parse("uint256[2][3]"),
-            Ok(DynSolType::FixedArray(
-                Box::new(DynSolType::FixedArray(Box::new(DynSolType::Uint(256)), 2)),
+            Ok(DynYlmType::FixedArray(
+                Box::new(DynYlmType::FixedArray(Box::new(DynYlmType::Uint(256)), 2)),
                 3
             ))
         );
         assert_eq!(
             parse("uint256[][][]"),
-            Ok(DynSolType::Array(Box::new(DynSolType::Array(Box::new(DynSolType::Array(
-                Box::new(DynSolType::Uint(256))
+            Ok(DynYlmType::Array(Box::new(DynYlmType::Array(Box::new(DynYlmType::Array(
+                Box::new(DynYlmType::Uint(256))
             ))))))
         );
 
         assert_eq!(
             parse("tuple(address,bytes,(bool,(string,uint256)[][3]))[2]"),
-            Ok(DynSolType::FixedArray(
-                Box::new(DynSolType::Tuple(vec![
-                    DynSolType::Address,
-                    DynSolType::Bytes,
-                    DynSolType::Tuple(vec![
-                        DynSolType::Bool,
-                        DynSolType::FixedArray(
-                            Box::new(DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-                                DynSolType::String,
-                                DynSolType::Uint(256)
+            Ok(DynYlmType::FixedArray(
+                Box::new(DynYlmType::Tuple(vec![
+                    DynYlmType::Address,
+                    DynYlmType::Bytes,
+                    DynYlmType::Tuple(vec![
+                        DynYlmType::Bool,
+                        DynYlmType::FixedArray(
+                            Box::new(DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+                                DynYlmType::String,
+                                DynYlmType::Uint(256)
                             ])))),
                             3
                         ),
@@ -344,10 +344,10 @@ mod tests {
 
     #[test]
     fn library_enum_workaround() {
-        assert_eq!(parse("MyLibrary.MyEnum"), Ok(DynSolType::Uint(8)));
+        assert_eq!(parse("MyLibrary.MyEnum"), Ok(DynYlmType::Uint(8)));
         assert_eq!(
             parse("MyLibrary.MyEnum[]"),
-            Ok(DynSolType::Array(Box::new(DynSolType::Uint(8))))
+            Ok(DynYlmType::Array(Box::new(DynYlmType::Uint(8))))
         );
     }
 }

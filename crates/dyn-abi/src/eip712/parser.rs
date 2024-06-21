@@ -1,6 +1,6 @@
 //! EIP-712 specific parsing structures.
 
-// TODO: move to `sol-type-parser`
+// TODO: move to `ylm-type-parser`
 
 use crate::{
     eip712::resolver::{PropertyDef, TypeDef},

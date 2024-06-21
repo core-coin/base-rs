@@ -1,16 +1,16 @@
-//! Tests `#[sol(alloy_sol_types = ...)]`.
+//! Tests `#[ylm(base_ylm_types = ...)]`.
 //!
-//! This has to be in a separate crate where `alloy_sol_types` is not provided as a dependency.
+//! This has to be in a separate crate where `base_ylm_types` is not provided as a dependency.
 
 #![no_std]
 
-use alloy_core::sol;
+use base_core::ylm;
 
-type _MyUint = sol!(uint32);
-type _MyTuple = sol!((_MyUint, bytes, bool, string, bytes32, (address, uint64)));
+type _MyUint = ylm!(uint32);
+type _MyTuple = ylm!((_MyUint, bytes, bool, string, bytes32, (address, uint64)));
 
-sol! {
-    #![sol(abi)]
+ylm! {
+    #![ylm(abi)]
 
     enum MyEnum {
         A, B
@@ -36,7 +36,7 @@ sol! {
     type MyType is uint32;
 }
 
-sol! {
+ylm! {
 
     contract MyContract {
         enum MyOtherEnum {

@@ -1,61 +1,40 @@
-# Alloy
+# Base-rs
 
+Base libraries at the root of the Rust Core ecosystem.
 
-
-# TODO:
-
-- [x] primitives
-- [ ] alloy-sol-macro -> Needs 22 byte addresses
-- [ ] alloy-sol-types -> Needs 22 byte addresses
-- [ ] alloy-dyn-abi -> Needs 22 byte addresses 
-- [ ] alloy-json-abi -> Needs 22 byte addresses
-- [ ] alloy-sol-type-parse -> Needs 22 byte addresses
-- [ ] syn-solidity -> Needs 22 byte addresses
-
-
-Core libraries at the root of the Rust Ethereum ecosystem.
-
-Alloy is a rewrite of [`ethers-rs`] from the ground up, with exciting new
+Base-rs is a rewrite of [`corebc-rs`] from the ground up, with exciting new
 features, high performance, and excellent docs.
 
-[`ethers-rs`] will continue to be maintained until we have achieved
-feature-parity in Alloy. No action is currently needed from devs.
+[`corebc-rs`] will continue to be maintained until we have achieved
+feature-parity in Base-rs. No action is currently needed from devs.
 
-[`ethers-rs`]: https://github.com/gakonst/ethers-rs
-
-[![Build Status][actions-badge]][actions-url]
-[![Telegram chat][telegram-badge]][telegram-url]
-
-[actions-badge]: https://img.shields.io/github/actions/workflow/status/alloy-rs/core/ci.yml?branch=main&style=for-the-badge
-[actions-url]: https://github.com/alloy-rs/core/actions?query=branch%3Amain
-[telegram-badge]: https://img.shields.io/endpoint?color=neon&style=for-the-badge&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fethers_rs
-[telegram-url]: https://t.me/ethers_rs
+[`corebc-rs`]: https://github.com/core-coin/corebc-rs
 
 ## Overview
 
 This repository contains the following crates:
 
-- [`alloy-core`]: Meta-crate for the entire project
-- [`alloy-primitives`] - Primitive integer and byte types
-- [`alloy-sol-types`] - Compile-time [ABI] and [EIP-712] implementations
-- [`alloy-sol-macro`] - The [`sol!`] procedural macro
-- [`alloy-dyn-abi`] - Run-time [ABI] and [EIP-712] implementations
-- [`alloy-json-abi`] - Full Ethereum [JSON-ABI] implementation
-- [`alloy-sol-type-parser`] - A simple parser for Solidity type strings
-- [`syn-solidity`] - [`syn`]-powered Solidity parser
+- [`base-core`]: Meta-crate for the entire project
+- [`base-primitives`] - Primitive integer and byte types
+- [`base-ylm-types`] - Compile-time [ABI] and [EIP-712] implementations
+- [`base-ylm-macro`] - The [`ylm!`] procedural macro
+- [`base-dyn-abi`] - Run-time [ABI] and [EIP-712] implementations
+- [`base-json-abi`] - Full Core [JSON-ABI] implementation
+- [`base-ylm-type-parser`] - A simple parser for Ylem type strings
+- [`syn-ylem`] - [`syn`]-powered Ylem parser
 
-[`alloy-core`]: /crates/core
-[`alloy-primitives`]: /crates/primitives
-[`alloy-sol-types`]: /crates/sol-types
-[`alloy-sol-macro`]: /crates/sol-macro
-[`alloy-dyn-abi`]: /crates/dyn-abi
-[`alloy-json-abi`]: /crates/json-abi
-[`alloy-sol-type-parser`]: /crates/sol-type-parser
-[`syn-solidity`]: /crates/syn-solidity
+[`base-core`]: /crates/core
+[`base-primitives`]: /crates/primitives
+[`base-ylm-types`]: /crates/ylm-types
+[`base-ylm-macro`]: /crates/ylm-macro
+[`base-dyn-abi`]: /crates/dyn-abi
+[`base-json-abi`]: /crates/json-abi
+[`base-ylm-type-parser`]: /crates/ylm-type-parser
+[`syn-ylem`]: /crates/syn-ylem
 [JSON-ABI]: https://docs.soliditylang.org/en/latest/abi-spec.html#json
 [ABI]: https://docs.soliditylang.org/en/latest/abi-spec.html
 [EIP-712]: https://eips.ethereum.org/EIPS/eip-712
-[`sol!`]: https://docs.rs/alloy-sol-macro/latest/alloy_sol_macro/macro.sol.html
+[`ylm!`]: https://docs.rs/alloy-ylm-macro/latest/alloy_ylm_macro/macro.sol.html
 [`syn`]: https://github.com/dtolnay/syn
 
 ## Supported Rust Versions
@@ -67,7 +46,7 @@ When updating this, also update:
 - .github/workflows/ci.yml
 -->
 
-Alloy will keep a rolling MSRV (minimum supported rust version) policy of **at
+Base-rs will keep a rolling MSRV (minimum supported rust version) policy of **at
 least** 6 months. When increasing the MSRV, the new Rust version must have been
 released at least six months ago. The current MSRV is 1.65.0.
 
@@ -78,7 +57,7 @@ release.
 
 Thanks for your help improving the project! We are so happy to have you! We have
 [a contributing guide](./CONTRIBUTING.md) to help you get involved in the
-Alloy project.
+Base-rs project.
 
 Pull requests will not be merged unless CI passes, so please ensure that your
 contribution follows the linting rules and passes clippy.
@@ -92,7 +71,7 @@ When building for the `wasm32-unknown-unknown` target and the `"getrandom"`
 feature is enabled, compilation for the `getrandom` crate will fail. This is
 expected: see [their documentation][getrandom] for more details.
 
-To fix this, either disable the `"getrandom"` feature on `alloy-core` or add
+To fix this, either disable the `"getrandom"` feature on `base-core` or add
 `getrandom` to your dependencies with the `"js"` feature enabled:
 
 ```toml
@@ -102,7 +81,7 @@ getrandom = { version = "0.2", features = ["js"] }
 There is currently no plan to provide an official JS/TS-accessible library
 interface, as we believe [viem] or [ethers.js] serve that need very well.
 
-[open an issue]: https://github.com/alloy-rs/core/issues/new/choose
+[open an issue]: https://github.com/core-coin/base-rs/issues/new/choose
 [getrandom]: https://docs.rs/getrandom/#webassembly-support
 [viem]: https://viem.sh
 [ethers.js]: https://docs.ethers.io/v6/
@@ -113,7 +92,7 @@ All crates in this workspace should support `no_std` environments, with the
 `alloc` crate. If you find a crate that does not support `no_std`, please
 [open an issue].
 
-[open an issue]: https://github.com/alloy-rs/core/issues/new/choose
+[open an issue]: https://github.com/core-coin/base-rs/issues/new/choose
 
 ## Credits
 

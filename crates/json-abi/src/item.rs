@@ -1,6 +1,6 @@
 use crate::{param::Param, utils::*, EventParam, StateMutability};
 use alloc::{borrow::Cow, string::String, vec::Vec};
-use alloy_primitives::{sha3, Selector, B256};
+use base_primitives::{sha3, Selector, B256};
 use core::str::FromStr;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -97,7 +97,7 @@ abi_items! {
         pub outputs: Vec<Param>,
         /// The state mutability of the function.
         ///
-        /// By default this is [StateMutability::NonPayable] which is reflected in Solidity by not specifying a state mutability modifier at all. This field was introduced in 0.4.16: <https://github.com/ethereum/solidity/releases/tag/v0.4.16>
+        /// By default this is [StateMutability::NonPayable] which is reflected in Ylem by not specifying a state mutability modifier at all. This field was introduced in 0.4.16: <https://github.com/ethereum/solidity/releases/tag/v0.4.16>
         #[serde(default)]
         pub state_mutability: StateMutability,
     }
@@ -149,7 +149,7 @@ impl AbiItem<'_> {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::{AbiItem, Function, Param};
+    /// # use base_json_abi::{AbiItem, Function, Param};
     /// assert_eq!(
     ///     AbiItem::parse("function foo(bool bar)"),
     ///     Ok(AbiItem::from(Function::parse("foo(bool bar)").unwrap()).into()),
@@ -330,7 +330,7 @@ impl FromStr for Constructor {
 }
 
 impl Constructor {
-    /// Parses a Solidity constructor string: `constructor($($inputs),*)`
+    /// Parses a Ylem constructor string: `constructor($($inputs),*)`
     ///
     /// Note:
     /// - the name must always be `constructor`
@@ -340,7 +340,7 @@ impl Constructor {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::{Constructor, Param, StateMutability};
+    /// # use base_json_abi::{Constructor, Param, StateMutability};
     /// assert_eq!(
     ///     Constructor::parse("constructor(uint foo, address bar)"),
     ///     Ok(Constructor {
@@ -378,7 +378,7 @@ impl FromStr for Error {
 }
 
 impl Error {
-    /// Parses a Solidity error signature string: `$(error)? $name($($inputs),*)`
+    /// Parses a Ylem error signature string: `$(error)? $name($($inputs),*)`
     ///
     /// If you want to parse a generic [Human-Readable ABI] string, use [`AbiItem::parse`].
     ///
@@ -389,7 +389,7 @@ impl Error {
     /// Basic usage:
     ///
     /// ```
-    /// # use alloy_json_abi::{Error, Param, StateMutability};
+    /// # use base_json_abi::{Error, Param, StateMutability};
     /// assert_eq!(
     ///     Error::parse("foo(bool bar)"),
     ///     Ok(Error { name: "foo".to_string(), inputs: vec![Param::parse("bool bar").unwrap()] }),
@@ -435,7 +435,7 @@ impl FromStr for Function {
 }
 
 impl Function {
-    /// Parses a Solidity function signature string:
+    /// Parses a Ylem function signature string:
     /// `$(function)? $name($($inputs),*) $(returns ($($outputs),+))?`
     ///
     /// Note:
@@ -452,7 +452,7 @@ impl Function {
     /// Basic usage:
     ///
     /// ```
-    /// # use alloy_json_abi::{Function, Param, StateMutability};
+    /// # use base_json_abi::{Function, Param, StateMutability};
     /// assert_eq!(
     ///     Function::parse("foo(bool bar)"),
     ///     Ok(Function {
@@ -467,7 +467,7 @@ impl Function {
     /// [Function]s also support parsing output parameters:
     ///
     /// ```
-    /// # use alloy_json_abi::{Function, Param, StateMutability};
+    /// # use base_json_abi::{Function, Param, StateMutability};
     /// assert_eq!(
     ///     Function::parse("function toString(uint number) returns (string s)"),
     ///     Ok(Function {
@@ -536,7 +536,7 @@ impl FromStr for Event {
 }
 
 impl Event {
-    /// Parses a Solidity event signature string: `$(event)? $name($($inputs),*) $(anonymous)?`
+    /// Parses a Ylem event signature string: `$(event)? $name($($inputs),*) $(anonymous)?`
     ///
     /// If you want to parse a generic [Human-Readable ABI] string, use [`AbiItem::parse`].
     ///
@@ -545,7 +545,7 @@ impl Event {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::{Event, EventParam};
+    /// # use base_json_abi::{Event, EventParam};
     /// assert_eq!(
     ///     Event::parse("event foo(bool bar, uint indexed baz)"),
     ///     Ok(Event {

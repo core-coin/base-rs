@@ -1,4 +1,4 @@
-use alloy_json_abi::{AbiItem, EventParam, JsonAbi, Param};
+use base_json_abi::{AbiItem, EventParam, JsonAbi, Param};
 use pretty_assertions::assert_eq;
 use std::{
     collections::HashMap,
@@ -50,7 +50,7 @@ fn abi_test(s: &str, path: &str, run_solc: bool) {
 
     #[cfg(all(feature = "std", feature = "serde_json"))]
     load_test(path, &abi1);
-    to_sol_test(path, &abi1, run_solc);
+    to_ylm_test(path, &abi1, run_solc);
 
     let json: String = serde_json::to_string(&abi2).unwrap();
     let abi3: JsonAbi = serde_json::from_str(&json).unwrap();
@@ -74,29 +74,29 @@ fn load_test(path: &str, abi: &JsonAbi) {
     assert_eq!(*abi, loaded_abi);
 }
 
-fn to_sol_test(path: &str, abi: &JsonAbi, run_solc: bool) {
-    let path = Path::new(path);
-    let sol_path = path.with_extension("sol");
+fn to_ylm_test(path: &str, abi: &JsonAbi, run_solc: bool) {
+    let path: &Path = Path::new(path);
+    let ylm_path = path.with_extension("sol");
     let name = path.file_stem().unwrap().to_str().unwrap();
 
     let mut abi = abi.clone();
     // Ignore constructors for Solc tests.
     abi.constructor = None;
     abi.dedup();
-    let actual = abi.to_sol(name, None);
+    let actual = abi.to_ylm(name, None);
 
-    ensure_file_contents(&sol_path, &actual);
+    ensure_file_contents(&ylm_path, &actual);
 
     if matches!(
         name,
-        // https://github.com/alloy-rs/core/issues/349
+        // https://github.com/core-coin/base-rs/issues/349
         "ZeroXExchange" | "GaugeController" | "DoubleExponentInterestSetter" | "NamelessParams"
     ) {
         return;
     }
 
     if run_solc {
-        let out = Command::new("solc").arg("--abi").arg(&sol_path).output().unwrap();
+        let out = Command::new("solc").arg("--abi").arg(&ylm_path).output().unwrap();
         let stdout = String::from_utf8_lossy(&out.stdout);
         let stderr = String::from_utf8_lossy(&out.stderr);
         let panik = |s| -> ! { panic!("{s}\n\nstdout:\n{stdout}\n\nstderr:\n{stderr}") };
@@ -291,7 +291,7 @@ fn parse_unlinked_contract() {
     const TESTDATA_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/testdata");
     // unlinked placeholder __$7233c33f2e1e35848c685b0eb24649959e$__
     let content = fs::read_to_string(Path::new(TESTDATA_PATH).join("UnlinkedNouns.json")).unwrap();
-    let res = serde_json::from_str::<alloy_json_abi::ContractObject>(&content);
+    let res = serde_json::from_str::<base_json_abi::ContractObject>(&content);
     let err = res.unwrap_err();
     assert!(err.to_string().contains("expected bytecode, found unlinked bytecode with placeholder: 7233c33f2e1e35848c685b0eb24649959e"));
 }

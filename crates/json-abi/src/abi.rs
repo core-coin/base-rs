@@ -1,9 +1,9 @@
 use crate::{
-    to_sol::{SolPrinter, ToSolConfig},
+    to_ylm::{ToYlmConfig, YlmPrinter},
     AbiItem, Constructor, Error, Event, Fallback, Function, Receive,
 };
 use alloc::{collections::btree_map, string::String, vec::Vec};
-use alloy_primitives::Bytes;
+use base_primitives::Bytes;
 use btree_map::BTreeMap;
 use core::{fmt, iter, iter::Flatten};
 use serde::{
@@ -33,7 +33,7 @@ type FlattenValues<'a, V> = Flatten<btree_map::Values<'a, String, Vec<V>>>;
 type FlattenValuesMut<'a, V> = Flatten<btree_map::ValuesMut<'a, String, Vec<V>>>;
 type FlattenIntoValues<V> = Flatten<btree_map::IntoValues<String, Vec<V>>>;
 
-/// The JSON contract ABI, as specified in the [Solidity ABI spec][ref].
+/// The JSON contract ABI, as specified in the [Ylem ABI spec][ref].
 ///
 /// [ref]: https://docs.soliditylang.org/en/latest/abi-spec.html#json
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
@@ -76,7 +76,7 @@ impl JsonAbi {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::JsonAbi;
+    /// # use base_json_abi::JsonAbi;
     /// assert_eq!(JsonAbi::parse([])?, JsonAbi::new());
     ///
     /// let abi = JsonAbi::parse([
@@ -91,7 +91,7 @@ impl JsonAbi {
     ///     "event PersonAdded(uint indexed id, tuple(string, uint16) person)",
     /// ])?;
     /// assert_eq!(abi.len(), 9);
-    /// # Ok::<(), alloy_sol_type_parser::Error>(())
+    /// # Ok::<(), base_ylm_type_parser::Error>(())
     /// ```
     pub fn parse<'a, I: IntoIterator<Item = &'a str>>(strings: I) -> parser::Result<Self> {
         let mut abi = Self::new();
@@ -176,7 +176,7 @@ impl JsonAbi {
         }
     }
 
-    /// Formats this JSON ABI as a Solidity interface.
+    /// Formats this JSON ABI as a Ylem interface.
     ///
     /// The order of the definitions is not guaranteed.
     ///
@@ -198,16 +198,16 @@ impl JsonAbi {
     /// Note that enums are going to be identical to `uint8` UDVTs, since no
     /// other information about enums is present in the ABI.
     #[inline]
-    pub fn to_sol(&self, name: &str, config: Option<ToSolConfig>) -> String {
+    pub fn to_ylm(&self, name: &str, config: Option<ToYlmConfig>) -> String {
         let mut out = String::new();
-        self.to_sol_raw(name, &mut out, config);
+        self.to_ylm_raw(name, &mut out, config);
         out
     }
 
-    /// Formats this JSON ABI as a Solidity interface into the given string.
+    /// Formats this JSON ABI as a Ylem interface into the given string.
     ///
-    /// See [`to_sol`](JsonAbi::to_sol) for more information.
-    pub fn to_sol_raw(&self, name: &str, out: &mut String, config: Option<ToSolConfig>) {
+    /// See [`to_ylm`](JsonAbi::to_ylm) for more information.
+    pub fn to_ylm_raw(&self, name: &str, out: &mut String, config: Option<ToYlmConfig>) {
         let len = self.len();
         out.reserve(len * 128);
 
@@ -219,7 +219,7 @@ impl JsonAbi {
         out.push('{');
         if len > 0 {
             out.push('\n');
-            SolPrinter::new(out, config.unwrap_or_default()).print(self);
+            YlmPrinter::new(out, config.unwrap_or_default()).print(self);
         }
         out.push('}');
     }

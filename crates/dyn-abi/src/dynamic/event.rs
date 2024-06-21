@@ -1,25 +1,25 @@
-use crate::{DynSolType, DynSolValue, Error, Result};
+use crate::{DynYlmType, DynYlmValue, Error, Result};
 use alloc::vec::Vec;
-use alloy_primitives::{LogData, B256};
+use base_primitives::{LogData, B256};
 
 /// A dynamic ABI event.
 ///
-/// This is a representation of a Solidity event, which can be used to decode
+/// This is a representation of a Ylem event, which can be used to decode
 /// logs.
 #[derive(Debug, Clone, PartialEq)]
-pub struct DynSolEvent {
+pub struct DynYlmEvent {
     pub(crate) topic_0: Option<B256>,
-    pub(crate) indexed: Vec<DynSolType>,
-    pub(crate) body: DynSolType,
+    pub(crate) indexed: Vec<DynYlmType>,
+    pub(crate) body: DynYlmType,
 }
 
-impl DynSolEvent {
+impl DynYlmEvent {
     /// Creates a new event, without length-checking the indexed, or ensuring
     /// the body is a tuple. This allows creation of invalid events.
     pub fn new_unchecked(
         topic_0: Option<B256>,
-        indexed: Vec<DynSolType>,
-        body: DynSolType,
+        indexed: Vec<DynYlmType>,
+        body: DynYlmType,
     ) -> Self {
         Self { topic_0, indexed, body }
     }
@@ -28,7 +28,7 @@ impl DynSolEvent {
     ///
     /// Checks that the indexed length is less than or equal to 4, and that the
     /// body is a tuple.
-    pub fn new(topic_0: Option<B256>, indexed: Vec<DynSolType>, body: DynSolType) -> Option<Self> {
+    pub fn new(topic_0: Option<B256>, indexed: Vec<DynYlmType>, body: DynYlmType) -> Option<Self> {
         let topics = indexed.len() + topic_0.is_some() as usize;
         if topics > 4 || body.as_tuple().is_none() {
             return None;
@@ -117,12 +117,12 @@ impl DynSolEvent {
     }
 
     /// Get the indexed types.
-    pub fn indexed(&self) -> &[DynSolType] {
+    pub fn indexed(&self) -> &[DynYlmType] {
         &self.indexed
     }
 
     /// Get the un-indexed types.
-    pub fn body(&self) -> &[DynSolType] {
+    pub fn body(&self) -> &[DynYlmType] {
         self.body.as_tuple().expect("body is a tuple")
     }
 }
@@ -131,24 +131,24 @@ impl DynSolEvent {
 #[derive(Debug, Clone, PartialEq)]
 pub struct DecodedEvent {
     /// The indexed values, in order.
-    pub indexed: Vec<DynSolValue>,
+    pub indexed: Vec<DynYlmValue>,
     /// The un-indexed values, in order.
-    pub body: Vec<DynSolValue>,
+    pub body: Vec<DynYlmValue>,
 }
 
 #[cfg(test)]
 mod test {
-    use alloy_primitives::{b256, bytes, cAddress, U256};
+    use base_primitives::{b256, bytes, cAddress, U256};
 
     use super::*;
 
     #[test]
     fn it_decodes_a_simple_log() {
         let log = LogData::new_unchecked(vec![], U256::ZERO.to_be_bytes_vec().into());
-        let event = DynSolEvent {
+        let event = DynYlmEvent {
             topic_0: None,
             indexed: vec![],
-            body: DynSolType::Tuple(vec![DynSolType::Uint(256)]),
+            body: DynYlmType::Tuple(vec![DynYlmType::Uint(256)]),
         };
         event.decode_log(&log, true).unwrap();
     }
@@ -165,19 +165,19 @@ mod test {
 			    "
             ),
         );
-        let event = DynSolEvent {
+        let event = DynYlmEvent {
             topic_0: Some(t0),
-            indexed: vec![DynSolType::Address],
-            body: DynSolType::Tuple(vec![DynSolType::Tuple(vec![
-                DynSolType::Address,
-                DynSolType::Address,
+            indexed: vec![DynYlmType::Address],
+            body: DynYlmType::Tuple(vec![DynYlmType::Tuple(vec![
+                DynYlmType::Address,
+                DynYlmType::Address,
             ])]),
         };
 
         let decoded = event.decode_log(&log, true).unwrap();
         assert_eq!(
             decoded.indexed,
-            vec![DynSolValue::Address(cAddress!("00000000000000000000000000000000000000012321"))]
+            vec![DynYlmValue::Address(cAddress!("00000000000000000000000000000000000000012321"))]
         );
     }
 }

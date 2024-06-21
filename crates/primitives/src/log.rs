@@ -1,7 +1,7 @@
 use crate::{Address, Bytes, B256};
 use alloc::vec::Vec;
 
-/// An Ethereum event log object.
+/// An Core event log object.
 #[derive(Clone, Default, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "arbitrary", derive(derive_arbitrary::Arbitrary, proptest_derive::Arbitrary))]

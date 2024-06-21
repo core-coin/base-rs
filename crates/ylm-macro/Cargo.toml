@@ -1,0 +1,41 @@
+[package]
+name = "base-ylm-macro"
+description = "Ylem to Rust procedural macro"
+keywords = ["core", "abi", "encoding", "evm", "solidity"]
+categories = ["encoding", "cryptography::cryptocurrencies"]
+homepage = "https://github.com/core-coin/base-rs/tree/main/crates/ylm-macro"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude.workspace = true
+
+[lib]
+proc_macro = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+base-ylm-macro-input.workspace = true
+syn-ylem = { workspace = true, features = ["visit", "visit-mut"] }
+
+proc-macro2.workspace = true
+quote.workspace = true
+syn = { workspace = true, features = ["extra-traits"] }
+
+heck = "0.4"
+hex.workspace = true
+indexmap = "2"
+proc-macro-error = "1.0"
+tiny-keccak = { workspace = true, features = ["sha3"] }
+
+# json
+base-json-abi = { workspace = true, optional = true }
+
+[features]
+json = ["dep:base-json-abi", "base-ylm-macro-input/json"]
