@@ -1,10 +1,15 @@
 use crate::{hex, signature::SignatureError, B1368};
 use alloc::vec::Vec;
 use core::str::FromStr;
+
+#[cfg(any(test, feature = "arbitrary"))]
+use arbitrary::Arbitrary;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// An Ethereum ECDSA signature.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(any(test, feature = "arbitrary"), derive(arbitrary::Arbitrary))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Signature {
     sig: B1368,
