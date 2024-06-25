@@ -1,5 +1,6 @@
 use crate::{hex, signature::SignatureError, B1368};
 use alloc::vec::Vec;
+use libgoldilocks::{errors::LibgoldilockErrors, goldilocks::ed448_sign, PrehashSigner, SigningKey};
 use core::str::FromStr;
 
 #[cfg(any(test, feature = "arbitrary"))]
@@ -13,6 +14,19 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Signature {
     sig: B1368,
+}
+
+impl PrehashSigner<Signature> for SigningKey {
+    fn sign_prehash(&self, prehash: &[u8]) -> Result<Signature, LibgoldilockErrors> {
+        let sig = ed448_sign(&self.to_bytes(), prehash);
+        let mut sig_with_private_key: [u8; 171] = [0; 171];
+        sig_with_private_key[0..114].copy_from_slice(&sig);
+        sig_with_private_key[114..171].copy_from_slice(&self.verifying_key().as_bytes());
+
+        Ok(Signature {
+            sig: sig_with_private_key.into(),
+        })
+    }
 }
 
 impl<'a> TryFrom<&'a [u8]> for Signature {
