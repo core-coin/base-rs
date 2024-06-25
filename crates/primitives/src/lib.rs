@@ -50,8 +50,14 @@ pub use self::bytes_::Bytes;
 mod common;
 pub use common::TxKind;
 
+mod common_ican;
+pub use common_ican::IcanTxKind;
+
 mod log;
 pub use log::{Log, LogData};
+
+mod log_ican;
+pub use log_ican::{IcanLog, IcanLogData};
 
 mod sealed;
 pub use sealed::{Sealable, Sealed};
