@@ -1,4 +1,4 @@
-use crate::{Address, Bytes, B256};
+use crate::{Bytes, IcanAddress, B256};
 use alloc::vec::Vec;
 
 /// An Ethereum event log object.
@@ -87,7 +87,7 @@ impl LogData {
 #[cfg_attr(feature = "arbitrary", derive(derive_arbitrary::Arbitrary, proptest_derive::Arbitrary))]
 pub struct Log<T = LogData> {
     /// The address which emitted this log.
-    pub address: Address,
+    pub address: IcanAddress,
     /// The log data.
     #[cfg_attr(feature = "serde", serde(flatten))]
     pub data: T,
@@ -105,20 +105,20 @@ impl<T> core::ops::Deref for Log<T> {
 impl Log {
     /// Creates a new log.
     #[inline]
-    pub fn new(address: Address, topics: Vec<B256>, data: Bytes) -> Option<Self> {
+    pub fn new(address: IcanAddress, topics: Vec<B256>, data: Bytes) -> Option<Self> {
         LogData::new(topics, data).map(|data| Self { address, data })
     }
 
     /// Creates a new log.
     #[inline]
-    pub fn new_unchecked(address: Address, topics: Vec<B256>, data: Bytes) -> Self {
+    pub fn new_unchecked(address: IcanAddress, topics: Vec<B256>, data: Bytes) -> Self {
         Self { address, data: LogData::new_unchecked(topics, data) }
     }
 
     /// Creates a new empty log.
     #[inline]
     pub const fn empty() -> Self {
-        Self { address: Address::ZERO, data: LogData::empty() }
+        Self { address: IcanAddress::ZERO, data: LogData::empty() }
     }
 }
 
@@ -128,12 +128,12 @@ where
 {
     /// Creates a new log.
     #[inline]
-    pub const fn new_from_event_unchecked(address: Address, data: T) -> Self {
+    pub const fn new_from_event_unchecked(address: IcanAddress, data: T) -> Self {
         Self { address, data }
     }
 
     /// Creates a new log from an deserialized event.
-    pub fn new_from_event(address: Address, data: T) -> Option<Self> {
+    pub fn new_from_event(address: IcanAddress, data: T) -> Option<Self> {
         let this = Self::new_from_event_unchecked(address, data);
         (&this.data).into().is_valid().then_some(this)
     }

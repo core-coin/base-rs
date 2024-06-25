@@ -1,4 +1,4 @@
-use crate::Address;
+use crate::IcanAddress;
 
 #[cfg(feature = "rlp")]
 use alloy_rlp::{Buf, BufMut, Decodable, Encodable, EMPTY_STRING_CODE};
@@ -11,13 +11,13 @@ pub enum TxKind {
     #[default]
     Create,
     /// A transaction that calls a contract or transfer.
-    Call(Address),
+    Call(IcanAddress),
 }
 
-impl From<Option<Address>> for TxKind {
+impl From<Option<IcanAddress>> for TxKind {
     /// Creates a `TxKind::Call` with the `Some` address, `None` otherwise.
     #[inline]
-    fn from(value: Option<Address>) -> Self {
+    fn from(value: Option<IcanAddress>) -> Self {
         match value {
             None => TxKind::Create,
             Some(addr) => TxKind::Call(addr),
@@ -25,17 +25,17 @@ impl From<Option<Address>> for TxKind {
     }
 }
 
-impl From<Address> for TxKind {
+impl From<IcanAddress> for TxKind {
     /// Creates a `TxKind::Call` with the given address.
     #[inline]
-    fn from(value: Address) -> Self {
+    fn from(value: IcanAddress) -> Self {
         TxKind::Call(value)
     }
 }
 
 impl TxKind {
     /// Returns the address of the contract that will be called or will receive the transfer.
-    pub const fn to(&self) -> Option<&Address> {
+    pub const fn to(&self) -> Option<&IcanAddress> {
         match self {
             TxKind::Create => None,
             TxKind::Call(to) => Some(to),
@@ -86,7 +86,7 @@ impl Decodable for TxKind {
                 buf.advance(1);
                 Ok(TxKind::Create)
             } else {
-                let addr = <Address as Decodable>::decode(buf)?;
+                let addr = <IcanAddress as Decodable>::decode(buf)?;
                 Ok(TxKind::Call(addr))
             }
         } else {
@@ -105,6 +105,6 @@ impl serde::Serialize for TxKind {
 #[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de> for TxKind {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        Ok(Option::<Address>::deserialize(deserializer)?.into())
+        Ok(Option::<IcanAddress>::deserialize(deserializer)?.into())
     }
 }
