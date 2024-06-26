@@ -2,7 +2,6 @@ use core::convert::Infallible;
 
 /// Errors in signature parsing or verification.
 #[derive(Debug)]
-#[cfg_attr(not(feature = "k256"), derive(Copy, Clone))]
 pub enum SignatureError {
     /// Error converting from bytes.
     FromBytes(&'static str),
@@ -13,16 +12,8 @@ pub enum SignatureError {
     /// Invalid parity.
     InvalidParity(u64),
 
-    /// k256 error
-    #[cfg(feature = "k256")]
-    K256(k256::ecdsa::Error),
-}
-
-#[cfg(feature = "k256")]
-impl From<k256::ecdsa::Error> for SignatureError {
-    fn from(err: k256::ecdsa::Error) -> Self {
-        Self::K256(err)
-    }
+    /// Libgoldilocks error
+    Libgoldilocks(libgoldilocks::errors::LibgoldilockErrors),
 }
 
 impl From<hex::FromHexError> for SignatureError {
@@ -35,8 +26,6 @@ impl From<hex::FromHexError> for SignatureError {
 impl std::error::Error for SignatureError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            #[cfg(feature = "k256")]
-            Self::K256(e) => Some(e),
             Self::FromHex(e) => Some(e),
             _ => None,
         }
@@ -46,11 +35,10 @@ impl std::error::Error for SignatureError {
 impl core::fmt::Display for SignatureError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            #[cfg(feature = "k256")]
-            Self::K256(e) => e.fmt(f),
             Self::FromBytes(e) => f.write_str(e),
             Self::FromHex(e) => e.fmt(f),
             Self::InvalidParity(v) => write!(f, "invalid parity: {v}"),
+            Self::Libgoldilocks(e) => e.fmt(f),
         }
     }
 }
