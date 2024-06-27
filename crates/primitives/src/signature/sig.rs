@@ -242,28 +242,42 @@ mod tests {
         let sig = crate::Signature::from_str(
             "ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580",
         ).unwrap();
-        let addr = sig.recover_address_from_prehash(&b256!("ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008"), 1).unwrap();
-        assert_eq!(addr, IcanAddress::from_str("cb72355e4fdb2edb55c4a747c899505d393aa6628590").unwrap());
+        let addr = sig
+            .recover_address_from_prehash(
+                &b256!("ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008"),
+                1,
+            )
+            .unwrap();
+        assert_eq!(
+            addr,
+            IcanAddress::from_str("cb72355e4fdb2edb55c4a747c899505d393aa6628590").unwrap()
+        );
     }
 
     #[test]
-    fn recover_address_from_msg(){
+    fn recover_address_from_msg() {
         let sig = crate::Signature::from_str(
             "0x1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080",
         ).unwrap();
         let addr = sig.recover_address_from_msg("Hello, world!", 1).unwrap();
-        assert_eq!(addr, IcanAddress::from_str("cb43bfd3937bfb2cd1b2b36253b43f60a1487ea4af3c").unwrap());
+        assert_eq!(
+            addr,
+            IcanAddress::from_str("cb43bfd3937bfb2cd1b2b36253b43f60a1487ea4af3c").unwrap()
+        );
     }
 
     #[test]
     fn sign_prehash() {
-        let prehash = crate::eip191_hash_message("Hello, world!"); 
+        let prehash = crate::eip191_hash_message("Hello, world!");
 
         let key = SigningKey::from_str("ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe706");
         let sig: Signature = key.sign_prehash(&prehash.0).unwrap();
-        
+
         assert_eq!(sig.sig.to_string(), "0x1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080");
-        assert_eq!(prehash.to_string(), "0x5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc");
+        assert_eq!(
+            prehash.to_string(),
+            "0x5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc"
+        );
     }
 
     #[test]
@@ -271,7 +285,11 @@ mod tests {
         let sig = crate::Signature::from_str(
             "1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080",
         ).unwrap();
-        let key = sig.recover_from_prehash(&b256!("5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc")).unwrap();
+        let key = sig
+            .recover_from_prehash(&b256!(
+                "5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc"
+            ))
+            .unwrap();
         assert_eq!(key, VerifyingKey::from_str("4c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080"));
     }
 
