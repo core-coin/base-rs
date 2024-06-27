@@ -1,4 +1,4 @@
-use alloy_json_abi::StateMutability;
+use base_json_abi::StateMutability;
 
 #[test]
 fn state_mutability() {

@@ -283,7 +283,7 @@ impl Bytes {
     /// # Examples
     ///
     /// ```
-    /// use alloy_primitives::Bytes;
+    /// use base_primitives::Bytes;
     ///
     /// let b = Bytes::new();
     /// assert_eq!(&b[..], b"");
@@ -301,7 +301,7 @@ impl Bytes {
     /// # Examples
     ///
     /// ```
-    /// use alloy_primitives::Bytes;
+    /// use base_primitives::Bytes;
     ///
     /// let b = Bytes::from_static(b"hello");
     /// assert_eq!(&b[..], b"hello");

@@ -1,0 +1,31 @@
+[package]
+name = "syn-ylem"
+description = "syn-powered Ylem parser"
+keywords = ["core", "evm", "syn", "solidity", "ast"]
+categories = ["data-structures", "cryptography::cryptocurrencies"]
+homepage = "https://github.com/core-coin/base-rs/tree/main/crates/syn-ylem"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+paste.workspace = true
+proc-macro2.workspace = true
+quote.workspace = true
+syn = { workspace = true, features = ["extra-traits"] }
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[features]
+visit = []
+visit-mut = []

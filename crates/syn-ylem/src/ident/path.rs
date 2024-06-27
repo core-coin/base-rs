@@ -1,0 +1,131 @@
+use crate::{Spanned, YlmIdent};
+use proc_macro2::{Ident, Span};
+use std::{
+    fmt,
+    ops::{Deref, DerefMut},
+};
+use syn::{
+    ext::IdentExt,
+    parse::{Parse, ParseStream},
+    punctuated::Punctuated,
+    Result, Token,
+};
+
+/// Create a [`YlmPath`] from a list of identifiers.
+#[macro_export]
+macro_rules! ylm_path {
+    () => { $crate::YlmPath::new() };
+
+    ($($e:expr),+) => {{
+        let mut path = $crate::YlmPath::new();
+        $(path.push($crate::YlmIdent::from($e));)+
+        path
+    }};
+}
+
+/// A list of identifiers, separated by dots.
+///
+/// This is never parsed as empty.
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct YlmPath(Punctuated<YlmIdent, Token![.]>);
+
+impl Deref for YlmPath {
+    type Target = Punctuated<YlmIdent, Token![.]>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for YlmPath {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl fmt::Display for YlmPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for (i, ident) in self.0.iter().enumerate() {
+            if i > 0 {
+                f.write_str(".")?;
+            }
+            ident.fmt(f)?;
+        }
+        Ok(())
+    }
+}
+
+impl fmt::Debug for YlmPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(&self.0).finish()
+    }
+}
+
+impl FromIterator<YlmIdent> for YlmPath {
+    fn from_iter<T: IntoIterator<Item = YlmIdent>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
+
+impl Parse for YlmPath {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        // Modified from: `syn::Path::parse_mod_style`
+        let mut segments = Punctuated::new();
+        loop {
+            if !input.peek(Ident::peek_any) {
+                break;
+            }
+            segments.push_value(input.parse()?);
+            if !input.peek(Token![.]) {
+                break;
+            }
+            segments.push_punct(input.parse()?);
+        }
+
+        if segments.is_empty() {
+            Err(input.parse::<YlmIdent>().unwrap_err())
+        } else if segments.trailing_punct() {
+            Err(input.error("expected path segment after `.`"))
+        } else {
+            Ok(Self(segments))
+        }
+    }
+}
+
+impl Spanned for YlmPath {
+    fn span(&self) -> Span {
+        self.0.span()
+    }
+
+    fn set_span(&mut self, span: Span) {
+        self.0.set_span(span);
+    }
+}
+
+impl Default for YlmPath {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl YlmPath {
+    pub const fn new() -> Self {
+        Self(Punctuated::new())
+    }
+
+    pub fn first(&self) -> &YlmIdent {
+        self.0.first().unwrap()
+    }
+
+    pub fn first_mut(&mut self) -> &mut YlmIdent {
+        self.0.first_mut().unwrap()
+    }
+
+    pub fn last(&self) -> &YlmIdent {
+        self.0.last().unwrap()
+    }
+
+    pub fn last_mut(&mut self) -> &mut YlmIdent {
+        self.0.last_mut().unwrap()
+    }
+}

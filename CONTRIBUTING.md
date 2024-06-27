@@ -1,9 +1,9 @@
-# Contributing to Alloy
+# Contributing to Base-rs
 
 :balloon: Thanks for your help improving the project! We are so happy to have
 you!
 
-There are opportunities to contribute to Alloy at any level. It doesn't
+There are opportunities to contribute to Base-rs at any level. It doesn't
 matter if you are just getting started with Rust or are the most weathered
 expert, we can use your help.
 
@@ -19,7 +19,7 @@ please join us!
 
 ## Conduct
 
-The Alloy project adheres to the [Rust Code of Conduct][coc]. This describes
+The Base-rs project adheres to the [Rust Code of Conduct][coc]. This describes
 the _minimum_ behavior expected from all contributors. Instances of violations
 of the Code of Conduct can be reported by contacting the project team at
 [james@prestwich](mailto:james@prestwi.ch).
@@ -31,7 +31,7 @@ of the Code of Conduct can be reported by contacting the project team at
 For any issue, there are fundamentally three ways an individual can contribute:
 
 1. By opening the issue for discussion: For instance, if you believe that you
-   have uncovered a bug in Alloy, creating a new issue in the Alloy
+   have uncovered a bug in Base-rs, creating a new issue in the Base-rs
    issue tracker is the way to report it.
 
 2. By helping to triage the issue: This can be done by providing
@@ -42,7 +42,7 @@ For any issue, there are fundamentally three ways an individual can contribute:
 3. By helping to resolve the issue: Typically this is done either in the form of
    demonstrating that the issue reported is not a problem after all, or more
    often, by opening a Pull Request that changes some bit of something in
-   Alloy in a concrete and reviewable manner.
+   Base-rs in a concrete and reviewable manner.
 
 **Anybody can participate in any stage of contribution**. We urge you to
 participate in the discussion around bugs and participate in reviewing PRs.
@@ -57,7 +57,7 @@ PR that helps others avoid the problems that you encountered.
 
 ### Submitting a Bug Report
 
-When opening a new issue in the Alloy issue tracker, users will be presented
+When opening a new issue in the Base-rs issue tracker, users will be presented
 with a [basic template][template] that should be filled in. If you believe that
 you have uncovered a bug, please fill out this form, following the template to
 the best of your ability. Do not worry if you cannot answer every detail, just
@@ -69,7 +69,7 @@ test case we can use to recreate the problem on our own. If we cannot recreate
 the issue, it becomes impossible for us to fix.
 
 In order to rule out the possibility of bugs introduced by userland code, test
-cases should be limited, as much as possible, to using only Alloy APIs.
+cases should be limited, as much as possible, to using only Base-rs APIs.
 
 See [How to create a Minimal, Complete, and Verifiable example][mcve].
 
@@ -101,12 +101,12 @@ In the majority of cases, issues are resolved by opening a Pull Request. The
 process for opening and reviewing a Pull Request is similar to that of opening
 and triaging issues, but carries with it a necessary review and approval
 workflow that ensures that the proposed changes meet the minimal quality and
-functional guidelines of the Alloy project.
+functional guidelines of the Base-rs project.
 
 ## Pull Requests
 
 Pull Requests are the way concrete changes are made to the code, documentation,
-and dependencies in the Alloy repository.
+and dependencies in the Base-rs repository.
 
 Even tiny pull requests (e.g., one character pull request fixing a typo in API
 documentation) are greatly appreciated. Before making a large change, it is
@@ -115,7 +115,7 @@ feedback and guidance. This will increase the likelihood of the PR getting
 merged.
 
 When opening a PR **please select the "Allow Edits From Maintainers" option**.
-Alloy maintains strict standards for code quality and style, as well as
+Base-rs maintains strict standards for code quality and style, as well as
 commit signing. This option allows us to make small changes to your PR to bring
 it in line with these standards. It helps us get your PR in faster, and with
 less work from you.
@@ -140,9 +140,9 @@ cargo +nightly clippy --all-features
 ### Tests
 
 If the change being proposed alters code (as opposed to only documentation for
-example), it is either adding new functionality to Alloy or it is fixing
+example), it is either adding new functionality to Base-rs or it is fixing
 existing, broken functionality. In both of these cases, the pull request should
-include one or more tests to ensure that Alloy does not regress in the
+include one or more tests to ensure that Base-rs does not regress in the
 future.
 
 #### Unit Tests
@@ -232,9 +232,9 @@ however, will stay intact on the Pull Request page.
 
 ## Reviewing Pull Requests
 
-**Any Alloy community member is welcome to review any pull request**.
+**Any Base-rs community member is welcome to review any pull request**.
 
-All Alloy contributors who choose to review and provide feedback on Pull
+All Base-rs contributors who choose to review and provide feedback on Pull
 Requests have a responsibility to both the project and the individual making the
 contribution. Reviews and feedback must be helpful, insightful, and geared
 towards improving the contribution as opposed to simply blocking it. If there
@@ -261,8 +261,8 @@ perfect grammar, or exact style matches. Do not succumb to that temptation.
 
 Focus first on the most significant aspects of the change:
 
-1. Does this change make sense for Alloy?
-2. Does this change make Alloy better, even if only incrementally?
+1. Does this change make sense for Base-rs?
+2. Does this change make Base-rs better, even if only incrementally?
 3. Are there clear bugs or larger scale issues that need attending to?
 4. Is the commit message readable and correct? If it contains a breaking change
    is it clear enough?
@@ -279,7 +279,7 @@ change over time. The first impression you give to a new contributor never does.
 
 Nits (requests for small changes that are not essential) are fine, but try to
 avoid stalling the Pull Request. Most nits can typically be fixed by the
-Alloy Collaborator landing the Pull Request but they can also be an
+Base-rs Collaborator landing the Pull Request but they can also be an
 opportunity for the contributor to learn a bit more about the project.
 
 It is always good to clearly indicate nits when you comment: e.g.
@@ -293,8 +293,8 @@ with the appropriate reason to keep the conversation flow concise and relevant.
 
 Be aware that _how_ you communicate requests and reviews in your feedback can
 have a significant impact on the success of the Pull Request. Yes, we may land
-a particular change that makes Alloy better, but the individual might just
-not want to have anything to do with Alloy ever again. The goal is not just
+a particular change that makes Base-rs better, but the individual might just
+not want to have anything to do with Base-rs ever again. The goal is not just
 having good code.
 
 ### Abandoned or Stalled Pull Requests

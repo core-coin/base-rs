@@ -1,4 +1,4 @@
-//! Common Ethereum utilities.
+//! Common Core utilities.
 
 use crate::B256;
 use alloc::{boxed::Box, collections::TryReserveError, vec::Vec};
@@ -103,7 +103,7 @@ pub fn vec_try_from_elem<T: Clone>(elem: T, n: usize) -> Result<Vec<T>, TryReser
 /// Hash a message according to [EIP-191] (version `0x01`).
 ///
 /// The final message is a UTF-8 string, encoded as follows:
-/// `"\x19Ethereum Signed Message:\n" + message.length + message`
+/// `"\x19Core Signed Message:\n" + message.length + message`
 ///
 /// This message is then hashed using [Keccak-256](sha3).
 ///
@@ -115,7 +115,7 @@ pub fn eip191_hash_message<T: AsRef<[u8]>>(message: T) -> B256 {
 /// Constructs a message according to [EIP-191] (version `0x01`).
 ///
 /// The final message is a UTF-8 string, encoded as follows:
-/// `"\x19Ethereum Signed Message:\n" + message.length + message`
+/// `"\x19Core Signed Message:\n" + message.length + message`
 ///
 /// [EIP-191]: https://eips.ethereum.org/EIPS/eip-191
 pub fn eip191_message<T: AsRef<[u8]>>(message: T) -> Vec<u8> {

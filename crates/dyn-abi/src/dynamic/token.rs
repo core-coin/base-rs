@@ -1,7 +1,7 @@
-use crate::{Decoder, DynSolValue, Error, Result, Word};
+use crate::{Decoder, DynYlmValue, Error, Result, Word};
 use alloc::{borrow::Cow, boxed::Box, vec::Vec};
-use alloy_primitives::try_vec;
-use alloy_sol_types::abi::token::{PackedSeqToken, Token, WordToken};
+use base_primitives::try_vec;
+use base_ylm_types::abi::token::{PackedSeqToken, Token, WordToken};
 
 /// A dynamic token.
 ///
@@ -70,15 +70,15 @@ impl<'a> DynToken<'a> {
 
     /// Instantiate a DynToken from a fixed sequence of values.
     #[inline]
-    pub fn from_fixed_seq(seq: &'a [DynSolValue]) -> Self {
-        let tokens = seq.iter().map(DynSolValue::tokenize).collect();
+    pub fn from_fixed_seq(seq: &'a [DynYlmValue]) -> Self {
+        let tokens = seq.iter().map(DynYlmValue::tokenize).collect();
         Self::FixedSeq(Cow::Owned(tokens), seq.len())
     }
 
     /// Instantiate a DynToken from a dynamic sequence of values.
     #[inline]
-    pub fn from_dyn_seq(seq: &'a [DynSolValue]) -> Self {
-        let tokens = seq.iter().map(DynSolValue::tokenize).collect();
+    pub fn from_dyn_seq(seq: &'a [DynYlmValue]) -> Self {
+        let tokens = seq.iter().map(DynYlmValue::tokenize).collect();
         Self::DynSeq { contents: Cow::Owned(tokens), template: None }
     }
 
@@ -165,7 +165,7 @@ impl<'a> DynToken<'a> {
                 // `empty_dyn_token()` which always sets template
                 let template = template.take().expect("no template for dynamic sequence");
 
-                // This appears to be an unclarity in the Solidity spec. The
+                // This appears to be an unclarity in the Ylem spec. The
                 // spec specifies that offsets are relative to the beginning of
                 // `enc(X)`. But known-good test vectors have it relative to the
                 // word AFTER the array size
@@ -175,7 +175,7 @@ impl<'a> DynToken<'a> {
                 // sequence. Each item in the sequence is at least one word, so
                 // the remaining words must be at least the size of the sequence
                 if child.remaining_words() < template.minimum_words() * size {
-                    return Err(alloy_sol_types::Error::Overrun.into());
+                    return Err(base_ylm_types::Error::Overrun.into());
                 }
 
                 let mut new_tokens = if size == 1 {

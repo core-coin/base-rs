@@ -2,7 +2,7 @@ use crate::{Address, FixedBytes, Selector};
 use core::borrow::Borrow;
 
 wrap_fixed_bytes! {
-    /// An Ethereum ABI function pointer, 24 bytes in length.
+    /// An Core ABI function pointer, 24 bytes in length.
     ///
     /// An address (20 bytes), followed by a function selector (4 bytes).
     /// Encoded identical to `bytes24`.
@@ -21,7 +21,7 @@ where
 }
 
 impl Function {
-    /// Creates an Ethereum function from an EVM word's lower 24 bytes
+    /// Creates an Core function from an EVM word's lower 24 bytes
     /// (`word[..24]`).
     ///
     /// Note that this is different from `Address::from_word`, which uses the
@@ -44,7 +44,7 @@ impl Function {
         FixedBytes(word)
     }
 
-    /// Creates an Ethereum function from an address and selector.
+    /// Creates an Core function from an address and selector.
     #[inline]
     pub fn from_address_and_selector<A, S>(address: A, selector: S) -> Self
     where

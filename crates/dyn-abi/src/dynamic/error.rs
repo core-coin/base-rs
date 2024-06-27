@@ -1,59 +1,59 @@
-use crate::{DynSolType, DynSolValue, Error, Result};
+use crate::{DynYlmType, DynYlmValue, Error, Result};
 use alloc::vec::Vec;
-use alloy_primitives::Selector;
-use alloy_sol_types::SolError;
+use base_primitives::Selector;
+use base_ylm_types::YlmError;
 
-/// See [alloy_sol_types::Panic] for signature details.
-const PANIC_SELECTOR: Selector = Selector::new(alloy_sol_types::Panic::SELECTOR);
-/// See [alloy_sol_types::Revert] for signature details.
-const REVERT_SELECTOR: Selector = Selector::new(alloy_sol_types::Revert::SELECTOR);
+/// See [base_ylm_types::Panic] for signature details.
+const PANIC_SELECTOR: Selector = Selector::new(base_ylm_types::Panic::SELECTOR);
+/// See [base_ylm_types::Revert] for signature details.
+const REVERT_SELECTOR: Selector = Selector::new(base_ylm_types::Revert::SELECTOR);
 
 /// A dynamic ABI error.
 ///
-/// This is a representation of a Solidity error, which can be used to decode
+/// This is a representation of a Ylem error, which can be used to decode
 /// error events.
 #[derive(Debug, Clone, PartialEq)]
-pub struct DynSolError {
+pub struct DynYlmError {
     /// Error selector.
     pub(crate) selector: Selector,
     /// Error body types. MUST be a tuple.
-    pub(crate) body: DynSolType,
+    pub(crate) body: DynYlmType,
 }
 
-impl DynSolError {
-    /// Represents a standard Solidity revert. These are thrown by
-    /// `revert(reason)` or `require(condition, reason)` statements in Solidity.
+impl DynYlmError {
+    /// Represents a standard Ylem revert. These are thrown by
+    /// `revert(reason)` or `require(condition, reason)` statements in Ylem.
     ///
     /// **Note**: Usage of this instantiator is not recommended. It is better to
-    /// use [alloy_sol_types::Revert] in almost all cases.
+    /// use [base_ylm_types::Revert] in almost all cases.
     pub fn revert() -> Self {
-        Self { selector: REVERT_SELECTOR, body: DynSolType::Tuple(vec![DynSolType::String]) }
+        Self { selector: REVERT_SELECTOR, body: DynYlmType::Tuple(vec![DynYlmType::String]) }
     }
 
-    /// A [Solidity panic].
+    /// A [Ylem panic].
     ///
     /// **Note**: Usage of this instantiator is not recommended. It is better to
-    /// use [alloy_sol_types::Panic] in almost all cases.
+    /// use [base_ylm_types::Panic] in almost all cases.
     ///
-    /// These are thrown by `assert(condition)` and by internal Solidity checks,
+    /// These are thrown by `assert(condition)` and by internal Ylem checks,
     /// such as arithmetic overflow or array bounds checks.
     ///
     /// The list of all known panic codes can be found in the [PanicKind] enum.
     ///
-    /// [Solidity panic]: https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require
-    /// [PanicKind]: alloy_sol_types::PanicKind
+    /// [Ylem panic]: https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require
+    /// [PanicKind]: base_ylm_types::PanicKind
     pub fn panic() -> Self {
-        Self { selector: PANIC_SELECTOR, body: DynSolType::Tuple(vec![DynSolType::Uint(256)]) }
+        Self { selector: PANIC_SELECTOR, body: DynYlmType::Tuple(vec![DynYlmType::Uint(256)]) }
     }
 
     /// Creates a new error, without length-checking the body. This allows
     /// creation of invalid errors.
-    pub const fn new_unchecked(selector: Selector, body: DynSolType) -> Self {
+    pub const fn new_unchecked(selector: Selector, body: DynYlmType) -> Self {
         Self { selector, body }
     }
 
     /// Creates a new error from a selector.
-    pub fn new(selector: Selector, body: DynSolType) -> Option<Self> {
+    pub fn new(selector: Selector, body: DynYlmType) -> Option<Self> {
         let _ = body.as_tuple()?;
         Some(Self::new_unchecked(selector, body))
     }
@@ -65,7 +65,7 @@ impl DynSolError {
     }
 
     /// Error body types.
-    pub fn body(&self) -> &[DynSolType] {
+    pub fn body(&self) -> &[DynYlmType] {
         self.body.as_tuple().expect("body is a tuple")
     }
 
@@ -96,30 +96,30 @@ impl DynSolError {
 #[derive(Debug, Clone, PartialEq)]
 pub struct DecodedError {
     /// The decoded error body.
-    pub body: Vec<DynSolValue>,
+    pub body: Vec<DynYlmValue>,
 }
 
 #[cfg(test)]
 mod test {
-    use super::DynSolError;
-    use crate::DynSolValue;
-    use alloy_primitives::hex;
+    use super::DynYlmError;
+    use crate::DynYlmValue;
+    use base_primitives::hex;
 
     #[test]
     fn decode_revert_message() {
-        let error = DynSolError::revert();
+        let error = DynYlmError::revert();
         let data = hex!("4e401cbe000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000042020202000000000000000000000000000000000000000000000000000000000");
 
         let decoded = error.decode_error(&data).unwrap();
-        assert_eq!(decoded.body, vec!(DynSolValue::String("    ".into())));
+        assert_eq!(decoded.body, vec!(DynYlmValue::String("    ".into())));
     }
 
     #[test]
     fn decode_panic() {
-        let error = DynSolError::panic();
+        let error = DynYlmError::panic();
         let data = hex!("4b1f2ce30000000000000000000000000000000000000000000000000000000000000001");
 
         let decoded = error.decode_error(&data).unwrap();
-        assert_eq!(decoded.body, vec![DynSolValue::Uint(alloy_primitives::Uint::from(1), 256)]);
+        assert_eq!(decoded.body, vec![DynYlmValue::Uint(base_primitives::Uint::from(1), 256)]);
     }
 }

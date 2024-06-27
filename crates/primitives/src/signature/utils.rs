@@ -13,7 +13,7 @@ pub const fn to_eip155_v(v: u8, chain_id: ChainId) -> ChainId {
 ///   4-26 here by returning v % 4.
 /// - 27-34 - legacy. 27-30 are legal. By legacy bitcoin convention range 27-30 signals uncompressed
 ///   pubkeys, while 31-34 signals compressed pubkeys. We do not respect the compression convention.
-///   All Ethereum keys are uncompressed.
+///   All Core keys are uncompressed.
 /// - 35+ - EIP-155. By EIP-155 convention, `v = 35 + CHAIN_ID * 2 + 0/1` We return (v-1 % 2) here.
 ///
 /// NB: raw and legacy support values 2, and 3, while EIP-155 does not.

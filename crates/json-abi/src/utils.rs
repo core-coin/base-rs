@@ -3,7 +3,7 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use alloy_primitives::Selector;
+use base_primitives::Selector;
 use core::{fmt::Write, num::NonZeroUsize};
 use parser::{ParameterSpecifier, TypeSpecifier, TypeStem};
 
@@ -15,7 +15,7 @@ macro_rules! validate_identifier {
         if !$name.is_empty() && !parser::is_valid_identifier($name) {
             return Err(serde::de::Error::invalid_value(
                 serde::de::Unexpected::Str($name),
-                &"a valid Solidity identifier",
+                &"a valid Ylem identifier",
             ));
         }
     };
@@ -152,7 +152,7 @@ pub(crate) fn event_full_signature(name: &str, inputs: &[EventParam]) -> String 
 pub(crate) fn selector(preimage: &str) -> Selector {
     // SAFETY: splitting an array
     unsafe {
-        alloy_primitives::sha3(preimage.as_bytes())
+        base_primitives::sha3(preimage.as_bytes())
             .0
             .get_unchecked(..4)
             .try_into()

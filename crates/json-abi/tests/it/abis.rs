@@ -1,4 +1,4 @@
-use alloy_json_abi::{
+use base_json_abi::{
     Constructor, Error, Event, EventParam, Fallback, Function, JsonAbi, Param, Receive,
     StateMutability,
 };

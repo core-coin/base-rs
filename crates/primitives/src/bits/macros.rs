@@ -7,7 +7,7 @@
 /// # Examples
 ///
 /// ```
-/// use alloy_primitives::wrap_fixed_bytes;
+/// use base_primitives::wrap_fixed_bytes;
 ///
 /// // These hashes are the same length, and have the same functionality, but
 /// // are distinct types
@@ -740,7 +740,7 @@ macro_rules! fixed_bytes_macros {
         /// # Examples
         ///
         /// ```
-        #[doc = concat!("use alloy_primitives::{", stringify!($name), ", ", stringify!($ty), "};")]
+        #[doc = concat!("use base_primitives::{", stringify!($name), ", ", stringify!($ty), "};")]
         ///
         #[doc = concat!("const ZERO: ", stringify!($ty $($rest)*), " = ", stringify!($name), "!();")]
         #[doc = concat!("assert_eq!(ZERO, ", stringify!($ty), "::ZERO);")]
@@ -794,7 +794,7 @@ fixed_bytes_macros! { $
 /// # Examples
 ///
 /// ```
-/// use alloy_primitives::{bytes, Bytes};
+/// use base_primitives::{bytes, Bytes};
 ///
 /// static MY_BYTES: Bytes = bytes!("0123abcd");
 /// assert_eq!(MY_BYTES, Bytes::from(&[0x01, 0x23, 0xab, 0xcd]));

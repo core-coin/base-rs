@@ -1,2 +1,2 @@
-*.sol linguist-language=Solidity
+*.sol linguist-language=Ylem
 **/tests/contracts/* linguist-vendored

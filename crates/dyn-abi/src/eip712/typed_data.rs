@@ -1,10 +1,10 @@
 use crate::{
     eip712::{PropertyDef, Resolver},
-    DynSolType, DynSolValue, Result,
+    DynYlmType, DynYlmValue, Result,
 };
 use alloc::{collections::BTreeMap, string::String, vec::Vec};
-use alloy_primitives::{sha3, B256};
-use alloy_sol_types::{Eip712Domain, SolStruct};
+use base_primitives::{sha3, B256};
+use base_ylm_types::{Eip712Domain, YlmStruct};
 use derive_more::{Deref, DerefMut, From, Into, IntoIterator};
 use parser::TypeSpecifier;
 use serde::{Deserialize, Serialize};
@@ -130,9 +130,9 @@ impl<'de> Deserialize<'de> for TypedData {
 }
 
 impl TypedData {
-    /// Instantiate [`TypedData`] from a [`SolStruct`] that implements
+    /// Instantiate [`TypedData`] from a [`YlmStruct`] that implements
     /// [`serde::Serialize`].
-    pub fn from_struct<S: SolStruct + Serialize>(s: &S, domain: Option<Eip712Domain>) -> Self {
+    pub fn from_struct<S: YlmStruct + Serialize>(s: &S, domain: Option<Eip712Domain>) -> Self {
         let mut resolver = Resolver::from_struct::<S>();
         let domain = domain.unwrap_or_default();
         resolver.ingest_string(domain.encode_type()).expect("domain string always valid");
@@ -149,13 +149,13 @@ impl TypedData {
         &self.domain
     }
 
-    fn resolve(&self) -> Result<DynSolType> {
+    fn resolve(&self) -> Result<DynYlmType> {
         self.resolver.resolve(&self.primary_type)
     }
 
     /// Coerce the message to the type specified by `primary_type`, using the
     /// types map as a resolver.
-    pub fn coerce(&self) -> Result<DynSolValue> {
+    pub fn coerce(&self) -> Result<DynYlmValue> {
         let ty = self.resolve()?;
         ty.coerce_json(&self.message)
     }
@@ -227,7 +227,7 @@ mod tests {
     use super::*;
     use crate::Error;
     use alloc::string::ToString;
-    use alloy_sol_types::sol;
+    use base_ylm_types::ylm;
     use serde_json::json;
 
     #[test]
@@ -665,8 +665,8 @@ mod tests {
     }
 
     #[test]
-    fn from_sol_struct() {
-        sol! {
+    fn from_ylm_struct() {
+        ylm! {
             #[derive(Serialize, Deserialize)]
             struct MyStruct {
                 string name;
@@ -683,8 +683,8 @@ mod tests {
     }
 
     #[test]
-    fn e2e_from_sol_struct() {
-        sol! {
+    fn e2e_from_ylm_struct() {
+        ylm! {
             #[derive(Serialize, Deserialize)]
             struct Person {
                 string name;

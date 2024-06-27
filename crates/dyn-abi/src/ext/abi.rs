@@ -1,8 +1,8 @@
-use crate::{DynSolValue, Error as CrateError, Result, Specifier};
+use crate::{DynYlmValue, Error as CrateError, Result, Specifier};
 use alloc::vec::Vec;
-use alloy_json_abi::{Constructor, Error, Function, Param};
-use alloy_primitives::Selector;
-use alloy_sol_types::abi::Decoder;
+use base_json_abi::{Constructor, Error, Function, Param};
+use base_primitives::Selector;
+use base_ylm_types::abi::Decoder;
 
 mod sealed {
     pub trait Sealed {}
@@ -35,7 +35,7 @@ pub trait JsonAbiExt: Sealed {
     ///
     /// This function will return an error if the given values do not match the
     /// expected input types.
-    fn abi_encode_input(&self, values: &[DynSolValue]) -> Result<Vec<u8>>;
+    fn abi_encode_input(&self, values: &[DynYlmValue]) -> Result<Vec<u8>>;
 
     /// ABI-encodes the given values, without prefixing the data with the item's
     /// selector.
@@ -47,7 +47,7 @@ pub trait JsonAbiExt: Sealed {
     ///
     /// This function will return an error if the given values do not match the
     /// expected input types.
-    fn abi_encode_input_raw(&self, values: &[DynSolValue]) -> Result<Vec<u8>>;
+    fn abi_encode_input_raw(&self, values: &[DynYlmValue]) -> Result<Vec<u8>>;
 
     /// ABI-decodes the given data according to this item's input types.
     ///
@@ -55,7 +55,7 @@ pub trait JsonAbiExt: Sealed {
     ///
     /// This function will return an error if the decoded data does not match
     /// the expected input types.
-    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>>;
+    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>>;
 }
 
 /// Provide ABI encoding and decoding for the [`Function`] type.
@@ -73,73 +73,73 @@ pub trait FunctionExt: JsonAbiExt + Sealed {
     ///
     /// This function will return an error if the given values do not match the
     /// expected input types.
-    fn abi_encode_output(&self, values: &[DynSolValue]) -> Result<Vec<u8>>;
+    fn abi_encode_output(&self, values: &[DynYlmValue]) -> Result<Vec<u8>>;
 
     /// ABI-decodes the given data according to this functions's output types.
     ///
     /// This method does not check for any prefixes or selectors.
-    fn abi_decode_output(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>>;
+    fn abi_decode_output(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>>;
 }
 
 impl JsonAbiExt for Constructor {
     #[inline]
-    fn abi_encode_input(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values)
     }
 
     #[inline]
-    fn abi_encode_input_raw(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input_raw(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values)
     }
 
     #[inline]
-    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>> {
+    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>> {
         abi_decode(data, &self.inputs, validate)
     }
 }
 
 impl JsonAbiExt for Error {
     #[inline]
-    fn abi_encode_input(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values).map(prefix_selector(self.selector()))
     }
 
     #[inline]
-    fn abi_encode_input_raw(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input_raw(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values)
     }
 
     #[inline]
-    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>> {
+    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>> {
         abi_decode(data, &self.inputs, validate)
     }
 }
 
 impl JsonAbiExt for Function {
     #[inline]
-    fn abi_encode_input(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values).map(prefix_selector(self.selector()))
     }
 
     #[inline]
-    fn abi_encode_input_raw(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_input_raw(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.inputs, values)
     }
 
     #[inline]
-    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>> {
+    fn abi_decode_input(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>> {
         abi_decode(data, &self.inputs, validate)
     }
 }
 
 impl FunctionExt for Function {
     #[inline]
-    fn abi_encode_output(&self, values: &[DynSolValue]) -> Result<Vec<u8>> {
+    fn abi_encode_output(&self, values: &[DynYlmValue]) -> Result<Vec<u8>> {
         encode_typeck(&self.outputs, values)
     }
 
     #[inline]
-    fn abi_decode_output(&self, data: &[u8], validate: bool) -> Result<Vec<DynSolValue>> {
+    fn abi_decode_output(&self, data: &[u8], validate: bool) -> Result<Vec<DynYlmValue>> {
         abi_decode(data, &self.outputs, validate)
     }
 }
@@ -154,7 +154,7 @@ fn prefix_selector(selector: Selector) -> impl FnOnce(Vec<u8>) -> Vec<u8> {
     }
 }
 
-fn encode_typeck(params: &[Param], values: &[DynSolValue]) -> Result<Vec<u8>> {
+fn encode_typeck(params: &[Param], values: &[DynYlmValue]) -> Result<Vec<u8>> {
     if values.len() != params.len() {
         return Err(CrateError::EncodeLengthMismatch {
             expected: params.len(),
@@ -165,8 +165,8 @@ fn encode_typeck(params: &[Param], values: &[DynSolValue]) -> Result<Vec<u8>> {
         let ty = param.resolve()?;
         if !ty.matches(value) {
             return Err(CrateError::TypeMismatch {
-                expected: ty.sol_type_name().into_owned(),
-                actual: value.sol_type_name().unwrap_or_else(|| "<none>".into()).into_owned(),
+                expected: ty.ylm_type_name().into_owned(),
+                actual: value.ylm_type_name().unwrap_or_else(|| "<none>".into()).into_owned(),
             });
         }
     }
@@ -175,11 +175,11 @@ fn encode_typeck(params: &[Param], values: &[DynSolValue]) -> Result<Vec<u8>> {
 }
 
 #[inline]
-fn abi_encode(values: &[DynSolValue]) -> Vec<u8> {
-    DynSolValue::encode_seq(values)
+fn abi_encode(values: &[DynYlmValue]) -> Vec<u8> {
+    DynYlmValue::encode_seq(values)
 }
 
-fn abi_decode(data: &[u8], params: &[Param], validate: bool) -> Result<Vec<DynSolValue>> {
+fn abi_decode(data: &[u8], params: &[Param], validate: bool) -> Result<Vec<DynYlmValue>> {
     let mut values = Vec::with_capacity(params.len());
     let mut decoder = Decoder::new(data, validate);
     for param in params {
@@ -193,7 +193,7 @@ fn abi_decode(data: &[u8], params: &[Param], validate: bool) -> Result<Vec<DynSo
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{bytes, cAddress, hex, IcanAddress, U256};
+    use base_primitives::{bytes, cAddress, hex, IcanAddress, U256};
 
     #[test]
     fn can_encode_decode_functions() {
@@ -228,29 +228,29 @@ mod tests {
         assert_eq!(func.signature(), "allowance(address,address)");
 
         // encode
-        let expected = alloy_primitives::hex!(
+        let expected = base_primitives::hex!(
             "0bf3a456"
             "0000000000000000000011111111111111111111111111111111111111111111"
             "0000000000000000000022222222222222222222222222222222222222222222"
         );
         let input = [
-            DynSolValue::Address(IcanAddress::repeat_byte(0x11)),
-            DynSolValue::Address(IcanAddress::repeat_byte(0x22)),
+            DynYlmValue::Address(IcanAddress::repeat_byte(0x11)),
+            DynYlmValue::Address(IcanAddress::repeat_byte(0x22)),
         ];
         let result = func.abi_encode_input(&input).unwrap();
         assert_eq!(expected[..], result);
 
         // Fail on unexpected input
         let wrong_input = [
-            DynSolValue::Uint(U256::from(10u8), 256),
-            DynSolValue::Address(IcanAddress::repeat_byte(2u8)),
+            DynYlmValue::Uint(U256::from(10u8), 256),
+            DynYlmValue::Address(IcanAddress::repeat_byte(2u8)),
         ];
         assert!(func.abi_encode_input(&wrong_input).is_err());
 
         // decode
         let response = U256::from(1u8).to_be_bytes_vec();
         let decoded = func.abi_decode_output(&response, true).unwrap();
-        assert_eq!(decoded, [DynSolValue::Uint(U256::from(1u8), 256)]);
+        assert_eq!(decoded, [DynYlmValue::Uint(U256::from(1u8), 256)]);
 
         // Fail on wrong response type
         let bad_response = IcanAddress::repeat_byte(3u8).to_vec();
@@ -259,14 +259,14 @@ mod tests {
     }
 
     // https://github.com/foundry-rs/foundry/issues/7280
-    // Same as `encode_empty_bytes_array_in_tuple` in sol-types.
+    // Same as `encode_empty_bytes_array_in_tuple` in ylm-types.
     #[test]
     fn empty_bytes_array() {
         let func = Function::parse("register(bytes,address,bytes[])").unwrap();
         let input = [
-            DynSolValue::Bytes(bytes!("09736b79736b79736b79026f7300").into()),
-            DynSolValue::Address(cAddress!("0000B7b54cd129e6D8B24e6AE652a473449B273eE3E4")),
-            DynSolValue::Array(vec![]),
+            DynYlmValue::Bytes(bytes!("09736b79736b79736b79026f7300").into()),
+            DynYlmValue::Address(cAddress!("0000B7b54cd129e6D8B24e6AE652a473449B273eE3E4")),
+            DynYlmValue::Array(vec![]),
         ];
         let result = func.abi_encode_input(&input).unwrap();
 

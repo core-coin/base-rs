@@ -1,10 +1,10 @@
-use crate::{DynSolValue, DynToken, Error, Result, SolType, Specifier, Word};
+use crate::{DynToken, DynYlmValue, Error, Result, Specifier, Word, YlmType};
 use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
-use alloy_primitives::{
+use base_primitives::{
     try_vec,
     utils::{box_try_new, vec_try_with_capacity},
 };
-use alloy_sol_types::{abi::Decoder, sol_data};
+use base_ylm_types::{abi::Decoder, ylm_data};
 use core::{fmt, iter::zip, num::NonZeroUsize, str::FromStr};
 use parser::TypeSpecifier;
 
@@ -22,62 +22,62 @@ macro_rules! as_tuple {
 }
 pub(crate) use as_tuple;
 
-/// A dynamic Solidity type.
+/// A dynamic Ylem type.
 ///
-/// Equivalent to an enum wrapper around all implementers of [`SolType`].
+/// Equivalent to an enum wrapper around all implementers of [`YlmType`].
 ///
-/// This is used to represent Solidity types that are not known at compile time.
-/// It is used in conjunction with [`DynToken`] and [`DynSolValue`] to allow for
+/// This is used to represent Ylem types that are not known at compile time.
+/// It is used in conjunction with [`DynToken`] and [`DynYlmValue`] to allow for
 /// dynamic ABI encoding and decoding.
 ///
 /// # Examples
 ///
-/// Parsing Solidity type strings:
+/// Parsing Ylem type strings:
 ///
 /// ```
-/// use alloy_dyn_abi::DynSolType;
+/// use base_dyn_abi::DynYlmType;
 ///
 /// let type_name = "(bool,address)[]";
-/// let ty = DynSolType::parse(type_name)?;
+/// let ty = DynYlmType::parse(type_name)?;
 /// assert_eq!(
 ///     ty,
-///     DynSolType::Array(Box::new(DynSolType::Tuple(
-///         vec![DynSolType::Bool, DynSolType::Address,]
+///     DynYlmType::Array(Box::new(DynYlmType::Tuple(
+///         vec![DynYlmType::Bool, DynYlmType::Address,]
 ///     )))
 /// );
-/// assert_eq!(ty.sol_type_name(), type_name);
+/// assert_eq!(ty.ylm_type_name(), type_name);
 ///
 /// // alternatively, you can use the FromStr impl
-/// let ty2 = type_name.parse::<DynSolType>()?;
+/// let ty2 = type_name.parse::<DynYlmType>()?;
 /// assert_eq!(ty, ty2);
-/// # Ok::<_, alloy_dyn_abi::Error>(())
+/// # Ok::<_, base_dyn_abi::Error>(())
 /// ```
 ///
 /// Decoding dynamic types:
 ///
 /// ```
-/// use alloy_dyn_abi::{DynSolType, DynSolValue};
-/// use alloy_primitives::U256;
+/// use base_dyn_abi::{DynYlmType, DynYlmValue};
+/// use base_primitives::U256;
 ///
-/// let my_type = DynSolType::Uint(256);
-/// let my_data: DynSolValue = U256::from(183u64).into();
-///
-/// let encoded = my_data.abi_encode();
-/// let decoded = my_type.abi_decode(&encoded)?;
-///
-/// assert_eq!(decoded, my_data);
-///
-/// let my_type = DynSolType::Array(Box::new(my_type));
-/// let my_data = DynSolValue::Array(vec![my_data.clone()]);
+/// let my_type = DynYlmType::Uint(256);
+/// let my_data: DynYlmValue = U256::from(183u64).into();
 ///
 /// let encoded = my_data.abi_encode();
 /// let decoded = my_type.abi_decode(&encoded)?;
 ///
 /// assert_eq!(decoded, my_data);
-/// # Ok::<_, alloy_dyn_abi::Error>(())
+///
+/// let my_type = DynYlmType::Array(Box::new(my_type));
+/// let my_data = DynYlmValue::Array(vec![my_data.clone()]);
+///
+/// let encoded = my_data.abi_encode();
+/// let decoded = my_type.abi_decode(&encoded)?;
+///
+/// assert_eq!(decoded, my_data);
+/// # Ok::<_, base_dyn_abi::Error>(())
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DynSolType {
+pub enum DynYlmType {
     /// Boolean.
     Bool,
     /// Signed Integer.
@@ -97,11 +97,11 @@ pub enum DynSolType {
     String,
 
     /// Dynamically sized array.
-    Array(Box<DynSolType>),
+    Array(Box<DynYlmType>),
     /// Fixed-sized array.
-    FixedArray(Box<DynSolType>, usize),
+    FixedArray(Box<DynYlmType>, usize),
     /// Tuple.
-    Tuple(Vec<DynSolType>),
+    Tuple(Vec<DynYlmType>),
 
     /// User-defined struct.
     #[cfg(feature = "eip712")]
@@ -111,18 +111,18 @@ pub enum DynSolType {
         /// Prop names.
         prop_names: Vec<String>,
         /// Inner types.
-        tuple: Vec<DynSolType>,
+        tuple: Vec<DynYlmType>,
     },
 }
 
-impl fmt::Display for DynSolType {
+impl fmt::Display for DynYlmType {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.sol_type_name())
+        f.write_str(&self.ylm_type_name())
     }
 }
 
-impl FromStr for DynSolType {
+impl FromStr for DynYlmType {
     type Err = Error;
 
     #[inline]
@@ -131,23 +131,23 @@ impl FromStr for DynSolType {
     }
 }
 
-impl DynSolType {
-    /// Parses a Solidity type name string into a [`DynSolType`].
+impl DynYlmType {
+    /// Parses a Ylem type name string into a [`DynYlmType`].
     ///
     /// # Examples
     ///
     /// ```
-    /// # use alloy_dyn_abi::DynSolType;
+    /// # use base_dyn_abi::DynYlmType;
     /// let type_name = "uint256";
-    /// let ty = DynSolType::parse(type_name)?;
-    /// assert_eq!(ty, DynSolType::Uint(256));
-    /// assert_eq!(ty.sol_type_name(), type_name);
+    /// let ty = DynYlmType::parse(type_name)?;
+    /// assert_eq!(ty, DynYlmType::Uint(256));
+    /// assert_eq!(ty.ylm_type_name(), type_name);
     /// assert_eq!(ty.to_string(), type_name);
     ///
     /// // alternatively, you can use the FromStr impl
-    /// let ty2 = type_name.parse::<DynSolType>()?;
+    /// let ty2 = type_name.parse::<DynYlmType>()?;
     /// assert_eq!(ty2, ty);
-    /// # Ok::<_, alloy_dyn_abi::Error>(())
+    /// # Ok::<_, base_dyn_abi::Error>(())
     /// ```
     #[inline]
     pub fn parse(s: &str) -> Result<Self> {
@@ -158,15 +158,15 @@ impl DynSolType {
     /// depth of 0, while all other types have a nesting depth of at least 1.
     pub fn nesting_depth(&self) -> usize {
         match self {
-            DynSolType::Bool
-            | DynSolType::Int(_)
-            | DynSolType::Uint(_)
-            | DynSolType::FixedBytes(_)
-            | DynSolType::Address
-            | DynSolType::Function
-            | DynSolType::Bytes
-            | DynSolType::String => 0,
-            DynSolType::Array(contents) | DynSolType::FixedArray(contents, _) => {
+            DynYlmType::Bool
+            | DynYlmType::Int(_)
+            | DynYlmType::Uint(_)
+            | DynYlmType::FixedBytes(_)
+            | DynYlmType::Address
+            | DynYlmType::Function
+            | DynYlmType::Bytes
+            | DynYlmType::String => 0,
+            DynYlmType::Array(contents) | DynYlmType::FixedArray(contents, _) => {
                 1 + contents.nesting_depth()
             }
             as_tuple!(Self tuple) => 1 + tuple.iter().map(Self::nesting_depth).max().unwrap_or(0),
@@ -213,48 +213,48 @@ impl DynSolType {
         }
     }
 
-    /// Check that the given [`DynSolValue`]s match these types.
+    /// Check that the given [`DynYlmValue`]s match these types.
     ///
     /// See [`matches`](Self::matches) for more information.
     #[inline]
-    pub fn matches_many(types: &[Self], values: &[DynSolValue]) -> bool {
+    pub fn matches_many(types: &[Self], values: &[DynYlmValue]) -> bool {
         types.len() == values.len() && zip(types, values).all(|(t, v)| t.matches(v))
     }
 
-    /// Check that the given [`DynSolValue`] matches this type.
+    /// Check that the given [`DynYlmValue`] matches this type.
     ///
     /// Note: this will not check any names, but just the types; e.g for
     /// `CustomStruct`, when the "eip712" feature is enabled, this will only
     /// check equality between the lengths and types of the tuple.
-    pub fn matches(&self, value: &DynSolValue) -> bool {
+    pub fn matches(&self, value: &DynYlmValue) -> bool {
         match self {
-            Self::Bool => matches!(value, DynSolValue::Bool(_)),
-            Self::Int(size) => matches!(value, DynSolValue::Int(_, s) if s == size),
-            Self::Uint(size) => matches!(value, DynSolValue::Uint(_, s) if s == size),
-            Self::FixedBytes(size) => matches!(value, DynSolValue::FixedBytes(_, s) if s == size),
-            Self::Address => matches!(value, DynSolValue::Address(_)),
-            Self::Function => matches!(value, DynSolValue::Function(_)),
-            Self::Bytes => matches!(value, DynSolValue::Bytes(_)),
-            Self::String => matches!(value, DynSolValue::String(_)),
+            Self::Bool => matches!(value, DynYlmValue::Bool(_)),
+            Self::Int(size) => matches!(value, DynYlmValue::Int(_, s) if s == size),
+            Self::Uint(size) => matches!(value, DynYlmValue::Uint(_, s) if s == size),
+            Self::FixedBytes(size) => matches!(value, DynYlmValue::FixedBytes(_, s) if s == size),
+            Self::Address => matches!(value, DynYlmValue::Address(_)),
+            Self::Function => matches!(value, DynYlmValue::Function(_)),
+            Self::Bytes => matches!(value, DynYlmValue::Bytes(_)),
+            Self::String => matches!(value, DynYlmValue::String(_)),
             Self::Array(t) => {
-                matches!(value, DynSolValue::Array(v) if v.iter().all(|v| t.matches(v)))
+                matches!(value, DynYlmValue::Array(v) if v.iter().all(|v| t.matches(v)))
             }
             Self::FixedArray(t, size) => matches!(
                 value,
-                DynSolValue::FixedArray(v) if v.len() == *size && v.iter().all(|v| t.matches(v))
+                DynYlmValue::FixedArray(v) if v.len() == *size && v.iter().all(|v| t.matches(v))
             ),
             Self::Tuple(types) => {
-                matches!(value, as_tuple!(DynSolValue tuple) if zip(types, tuple).all(|(t, v)| t.matches(v)))
+                matches!(value, as_tuple!(DynYlmValue tuple) if zip(types, tuple).all(|(t, v)| t.matches(v)))
             }
             #[cfg(feature = "eip712")]
             Self::CustomStruct { name: _, prop_names, tuple } => {
-                if let DynSolValue::CustomStruct { name: _, prop_names: p, tuple: t } = value {
+                if let DynYlmValue::CustomStruct { name: _, prop_names: p, tuple: t } = value {
                     // check just types
                     prop_names.len() == tuple.len()
                         && prop_names.len() == p.len()
                         && tuple.len() == t.len()
                         && zip(tuple, t).all(|(a, b)| a.matches(b))
-                } else if let DynSolValue::Tuple(v) = value {
+                } else if let DynYlmValue::Tuple(v) = value {
                     zip(v, tuple).all(|(v, t)| t.matches(v))
                 } else {
                     false
@@ -266,42 +266,42 @@ impl DynSolType {
     /// Dynamic detokenization.
     // This should not fail when using a token created by `Self::empty_dyn_token`.
     #[allow(clippy::unnecessary_to_owned)] // https://github.com/rust-lang/rust-clippy/issues/8148
-    pub fn detokenize(&self, token: DynToken<'_>) -> Result<DynSolValue> {
+    pub fn detokenize(&self, token: DynToken<'_>) -> Result<DynYlmValue> {
         match (self, token) {
             (Self::Bool, DynToken::Word(word)) => {
-                Ok(DynSolValue::Bool(sol_data::Bool::detokenize(word.into())))
+                Ok(DynYlmValue::Bool(ylm_data::Bool::detokenize(word.into())))
             }
 
             // cheating here, but it's ok
             (Self::Int(size), DynToken::Word(word)) => {
-                Ok(DynSolValue::Int(sol_data::Int::<256>::detokenize(word.into()), *size))
+                Ok(DynYlmValue::Int(ylm_data::Int::<256>::detokenize(word.into()), *size))
             }
 
             (Self::Uint(size), DynToken::Word(word)) => {
-                Ok(DynSolValue::Uint(sol_data::Uint::<256>::detokenize(word.into()), *size))
+                Ok(DynYlmValue::Uint(ylm_data::Uint::<256>::detokenize(word.into()), *size))
             }
 
-            (Self::FixedBytes(size), DynToken::Word(word)) => Ok(DynSolValue::FixedBytes(
-                sol_data::FixedBytes::<32>::detokenize(word.into()),
+            (Self::FixedBytes(size), DynToken::Word(word)) => Ok(DynYlmValue::FixedBytes(
+                ylm_data::FixedBytes::<32>::detokenize(word.into()),
                 *size,
             )),
 
             (Self::Address, DynToken::Word(word)) => {
-                Ok(DynSolValue::Address(sol_data::Address::detokenize(word.into())))
+                Ok(DynYlmValue::Address(ylm_data::Address::detokenize(word.into())))
             }
 
             (Self::Function, DynToken::Word(word)) => {
-                Ok(DynSolValue::Function(sol_data::Function::detokenize(word.into())))
+                Ok(DynYlmValue::Function(ylm_data::Function::detokenize(word.into())))
             }
 
-            (Self::Bytes, DynToken::PackedSeq(buf)) => Ok(DynSolValue::Bytes(buf.to_vec())),
+            (Self::Bytes, DynToken::PackedSeq(buf)) => Ok(DynYlmValue::Bytes(buf.to_vec())),
 
             (Self::String, DynToken::PackedSeq(buf)) => {
-                Ok(DynSolValue::String(sol_data::String::detokenize(buf.into())))
+                Ok(DynYlmValue::String(ylm_data::String::detokenize(buf.into())))
             }
 
             (Self::Array(t), DynToken::DynSeq { contents, .. }) => {
-                t.detokenize_array(contents.into_owned()).map(DynSolValue::Array)
+                t.detokenize_array(contents.into_owned()).map(DynYlmValue::Array)
             }
 
             (Self::FixedArray(t, size), DynToken::FixedSeq(tokens, _)) => {
@@ -310,7 +310,7 @@ impl DynSolType {
                         "array length mismatch on dynamic detokenization",
                     ));
                 }
-                t.detokenize_array(tokens.into_owned()).map(DynSolValue::FixedArray)
+                t.detokenize_array(tokens.into_owned()).map(DynYlmValue::FixedArray)
             }
 
             (Self::Tuple(types), DynToken::FixedSeq(tokens, _)) => {
@@ -319,7 +319,7 @@ impl DynSolType {
                         "tuple length mismatch on dynamic detokenization",
                     ));
                 }
-                Self::detokenize_many(types, tokens.into_owned()).map(DynSolValue::Tuple)
+                Self::detokenize_many(types, tokens.into_owned()).map(DynYlmValue::Tuple)
             }
 
             #[cfg(feature = "eip712")]
@@ -330,7 +330,7 @@ impl DynSolType {
                     ));
                 }
                 Self::detokenize_many(tuple, tokens.into_owned()).map(|tuple| {
-                    DynSolValue::CustomStruct {
+                    DynYlmValue::CustomStruct {
                         name: name.clone(),
                         prop_names: prop_names.clone(),
                         tuple,
@@ -342,7 +342,7 @@ impl DynSolType {
         }
     }
 
-    fn detokenize_array(&self, tokens: Vec<DynToken<'_>>) -> Result<Vec<DynSolValue>> {
+    fn detokenize_array(&self, tokens: Vec<DynToken<'_>>) -> Result<Vec<DynYlmValue>> {
         let mut values = vec_try_with_capacity(tokens.len())?;
         for token in tokens {
             values.push(self.detokenize(token)?);
@@ -350,7 +350,7 @@ impl DynSolType {
         Ok(values)
     }
 
-    fn detokenize_many(types: &[Self], tokens: Vec<DynToken<'_>>) -> Result<Vec<DynSolValue>> {
+    fn detokenize_many(types: &[Self], tokens: Vec<DynToken<'_>>) -> Result<Vec<DynYlmValue>> {
         assert_eq!(types.len(), tokens.len());
         let mut values = vec_try_with_capacity(tokens.len())?;
         for (ty, token) in zip(types, tokens) {
@@ -361,7 +361,7 @@ impl DynSolType {
 
     #[inline]
     #[allow(clippy::missing_const_for_fn)]
-    fn sol_type_name_simple(&self) -> Option<&'static str> {
+    fn ylm_type_name_simple(&self) -> Option<&'static str> {
         match self {
             Self::Address => Some("address"),
             Self::Function => Some("function"),
@@ -373,10 +373,10 @@ impl DynSolType {
     }
 
     #[inline]
-    fn sol_type_name_raw(&self, out: &mut String) {
+    fn ylm_type_name_raw(&self, out: &mut String) {
         match self {
             Self::Address | Self::Function | Self::Bool | Self::Bytes | Self::String => {
-                out.push_str(unsafe { self.sol_type_name_simple().unwrap_unchecked() });
+                out.push_str(unsafe { self.ylm_type_name_simple().unwrap_unchecked() });
             }
 
             Self::FixedBytes(size) | Self::Int(size) | Self::Uint(size) => {
@@ -396,7 +396,7 @@ impl DynSolType {
                     if i > 0 {
                         out.push(',');
                     }
-                    val.sol_type_name_raw(out);
+                    val.ylm_type_name_raw(out);
                 }
                 if tuple.len() == 1 {
                     out.push(',');
@@ -404,11 +404,11 @@ impl DynSolType {
                 out.push(')');
             }
             Self::Array(t) => {
-                t.sol_type_name_raw(out);
+                t.ylm_type_name_raw(out);
                 out.push_str("[]");
             }
             Self::FixedArray(t, len) => {
-                t.sol_type_name_raw(out);
+                t.ylm_type_name_raw(out);
                 out.push('[');
                 out.push_str(itoa::Buffer::new().format(*len));
                 out.push(']');
@@ -419,9 +419,9 @@ impl DynSolType {
     /// Returns an estimate of the number of bytes needed to format this type.
     ///
     /// This calculation is meant to be an upper bound for valid types to avoid
-    /// a second allocation in `sol_type_name_raw` and thus is almost never
+    /// a second allocation in `ylm_type_name_raw` and thus is almost never
     /// going to be exact.
-    fn sol_type_name_capacity(&self) -> usize {
+    fn ylm_type_name_capacity(&self) -> usize {
         match self {
             | Self::Address // 7
             | Self::Function // 8
@@ -435,34 +435,34 @@ impl DynSolType {
 
             | Self::Array(t) // t + 2
             | Self::FixedArray(t, _) // t + 2 + log10(len)
-            => t.sol_type_name_capacity() + 8,
+            => t.ylm_type_name_capacity() + 8,
 
             as_tuple!(Self tuple) // sum(tuple) + len(tuple) + 2
-            => tuple.iter().map(Self::sol_type_name_capacity).sum::<usize>() + 8,
+            => tuple.iter().map(Self::ylm_type_name_capacity).sum::<usize>() + 8,
         }
     }
 
-    /// The Solidity type name. This returns the Solidity type corresponding to
+    /// The Ylem type name. This returns the Ylem type corresponding to
     /// this value, if it is known. A type will not be known if the value
     /// contains an empty sequence, e.g. `T[0]`.
-    pub fn sol_type_name(&self) -> Cow<'static, str> {
-        if let Some(s) = self.sol_type_name_simple() {
+    pub fn ylm_type_name(&self) -> Cow<'static, str> {
+        if let Some(s) = self.ylm_type_name_simple() {
             Cow::Borrowed(s)
         } else {
-            let mut s = String::with_capacity(self.sol_type_name_capacity());
-            self.sol_type_name_raw(&mut s);
+            let mut s = String::with_capacity(self.ylm_type_name_capacity());
+            self.ylm_type_name_raw(&mut s);
             Cow::Owned(s)
         }
     }
 
-    /// The Solidity type name, as a `String`.
+    /// The Ylem type name, as a `String`.
     ///
     /// Note: this shadows the inherent [`ToString`] implementation, derived
     /// from [`fmt::Display`], for performance reasons.
     #[inline]
     #[allow(clippy::inherent_to_string_shadow_display)]
     pub fn to_string(&self) -> String {
-        self.sol_type_name().into_owned()
+        self.ylm_type_name().into_owned()
     }
 
     /// Instantiate an empty dyn token, to be decoded into.
@@ -499,8 +499,8 @@ impl DynSolType {
         })
     }
 
-    /// Decode an event topic into a [`DynSolValue`].
-    pub(crate) fn decode_event_topic(&self, topic: Word) -> DynSolValue {
+    /// Decode an event topic into a [`DynYlmValue`].
+    pub(crate) fn decode_event_topic(&self, topic: Word) -> DynYlmValue {
         match self {
             Self::Address
             | Self::Function
@@ -508,22 +508,22 @@ impl DynSolType {
             | Self::FixedBytes(_)
             | Self::Int(_)
             | Self::Uint(_) => self.detokenize(DynToken::Word(topic)).unwrap(),
-            _ => DynSolValue::FixedBytes(topic, 32),
+            _ => DynYlmValue::FixedBytes(topic, 32),
         }
     }
 
-    /// Decode a [`DynSolValue`] from a byte slice. Fails if the value does not
+    /// Decode a [`DynYlmValue`] from a byte slice. Fails if the value does not
     /// match this type.
     ///
     /// This method is used for decoding single values. It assumes the `data`
     /// argument is an encoded single-element sequence wrapping the `self` type.
     #[inline]
     #[cfg_attr(debug_assertions, track_caller)]
-    pub fn abi_decode(&self, data: &[u8]) -> Result<DynSolValue> {
+    pub fn abi_decode(&self, data: &[u8]) -> Result<DynYlmValue> {
         self.abi_decode_inner(&mut Decoder::new(data, false), DynToken::decode_single_populate)
     }
 
-    /// Decode a [`DynSolValue`] from a byte slice. Fails if the value does not
+    /// Decode a [`DynYlmValue`] from a byte slice. Fails if the value does not
     /// match this type.
     ///
     /// This method is used for decoding function arguments. It tries to
@@ -535,28 +535,28 @@ impl DynSolType {
     ///
     /// ```solidity
     /// // This function takes a single simple param:
-    /// // DynSolType::Uint(256).decode_params(data)
+    /// // DynYlmType::Uint(256).decode_params(data)
     /// function myFunc(uint256 a) public;
     ///
     /// // This function takes 2 params:
-    /// // DynSolType::Tuple(vec![DynSolType::Uint(256), DynSolType::Bool])
+    /// // DynYlmType::Tuple(vec![DynYlmType::Uint(256), DynYlmType::Bool])
     /// //     .decode_params(data)
     /// function myFunc(uint256 b, bool c) public;
     /// ```
     #[inline]
     #[cfg_attr(debug_assertions, track_caller)]
-    pub fn abi_decode_params(&self, data: &[u8]) -> Result<DynSolValue> {
+    pub fn abi_decode_params(&self, data: &[u8]) -> Result<DynYlmValue> {
         match self {
             Self::Tuple(_) => self.abi_decode_sequence(data),
             _ => self.abi_decode(data),
         }
     }
 
-    /// Decode a [`DynSolValue`] from a byte slice. Fails if the value does not
+    /// Decode a [`DynYlmValue`] from a byte slice. Fails if the value does not
     /// match this type.
     #[inline]
     #[cfg_attr(debug_assertions, track_caller)]
-    pub fn abi_decode_sequence(&self, data: &[u8]) -> Result<DynSolValue> {
+    pub fn abi_decode_sequence(&self, data: &[u8]) -> Result<DynYlmValue> {
         self.abi_decode_inner(&mut Decoder::new(data, false), DynToken::decode_sequence_populate)
     }
 
@@ -565,21 +565,21 @@ impl DynSolType {
     pub fn minimum_words(&self) -> usize {
         match self {
             // word types are always 1
-            DynSolType::Bool |
-            DynSolType::Int(_) |
-            DynSolType::Uint(_) |
-            DynSolType::FixedBytes(_) |
-            DynSolType::Address |
-            DynSolType::Function |
+            DynYlmType::Bool |
+            DynYlmType::Int(_) |
+            DynYlmType::Uint(_) |
+            DynYlmType::FixedBytes(_) |
+            DynYlmType::Address |
+            DynYlmType::Function |
             // packed/dynamic seq types may be empty
-            DynSolType::Bytes |
-            DynSolType::String |
-            DynSolType::Array(_) => 1,
+            DynYlmType::Bytes |
+            DynYlmType::String |
+            DynYlmType::Array(_) => 1,
             // fixed-seq types are the sum of their components
-            DynSolType::FixedArray(v, size) => size * v.minimum_words(),
-            DynSolType::Tuple(tuple) => tuple.iter().map(|ty| ty.minimum_words()).sum(),
+            DynYlmType::FixedArray(v, size) => size * v.minimum_words(),
+            DynYlmType::Tuple(tuple) => tuple.iter().map(|ty| ty.minimum_words()).sum(),
             #[cfg(feature = "eip712")]
-            DynSolType::CustomStruct { tuple, ..} => tuple.iter().map(|ty| ty.minimum_words()).sum(),
+            DynYlmType::CustomStruct { tuple, ..} => tuple.iter().map(|ty| ty.minimum_words()).sum(),
         }
     }
 
@@ -589,7 +589,7 @@ impl DynSolType {
         &self,
         decoder: &mut Decoder<'d>,
         f: F,
-    ) -> Result<DynSolValue>
+    ) -> Result<DynYlmValue>
     where
         F: FnOnce(&mut DynToken<'d>, &mut Decoder<'d>) -> Result<()>,
     {
@@ -598,7 +598,7 @@ impl DynSolType {
         }
 
         if decoder.remaining_words() < self.minimum_words() {
-            return Err(Error::SolTypes(alloy_sol_types::Error::Overrun));
+            return Err(Error::YlmTypes(base_ylm_types::Error::Overrun));
         }
 
         let mut token = self.empty_dyn_token()?;
@@ -641,11 +641,11 @@ impl DynSolType {
     }
 
     #[inline]
-    const fn zero_sized_value(&self) -> Option<DynSolValue> {
+    const fn zero_sized_value(&self) -> Option<DynYlmValue> {
         match self {
-            Self::Array(_) => Some(DynSolValue::Array(vec![])),
-            Self::FixedArray(_, _) => Some(DynSolValue::FixedArray(vec![])),
-            Self::Tuple(_) => Some(DynSolValue::Tuple(vec![])),
+            Self::Array(_) => Some(DynYlmValue::Array(vec![])),
+            Self::FixedArray(_, _) => Some(DynYlmValue::FixedArray(vec![])),
+            Self::Tuple(_) => Some(DynYlmValue::Tuple(vec![])),
             _ => None,
         }
     }
@@ -654,7 +654,7 @@ impl DynSolType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{hex, IcanAddress};
+    use base_primitives::{hex, IcanAddress};
 
     #[test]
     fn dynamically_encodes() {
@@ -663,11 +663,11 @@ mod tests {
         let word2 =
             "0000000000000000000002020202020202020202020202020202020202020202".parse().unwrap();
 
-        let val = DynSolValue::Address(IcanAddress::repeat_byte(0x01));
+        let val = DynYlmValue::Address(IcanAddress::repeat_byte(0x01));
         let token = val.tokenize();
         assert_eq!(token, DynToken::from(word1));
 
-        let val = DynSolValue::FixedArray(vec![
+        let val = DynYlmValue::FixedArray(vec![
             IcanAddress::repeat_byte(0x01).into(),
             IcanAddress::repeat_byte(0x02).into(),
         ]);
@@ -678,7 +678,7 @@ mod tests {
             DynToken::FixedSeq(vec![DynToken::Word(word1), DynToken::Word(word2)].into(), 2)
         );
         let mut enc = crate::Encoder::default();
-        DynSolValue::encode_seq_to(val.as_fixed_seq().unwrap(), &mut enc);
+        DynYlmValue::encode_seq_to(val.as_fixed_seq().unwrap(), &mut enc);
         assert_eq!(enc.finish(), vec![word1, word2]);
     }
 
@@ -693,11 +693,11 @@ mod tests {
     }
 
     fn encoder_test(s: &str, encoded: &[u8]) {
-        let ty: DynSolType = s.parse().expect("parsing failed");
-        assert_eq!(ty.sol_type_name(), s, "type names are not the same");
+        let ty: DynYlmType = s.parse().expect("parsing failed");
+        assert_eq!(ty.ylm_type_name(), s, "type names are not the same");
 
         let value = ty.abi_decode_params(encoded).expect("decoding failed");
-        if let Some(value_name) = value.sol_type_name() {
+        if let Some(value_name) = value.ylm_type_name() {
             assert_eq!(value_name, s, "value names are not the same");
         }
 
@@ -1024,55 +1024,55 @@ re-enc: {re_enc}
         "),
     }
 
-    // https://github.com/alloy-rs/core/issues/392
+    // https://github.com/core-coin/base-rs/issues/392
     #[test]
     fn zst_dos() {
-        let my_type: DynSolType = "()[]".parse().unwrap();
+        let my_type: DynYlmType = "()[]".parse().unwrap();
         let value = my_type.abi_decode(&hex!("000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000FFFFFFFF"));
-        assert_eq!(value, Ok(DynSolValue::Array(vec![])));
+        assert_eq!(value, Ok(DynYlmValue::Array(vec![])));
     }
 
     #[test]
     #[cfg_attr(miri, ignore = "takes too long")]
     fn recursive_dos() {
-        // https://github.com/alloy-rs/core/issues/490
+        // https://github.com/core-coin/base-rs/issues/490
         let payload = "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020";
 
         // Used to eat 60 gb of memory and then crash.
-        let my_type: DynSolType = "uint256[][][][][][][][][][]".parse().unwrap();
+        let my_type: DynYlmType = "uint256[][][][][][][][][][]".parse().unwrap();
         let decoded = my_type.abi_decode(&hex::decode(payload).unwrap());
-        assert_eq!(decoded, Err(alloy_sol_types::Error::RecursionLimitExceeded(16).into()));
+        assert_eq!(decoded, Err(base_ylm_types::Error::RecursionLimitExceeded(16).into()));
 
         // https://github.com/paulmillr/micro-eth-signer/discussions/20
         let payload = &"0000000000000000000000000000000000000000000000000000000000000020\
              000000000000000000000000000000000000000000000000000000000000000a\
              0000000000000000000000000000000000000000000000000000000000000020"
             .repeat(64);
-        let my_type: DynSolType = "uint256[][][][][][][][][][]".parse().unwrap();
+        let my_type: DynYlmType = "uint256[][][][][][][][][][]".parse().unwrap();
         let decoded = my_type.abi_decode(&hex::decode(payload).unwrap());
-        assert_eq!(decoded, Err(alloy_sol_types::Error::RecursionLimitExceeded(16).into()));
+        assert_eq!(decoded, Err(base_ylm_types::Error::RecursionLimitExceeded(16).into()));
 
-        let my_type: DynSolType = "bytes[][][][][][][][][][]".parse().unwrap();
+        let my_type: DynYlmType = "bytes[][][][][][][][][][]".parse().unwrap();
         let decoded = my_type.abi_decode(&hex::decode(payload).unwrap());
-        assert_eq!(decoded, Err(alloy_sol_types::Error::RecursionLimitExceeded(16).into()));
+        assert_eq!(decoded, Err(base_ylm_types::Error::RecursionLimitExceeded(16).into()));
     }
 
-    // https://github.com/alloy-rs/core/issues/490
+    // https://github.com/core-coin/base-rs/issues/490
     #[test]
     fn large_dyn_array_dos() {
         let payload = "000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000FFFFFFFF";
 
         // Used to eat 60 gb of memory.
-        let my_type: DynSolType = "uint32[1][]".parse().unwrap();
+        let my_type: DynYlmType = "uint32[1][]".parse().unwrap();
         let decoded = my_type.abi_decode(&hex::decode(payload).unwrap());
-        assert_eq!(decoded, Err(alloy_sol_types::Error::Overrun.into()))
+        assert_eq!(decoded, Err(base_ylm_types::Error::Overrun.into()))
     }
 
     #[test]
     fn fixed_array_dos() {
-        let t = "uint32[9999999999]".parse::<DynSolType>().unwrap();
+        let t = "uint32[9999999999]".parse::<DynYlmType>().unwrap();
         let decoded = t.abi_decode(&[]);
-        assert_eq!(decoded, Err(alloy_sol_types::Error::Overrun.into()))
+        assert_eq!(decoded, Err(base_ylm_types::Error::Overrun.into()))
     }
 
     macro_rules! packed_tests {
@@ -1091,8 +1091,8 @@ re-enc: {re_enc}
     }
 
     fn packed_test(t_s: &str, v_s: &str, expected: &[u8]) {
-        let ty: DynSolType = t_s.parse().expect("parsing failed");
-        assert_eq!(ty.sol_type_name(), t_s, "type names are not the same");
+        let ty: DynYlmType = t_s.parse().expect("parsing failed");
+        assert_eq!(ty.ylm_type_name(), t_s, "type names are not the same");
 
         let value = match ty.coerce_str(v_s) {
             Ok(v) => v,
@@ -1100,7 +1100,7 @@ re-enc: {re_enc}
                 panic!("failed to coerce to a value: {e}");
             }
         };
-        if let Some(value_name) = value.sol_type_name() {
+        if let Some(value_name) = value.ylm_type_name() {
             assert_eq!(value_name, t_s, "value names are not the same");
         }
 

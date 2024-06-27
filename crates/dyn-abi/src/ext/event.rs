@@ -1,16 +1,16 @@
-use crate::{DecodedEvent, DynSolEvent, DynSolType, Error, Result, Specifier};
+use crate::{DecodedEvent, DynYlmEvent, DynYlmType, Error, Result, Specifier};
 use alloc::vec::Vec;
-use alloy_json_abi::Event;
-use alloy_primitives::{LogData, B256};
+use base_json_abi::Event;
+use base_primitives::{LogData, B256};
 
 mod sealed {
     pub trait Sealed {}
-    impl Sealed for alloy_json_abi::Event {}
+    impl Sealed for base_json_abi::Event {}
 }
 use sealed::Sealed;
 
-impl Specifier<DynSolEvent> for Event {
-    fn resolve(&self) -> Result<DynSolEvent> {
+impl Specifier<DynYlmEvent> for Event {
+    fn resolve(&self) -> Result<DynYlmEvent> {
         let mut indexed = Vec::with_capacity(self.inputs.len());
         let mut body = Vec::with_capacity(self.inputs.len());
         for param in &self.inputs {
@@ -28,7 +28,7 @@ impl Specifier<DynSolEvent> for Event {
             return Err(Error::TopicLengthMismatch { expected: 4, actual: num_topics });
         }
 
-        Ok(DynSolEvent::new_unchecked(topic_0, indexed, DynSolType::Tuple(body)))
+        Ok(DynYlmEvent::new_unchecked(topic_0, indexed, DynYlmType::Tuple(body)))
     }
 }
 
@@ -44,7 +44,7 @@ pub trait EventExt: Sealed {
     ///
     /// The first topic is skipped, unless the event is anonymous.
     ///
-    /// For more details, see the [Solidity reference][ref].
+    /// For more details, see the [Ylem reference][ref].
     ///
     /// [ref]: https://docs.soliditylang.org/en/latest/abi-spec.html#encoding-of-indexed-event-parameters
     ///
@@ -76,11 +76,11 @@ impl EventExt for Event {
 
 #[cfg(test)]
 mod tests {
-    use crate::DynSolValue;
+    use crate::DynYlmValue;
 
     use super::*;
-    use alloy_json_abi::EventParam;
-    use alloy_primitives::{b256, bytes, cAddress, hex, sha3, Signed};
+    use base_json_abi::EventParam;
+    use base_primitives::{b256, bytes, cAddress, hex, sha3, Signed};
 
     #[test]
     fn empty() {
@@ -145,26 +145,26 @@ mod tests {
         assert_eq!(
             result.body,
             [
-                DynSolValue::Int(
+                DynYlmValue::Int(
                     Signed::from_be_bytes(hex!(
                         "0000000000000000000000000000000000000000000000000000000000000003"
                     )),
                     256
                 ),
-                DynSolValue::Address(cAddress!("22222222222222222222222222222222222222222222")),
+                DynYlmValue::Address(cAddress!("22222222222222222222222222222222222222222222")),
             ]
         );
         assert_eq!(
             result.indexed,
             [
-                DynSolValue::Int(
+                DynYlmValue::Int(
                     Signed::from_be_bytes(hex!(
                         "0000000000000000000000000000000000000000000000000000000000000002"
                     )),
                     256
                 ),
-                DynSolValue::Address(cAddress!("11111111111111111111111111111111111111111111")),
-                DynSolValue::FixedBytes(
+                DynYlmValue::Address(cAddress!("11111111111111111111111111111111111111111111")),
+                DynYlmValue::FixedBytes(
                     b256!("00000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
                     32
                 ),

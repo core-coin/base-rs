@@ -84,6 +84,6 @@ pub type StorageKey = B256;
 /// An account storage value.
 pub type StorageValue = U256;
 
-/// Solidity contract functions are addressed using the first four bytes of the
+/// Ylem contract functions are addressed using the first four bytes of the
 /// Keccak-256 hash of their signature.
 pub type Selector = FixedBytes<4>;

@@ -1,8 +1,8 @@
 use super::ty::as_tuple;
-use crate::{DynSolType, DynToken, Word};
+use crate::{DynToken, DynYlmType, Word};
 use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
-use alloy_primitives::{Function, IcanAddress, I256, U256};
-use alloy_sol_types::{abi::Encoder, utils::words_for_len};
+use base_primitives::{Function, IcanAddress, I256, U256};
+use base_ylm_types::{abi::Encoder, utils::words_for_len};
 
 #[cfg(feature = "eip712")]
 macro_rules! as_fixed_seq {
@@ -17,7 +17,7 @@ macro_rules! as_fixed_seq {
     };
 }
 
-/// A dynamic Solidity value.
+/// A dynamic Ylem value.
 ///
 /// It is broadly similar to `serde_json::Value` in that it is an enum of
 /// possible types, and the user must inspect and disambiguate.
@@ -27,38 +27,38 @@ macro_rules! as_fixed_seq {
 /// Basic usage:
 ///
 /// ```
-/// use alloy_dyn_abi::{DynSolType, DynSolValue};
+/// use base_dyn_abi::{DynYlmType, DynYlmValue};
 ///
-/// let ty: DynSolType = "uint64".parse()?;
-/// let value: DynSolValue = 183u64.into();
+/// let ty: DynYlmType = "uint64".parse()?;
+/// let value: DynYlmValue = 183u64.into();
 ///
 /// let encoded: Vec<u8> = value.abi_encode();
-/// let decoded: DynSolValue = ty.abi_decode(&encoded)?;
+/// let decoded: DynYlmValue = ty.abi_decode(&encoded)?;
 ///
 /// assert_eq!(decoded, value);
-/// # Ok::<(), alloy_dyn_abi::Error>(())
+/// # Ok::<(), base_dyn_abi::Error>(())
 /// ```
 ///
-/// Coerce a string using [`DynSolType`]:
+/// Coerce a string using [`DynYlmType`]:
 ///
 /// ```
-/// use alloy_dyn_abi::{DynSolType, DynSolValue};
-/// use alloy_primitives::U256;
+/// use base_dyn_abi::{DynYlmType, DynYlmValue};
+/// use base_primitives::U256;
 ///
-/// let ty: DynSolType = "(string, uint256)".parse()?;
+/// let ty: DynYlmType = "(string, uint256)".parse()?;
 #[cfg_attr(feature = "std", doc = "let value = ty.coerce_str(\"(foo bar, 2.5 gwei)\")?;")]
 #[cfg_attr(not(feature = "std"), doc = "let value = ty.coerce_str(\"(foo bar, 2500000000)\")?;")]
 /// assert_eq!(
 ///     value,
-///     DynSolValue::Tuple(vec![
-///         DynSolValue::String(String::from("foo bar")),
-///         DynSolValue::Uint(U256::from(2_500_000_000u64), 256)
+///     DynYlmValue::Tuple(vec![
+///         DynYlmValue::String(String::from("foo bar")),
+///         DynYlmValue::Uint(U256::from(2_500_000_000u64), 256)
 ///     ]),
 /// );
-/// # Ok::<(), alloy_dyn_abi::Error>(())
+/// # Ok::<(), base_dyn_abi::Error>(())
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub enum DynSolValue {
+pub enum DynYlmValue {
     /// A boolean.
     Bool(bool),
     /// A signed integer. The second parameter is the number of bits, not bytes.
@@ -78,11 +78,11 @@ pub enum DynSolValue {
     String(String),
 
     /// A dynamically-sized array of values.
-    Array(Vec<DynSolValue>),
+    Array(Vec<DynYlmValue>),
     /// A fixed-size array of values.
-    FixedArray(Vec<DynSolValue>),
+    FixedArray(Vec<DynYlmValue>),
     /// A tuple of values.
-    Tuple(Vec<DynSolValue>),
+    Tuple(Vec<DynYlmValue>),
 
     /// A named struct, treated as a tuple with a name parameter.
     #[cfg(feature = "eip712")]
@@ -92,46 +92,46 @@ pub enum DynSolValue {
         /// The struct's prop names, in declaration order.
         prop_names: Vec<String>,
         /// The inner types.
-        tuple: Vec<DynSolValue>,
+        tuple: Vec<DynYlmValue>,
     },
 }
 
-impl From<IcanAddress> for DynSolValue {
+impl From<IcanAddress> for DynYlmValue {
     #[inline]
     fn from(value: IcanAddress) -> Self {
         Self::Address(value)
     }
 }
 
-impl From<bool> for DynSolValue {
+impl From<bool> for DynYlmValue {
     #[inline]
     fn from(value: bool) -> Self {
         Self::Bool(value)
     }
 }
 
-impl From<Vec<u8>> for DynSolValue {
+impl From<Vec<u8>> for DynYlmValue {
     #[inline]
     fn from(value: Vec<u8>) -> Self {
         Self::Bytes(value)
     }
 }
 
-impl From<String> for DynSolValue {
+impl From<String> for DynYlmValue {
     #[inline]
     fn from(value: String) -> Self {
         Self::String(value)
     }
 }
 
-impl From<Vec<Self>> for DynSolValue {
+impl From<Vec<Self>> for DynYlmValue {
     #[inline]
     fn from(value: Vec<Self>) -> Self {
         Self::Array(value)
     }
 }
 
-impl<const N: usize> From<[Self; N]> for DynSolValue {
+impl<const N: usize> From<[Self; N]> for DynYlmValue {
     #[inline]
     fn from(value: [Self; N]) -> Self {
         Self::FixedArray(value.to_vec())
@@ -140,7 +140,7 @@ impl<const N: usize> From<[Self; N]> for DynSolValue {
 
 macro_rules! impl_from_int {
     ($($t:ty),+) => {$(
-        impl From<$t> for DynSolValue {
+        impl From<$t> for DynYlmValue {
             #[inline]
             fn from(value: $t) -> Self {
                 const BITS: usize = <$t>::BITS as usize;
@@ -148,9 +148,9 @@ macro_rules! impl_from_int {
                 const _: () = assert!(BYTES <= 32);
 
                 let mut word = if value.is_negative() {
-                    alloy_primitives::B256::repeat_byte(0xff)
+                    base_primitives::B256::repeat_byte(0xff)
                 } else {
-                    alloy_primitives::B256::ZERO
+                    base_primitives::B256::ZERO
                 };
                 word[32 - BYTES..].copy_from_slice(&value.to_be_bytes());
 
@@ -162,7 +162,7 @@ macro_rules! impl_from_int {
 
 impl_from_int!(i8, i16, i32, i64, isize, i128);
 
-impl From<I256> for DynSolValue {
+impl From<I256> for DynYlmValue {
     #[inline]
     fn from(value: I256) -> Self {
         Self::Int(value, 256)
@@ -171,7 +171,7 @@ impl From<I256> for DynSolValue {
 
 macro_rules! impl_from_uint {
     ($($t:ty),+) => {$(
-        impl From<$t> for DynSolValue {
+        impl From<$t> for DynYlmValue {
             #[inline]
             fn from(value: $t) -> Self {
                 Self::Uint(U256::from(value), <$t>::BITS as usize)
@@ -182,40 +182,40 @@ macro_rules! impl_from_uint {
 
 impl_from_uint!(u8, u16, u32, u64, usize, u128);
 
-impl From<U256> for DynSolValue {
+impl From<U256> for DynYlmValue {
     #[inline]
     fn from(value: U256) -> Self {
         Self::Uint(value, 256)
     }
 }
 
-impl DynSolValue {
-    /// The Solidity type. This returns the Solidity type corresponding to this
+impl DynYlmValue {
+    /// The Ylem type. This returns the Ylem type corresponding to this
     /// value, if it is known. A type will not be known if the value contains
     /// an empty sequence, e.g. `T[0]`.
-    pub fn as_type(&self) -> Option<DynSolType> {
+    pub fn as_type(&self) -> Option<DynYlmType> {
         let ty = match self {
-            Self::Address(_) => DynSolType::Address,
-            Self::Function(_) => DynSolType::Function,
-            Self::Bool(_) => DynSolType::Bool,
-            Self::Bytes(_) => DynSolType::Bytes,
-            Self::FixedBytes(_, size) => DynSolType::FixedBytes(*size),
-            Self::Int(_, size) => DynSolType::Int(*size),
-            Self::Uint(_, size) => DynSolType::Uint(*size),
-            Self::String(_) => DynSolType::String,
+            Self::Address(_) => DynYlmType::Address,
+            Self::Function(_) => DynYlmType::Function,
+            Self::Bool(_) => DynYlmType::Bool,
+            Self::Bytes(_) => DynYlmType::Bytes,
+            Self::FixedBytes(_, size) => DynYlmType::FixedBytes(*size),
+            Self::Int(_, size) => DynYlmType::Int(*size),
+            Self::Uint(_, size) => DynYlmType::Uint(*size),
+            Self::String(_) => DynYlmType::String,
             Self::Tuple(inner) => {
                 return inner
                     .iter()
                     .map(Self::as_type)
                     .collect::<Option<Vec<_>>>()
-                    .map(DynSolType::Tuple)
+                    .map(DynYlmType::Tuple)
             }
-            Self::Array(inner) => DynSolType::Array(Box::new(Self::as_type(inner.first()?)?)),
+            Self::Array(inner) => DynYlmType::Array(Box::new(Self::as_type(inner.first()?)?)),
             Self::FixedArray(inner) => {
-                DynSolType::FixedArray(Box::new(Self::as_type(inner.first()?)?), inner.len())
+                DynYlmType::FixedArray(Box::new(Self::as_type(inner.first()?)?), inner.len())
             }
             #[cfg(feature = "eip712")]
-            Self::CustomStruct { name, prop_names, tuple } => DynSolType::CustomStruct {
+            Self::CustomStruct { name, prop_names, tuple } => DynYlmType::CustomStruct {
                 name: name.clone(),
                 prop_names: prop_names.clone(),
                 tuple: tuple.iter().map(Self::as_type).collect::<Option<Vec<_>>>()?,
@@ -226,7 +226,7 @@ impl DynSolValue {
 
     #[inline]
     #[allow(clippy::missing_const_for_fn)]
-    fn sol_type_name_simple(&self) -> Option<&'static str> {
+    fn ylm_type_name_simple(&self) -> Option<&'static str> {
         match self {
             Self::Address(_) => Some("address"),
             Self::Function(_) => Some("function"),
@@ -237,15 +237,15 @@ impl DynSolValue {
         }
     }
 
-    fn sol_type_name_raw(&self, out: &mut String) {
+    fn ylm_type_name_raw(&self, out: &mut String) {
         match self {
             Self::Address(_)
             | Self::Function(_)
             | Self::Bool(_)
             | Self::Bytes(_)
             | Self::String(_) => {
-                // SAFETY: `sol_type_name_simple` returns `Some` for these types
-                out.push_str(unsafe { self.sol_type_name_simple().unwrap_unchecked() });
+                // SAFETY: `ylm_type_name_simple` returns `Some` for these types
+                out.push_str(unsafe { self.ylm_type_name_simple().unwrap_unchecked() });
             }
 
             Self::FixedBytes(_, size) | Self::Int(_, size) | Self::Uint(_, size) => {
@@ -260,9 +260,9 @@ impl DynSolValue {
             }
 
             Self::Array(values) | Self::FixedArray(values) => {
-                // SAFETY: checked in `sol_type_name_capacity`
+                // SAFETY: checked in `ylm_type_name_capacity`
                 debug_assert!(!values.is_empty());
-                unsafe { values.first().unwrap_unchecked() }.sol_type_name_raw(out);
+                unsafe { values.first().unwrap_unchecked() }.ylm_type_name_raw(out);
 
                 out.push('[');
                 let format_len = match self {
@@ -281,7 +281,7 @@ impl DynSolValue {
                     if i > 0 {
                         out.push(',');
                     }
-                    val.sol_type_name_raw(out);
+                    val.ylm_type_name_raw(out);
                 }
                 if tuple.len() == 1 {
                     out.push(',');
@@ -294,8 +294,8 @@ impl DynSolValue {
     /// Returns an estimate of the number of bytes needed to format this type.
     /// Returns `None` if it cannot be formatted.
     ///
-    /// See `DynSolType::sol_type_name_capacity` for more info.
-    fn sol_type_name_capacity(&self) -> Option<usize> {
+    /// See `DynYlmType::ylm_type_name_capacity` for more info.
+    fn ylm_type_name_capacity(&self) -> Option<usize> {
         match self {
             Self::Bool(_)
             | Self::Int(..)
@@ -307,24 +307,24 @@ impl DynSolValue {
             | Self::String(_) => Some(8),
 
             Self::Array(t) | Self::FixedArray(t) => {
-                t.first().and_then(Self::sol_type_name_capacity).map(|x| x + 8)
+                t.first().and_then(Self::ylm_type_name_capacity).map(|x| x + 8)
             }
 
             as_tuple!(Self tuple) => {
-                tuple.iter().map(Self::sol_type_name_capacity).sum::<Option<usize>>().map(|x| x + 8)
+                tuple.iter().map(Self::ylm_type_name_capacity).sum::<Option<usize>>().map(|x| x + 8)
             }
         }
     }
 
-    /// The Solidity type name. This returns the Solidity type corresponding to
+    /// The Ylem type name. This returns the Ylem type corresponding to
     /// this value, if it is known. A type will not be known if the value
     /// contains an empty sequence, e.g. `T[0]`.
-    pub fn sol_type_name(&self) -> Option<Cow<'static, str>> {
-        if let Some(s) = self.sol_type_name_simple() {
+    pub fn ylm_type_name(&self) -> Option<Cow<'static, str>> {
+        if let Some(s) = self.ylm_type_name_simple() {
             Some(Cow::Borrowed(s))
-        } else if let Some(capacity) = self.sol_type_name_capacity() {
+        } else if let Some(capacity) = self.ylm_type_name_capacity() {
             let mut s = String::with_capacity(capacity);
-            self.sol_type_name_raw(&mut s);
+            self.ylm_type_name_raw(&mut s);
             Some(Cow::Owned(s))
         } else {
             None
@@ -358,7 +358,7 @@ impl DynSolValue {
         }
     }
 
-    /// Fallible cast to the contents of a variant DynSolValue {.
+    /// Fallible cast to the contents of a variant DynYlmValue {.
     #[inline]
     pub const fn as_address(&self) -> Option<IcanAddress> {
         match self {
@@ -530,21 +530,21 @@ impl DynSolValue {
         }
     }
 
-    /// Check that these values have the same type as the given [`DynSolType`]s.
+    /// Check that these values have the same type as the given [`DynYlmType`]s.
     ///
-    /// See [`DynSolType::matches`] for more information.
+    /// See [`DynYlmType::matches`] for more information.
     #[doc(alias = "types_check")] // from ethabi
     #[inline(always)]
-    pub fn matches_many(values: &[Self], types: &[DynSolType]) -> bool {
-        DynSolType::matches_many(types, values)
+    pub fn matches_many(values: &[Self], types: &[DynYlmType]) -> bool {
+        DynYlmType::matches_many(types, values)
     }
 
-    /// Check that this value has the same type as the given [`DynSolType`].
+    /// Check that this value has the same type as the given [`DynYlmType`].
     ///
-    /// See [`DynSolType::matches`] for more information.
+    /// See [`DynYlmType::matches`] for more information.
     #[doc(alias = "type_check")] // from ethabi
     #[inline(always)]
-    pub fn matches(&self, ty: &DynSolType) -> bool {
+    pub fn matches(&self, ty: &DynYlmType) -> bool {
         ty.matches(self)
     }
 
@@ -726,7 +726,7 @@ impl DynSolValue {
     /// Note that invalid value sizes will saturate to the maximum size, e.g. `Uint(x, 300)` will
     /// behave the same as `Uint(x, 256)`.
     ///
-    /// See [`SolType::abi_encode_packed`](alloy_sol_types::SolType::abi_encode_packed) for more
+    /// See [`YlmType::abi_encode_packed`](base_ylm_types::YlmType::abi_encode_packed) for more
     /// details.
     #[inline]
     pub fn abi_encode_packed(&self) -> Vec<u8> {
@@ -791,12 +791,12 @@ impl DynSolValue {
     ///
     /// ```ignore (pseudo-code)
     /// // Encoding for function foo(address)
-    /// DynSolValue::Address(_).abi_encode_params();
+    /// DynYlmValue::Address(_).abi_encode_params();
     ///
     /// // Encoding for function foo(address, uint256)
-    /// DynSolValue::Tuple(vec![
-    ///     DynSolValue::Address(_),
-    ///     DynSolValue::Uint(_, 256),
+    /// DynYlmValue::Tuple(vec![
+    ///     DynYlmValue::Address(_),
+    ///     DynYlmValue::Uint(_, 256),
     /// ]).abi_encode_params();
     /// ```
     #[inline]

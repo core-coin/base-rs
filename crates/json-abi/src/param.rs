@@ -21,7 +21,7 @@ use serde::{de::Unexpected, Deserialize, Deserializer, Serialize, Serializer};
 /// [Error]: crate::Error
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Param {
-    /// The canonical Solidity type of the parameter, using the word "tuple" to
+    /// The canonical Ylem type of the parameter, using the word "tuple" to
     /// represent complex types. E.g. `uint256` or `bytes[2]` or `tuple` or
     /// `tuple[2]`.
     ///
@@ -31,13 +31,13 @@ pub struct Param {
     /// instead of the actual type (`uint8`).
     pub ty: String,
     /// The name of the parameter. This field always contains either the empty
-    /// string, or a valid Solidity identifier.
+    /// string, or a valid Ylem identifier.
     pub name: String,
     /// If the paramaeter is a compound type (a struct or tuple), a list of the
     /// parameter's components, in order. Empty otherwise
     pub components: Vec<Param>,
     /// The internal type of the parameter. This type represents the type that
-    /// the author of the Solidity contract specified. E.g. for a contract, this
+    /// the author of the Ylem contract specified. E.g. for a contract, this
     /// will be `contract MyContract` while the `type` field will be `address`.
     pub internal_type: Option<InternalType>,
 }
@@ -85,12 +85,12 @@ impl FromStr for Param {
 }
 
 impl Param {
-    /// Parse a parameter from a Solidity parameter string.
+    /// Parse a parameter from a Ylem parameter string.
     ///
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::Param;
+    /// # use base_json_abi::Param;
     /// assert_eq!(
     ///     Param::parse("uint256[] foo"),
     ///     Ok(Param {
@@ -265,13 +265,13 @@ impl Param {
     }
 }
 
-/// A Solidity Event parameter.
+/// A Ylem Event parameter.
 ///
 /// Event parameters are distinct from function parameters in that they have an
 /// `indexed` field.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct EventParam {
-    /// The canonical Solidity type of the parameter, using the word "tuple" to
+    /// The canonical Ylem type of the parameter, using the word "tuple" to
     /// represent complex types. E.g. `uint256` or `bytes[2]` or `tuple` or
     /// `tuple[2]`.
     ///
@@ -281,7 +281,7 @@ pub struct EventParam {
     /// instead of the actual type (`uint8`).
     pub ty: String,
     /// The name of the parameter. This field always contains either the empty
-    /// string, or a valid Solidity identifier.
+    /// string, or a valid Ylem identifier.
     pub name: String,
     /// Whether the parameter is indexed. Indexed parameters have their
     /// value, or the hash of their value, stored in the log topics.
@@ -292,7 +292,7 @@ pub struct EventParam {
     /// `indexed` field.
     pub components: Vec<Param>,
     /// The internal type of the parameter. This type represents the type that
-    /// the author of the Solidity contract specified. E.g. for a contract, this
+    /// the author of the Ylem contract specified. E.g. for a contract, this
     /// will be `contract MyContract` while the `type` field will be `address`.
     pub internal_type: Option<InternalType>,
 }
@@ -337,12 +337,12 @@ impl FromStr for EventParam {
 }
 
 impl EventParam {
-    /// Parse an event parameter from a Solidity parameter string.
+    /// Parse an event parameter from a Ylem parameter string.
     ///
     /// # Examples
     ///
     /// ```
-    /// # use alloy_json_abi::EventParam;
+    /// # use base_json_abi::EventParam;
     /// assert_eq!(
     ///     EventParam::parse("uint256[] indexed foo"),
     ///     Ok(EventParam {
@@ -544,7 +544,7 @@ impl BorrowedParam<'_> {
             if parser::TypeSpecifier::parse(self.ty).is_err() {
                 return Err(E::invalid_value(
                     Unexpected::Str(self.ty),
-                    &"a valid Solidity type specifier",
+                    &"a valid Ylem type specifier",
                 ));
             }
         } else {

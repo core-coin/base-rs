@@ -16,10 +16,10 @@ body:
               - dyn-abi
               - json-abi
               - primitives
-              - sol-type-parser
-              - sol-types
-              - sol! macro
-              - syn-solidity
+              - ylm-type-parser
+              - ylm-types
+              - ylm! macro
+              - syn-ylem
               - Other (please provide more details)
       validations:
           required: true

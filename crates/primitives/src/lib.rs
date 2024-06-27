@@ -1,8 +1,4 @@
 #![doc = include_str!("../README.md")]
-#![doc(
-    html_logo_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/alloy.jpg",
-    html_favicon_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/favicon.ico"
-)]
 #![warn(
     missing_copy_implementations,
     missing_debug_implementations,
@@ -62,6 +58,7 @@ pub use signed::{BigIntConversionError, ParseSignedError, Sign, Signed};
 mod signature;
 pub use signature::{to_eip155_v, Parity, SignatureError};
 
+/// Type for ed448 signature
 pub type Signature = signature::Signature;
 
 pub mod utils;
@@ -83,7 +80,7 @@ pub use ::hex::serde as serde_hex;
 ///
 /// You'll likely want to use [`Address`] instead, as it is a different type
 /// from `FixedBytes<20>`, and implements methods useful for working with
-/// Ethereum addresses.
+/// Core addresses.
 ///
 /// If you are sure you want to use this type, and you don't want the
 /// deprecation warning, you can use `aliases::B160`.

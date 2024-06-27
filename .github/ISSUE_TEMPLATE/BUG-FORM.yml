@@ -18,17 +18,17 @@ body:
               - dyn-abi
               - json-abi
               - primitives
-              - sol-type-parser
-              - sol-types
-              - sol! macro
-              - syn-solidity
+              - ylm-type-parser
+              - ylm-types
+              - ylm! macro
+              - syn-ylem
               - Other (please provide more details)
       validations:
           required: true
     - type: input
       attributes:
           label: What version of Alloy are you on?
-          placeholder: "Run `carge tree | grep alloy` and paste the output here"
+          placeholder: "Run `carge tree | grep base` and paste the output here"
     - type: dropdown
       attributes:
           label: Operating System

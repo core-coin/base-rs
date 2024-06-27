@@ -3,10 +3,10 @@ use core::fmt;
 use parser::TypeSpecifier;
 use serde::{de::Visitor, Deserialize, Deserializer, Serialize, Serializer};
 
-/// The contract internal type. This could be a regular Solidity type, a
+/// The contract internal type. This could be a regular Ylem type, a
 /// user-defined type, an enum, a struct, a contract, or an address payable.
 ///
-/// The internal type represents the Solidity definition of the type, stripped
+/// The internal type represents the Ylem definition of the type, stripped
 /// of the memory or storage keywords. It is used to convey the application dev
 /// and user-facing type, while the json param "type" field is used to convey
 /// the underlying ABI type.
@@ -176,7 +176,7 @@ impl InternalType {
     }
 
     /// Return a [`TypeSpecifier`] describing the other if this type is an
-    /// other. An "other" specifier indicates EITHER a regular Solidity type OR
+    /// other. An "other" specifier indicates EITHER a regular Ylem type OR
     /// a user-defined type. It is not possible to distinguish between the two
     /// without additional context.
     #[inline]
@@ -303,7 +303,7 @@ impl<'de> Visitor<'de> for ItVisitor {
         // method. Because the lifetime is unspecified, we can't borrow from it.
         // As a result, we don't support `from_reader`.
         Err(serde::de::Error::custom(
-            "Using serde_json::from_reader is not supported. Instead, buffer the reader contents into a string, as in alloy_json_abi::JsonAbi::load.",
+            "Using serde_json::from_reader is not supported. Instead, buffer the reader contents into a string, as in base_json_abi::JsonAbi::load.",
         ))
     }
 }

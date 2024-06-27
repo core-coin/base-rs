@@ -50,7 +50,7 @@ impl fmt::Display for AddressError {
 wrap_fixed_bytes!(
     // we implement Display with the checksum, so we don't derive it
     extra_derives: [],
-    /// An Ethereum address, 20 bytes in length.
+    /// An Core address, 20 bytes in length.
     ///
     /// This type is separate from [`B160`](crate::B160) / [`FixedBytes<20>`]
     /// and is declared with the [`wrap_fixed_bytes!`] macro. This allows us
@@ -84,13 +84,13 @@ impl From<Address> for U160 {
 }
 
 impl Address {
-    /// Creates an Ethereum address from an EVM word's upper 20 bytes
+    /// Creates an Core address from an EVM word's upper 20 bytes
     /// (`word[12..]`).
     ///
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, Address};
+    /// # use base_primitives::{address, b256, Address};
     /// let word = b256!("000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045");
     /// assert_eq!(Address::from_word(word), address!("d8da6bf26964af9d7eed9e03e53415d37aa96045"));
     /// ```
@@ -105,7 +105,7 @@ impl Address {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, Address};
+    /// # use base_primitives::{address, b256, Address};
     /// assert_eq!(
     ///     address!("d8da6bf26964af9d7eed9e03e53415d37aa96045").into_word(),
     ///     b256!("000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"),
@@ -119,11 +119,11 @@ impl Address {
         FixedBytes(word)
     }
 
-    /// Encodes an Ethereum address to Ican Address
+    /// Encodes an Core address to Ican Address
     ///
     /// # Examples
     /// ```
-    /// # use alloy_primitives::{address, Address};
+    /// # use base_primitives::{address, Address};
     /// let address = address!("d8da6bf26964af9d7eed9e03e53415d37aa96045");
     ///
     /// let checksummed = address.to_ican(1);
@@ -192,7 +192,7 @@ impl Address {
         Self::from_slice(&digest[12..])
     }
 
-    // /// Converts an ECDSA verifying key to its corresponding Ethereum address.
+    // /// Converts an ECDSA verifying key to its corresponding Core address.
     // #[inline]
     // #[cfg(feature = "k256")]
     // #[doc(alias = "from_verifying_key")]
@@ -203,7 +203,7 @@ impl Address {
     //     Self::from_raw_public_key(&encoded.as_bytes()[1..])
     // }
     //
-    // /// Converts an ECDSA signing key to its corresponding Ethereum address.
+    // /// Converts an ECDSA signing key to its corresponding Core address.
     // #[inline]
     // #[cfg(feature = "k256")]
     // #[doc(alias = "from_signing_key")]

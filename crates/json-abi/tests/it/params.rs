@@ -1,4 +1,4 @@
-use alloy_json_abi::{InternalType::Struct, Param};
+use base_json_abi::{InternalType::Struct, Param};
 
 #[test]
 fn param_simple() {

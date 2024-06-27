@@ -1,0 +1,26 @@
+[package]
+name = "base-ylm-type-parser"
+description = "Simple and light-weight Ylem type strings parser"
+keywords = ["core", "abi", "evm", "solidity", "parser"]
+categories = ["no-std", "cryptography::cryptocurrencies"]
+homepage = "https://github.com/core-coin/base-rs/tree/main/crates/ylm-type-parser"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+winnow.workspace = true
+
+[features]
+default = ["std"]
+std = ["winnow/std"]
+debug = ["std"] # intentionally doesn't enable `winnow/debug`

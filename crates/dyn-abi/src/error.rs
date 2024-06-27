@@ -1,6 +1,6 @@
 use alloc::{borrow::Cow, string::String};
-use alloy_primitives::{Selector, B256};
-use alloy_sol_types::Error as SolTypesError;
+use base_primitives::{Selector, B256};
+use base_ylm_types::Error as YlmTypesError;
 use core::fmt;
 use hex::FromHexError;
 use parser::Error as TypeParserError;
@@ -64,10 +64,10 @@ pub enum Error {
 
     /// [`hex`] error.
     Hex(hex::FromHexError),
-    /// [`alloy_sol_type_parser`] error.
+    /// [`base_ylm_type_parser`] error.
     TypeParser(TypeParserError),
-    /// [`alloy_sol_types`] error.
-    SolTypes(SolTypesError),
+    /// [`base_ylm_types`] error.
+    YlmTypes(YlmTypesError),
 }
 
 impl From<FromHexError> for Error {
@@ -77,10 +77,10 @@ impl From<FromHexError> for Error {
     }
 }
 
-impl From<SolTypesError> for Error {
+impl From<YlmTypesError> for Error {
     #[inline]
-    fn from(e: SolTypesError) -> Self {
-        Self::SolTypes(e)
+    fn from(e: YlmTypesError) -> Self {
+        Self::YlmTypes(e)
     }
 }
 
@@ -94,7 +94,7 @@ impl From<TypeParserError> for Error {
 impl From<alloc::collections::TryReserveError> for Error {
     #[inline]
     fn from(value: alloc::collections::TryReserveError) -> Self {
-        Self::SolTypes(value.into())
+        Self::YlmTypes(value.into())
     }
 }
 
@@ -105,7 +105,7 @@ impl std::error::Error for Error {
         match self {
             Self::Hex(e) => Some(e),
             Self::TypeParser(e) => Some(e),
-            Self::SolTypes(e) => Some(e),
+            Self::YlmTypes(e) => Some(e),
             _ => None,
         }
     }
@@ -140,7 +140,7 @@ impl fmt::Display for Error {
             }
             Self::Hex(e) => e.fmt(f),
             Self::TypeParser(e) => e.fmt(f),
-            Self::SolTypes(e) => e.fmt(f),
+            Self::YlmTypes(e) => e.fmt(f),
         }
     }
 }
@@ -148,11 +148,11 @@ impl fmt::Display for Error {
 impl Error {
     /// Instantiates a new error with a static str.
     pub fn custom(s: impl Into<Cow<'static, str>>) -> Self {
-        Self::SolTypes(SolTypesError::custom(s))
+        Self::YlmTypes(YlmTypesError::custom(s))
     }
 
     #[cfg(feature = "eip712")]
-    pub(crate) fn eip712_coerce(expected: &crate::DynSolType, actual: &serde_json::Value) -> Self {
+    pub(crate) fn eip712_coerce(expected: &crate::DynYlmType, actual: &serde_json::Value) -> Self {
         #[allow(unused_imports)]
         use alloc::string::ToString;
         Self::TypeMismatch { expected: expected.to_string(), actual: actual.to_string() }

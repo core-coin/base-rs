@@ -1,5 +1,5 @@
 [package]
-name = "alloy-core-sol-test"
+name = "base-core-ylm-test"
 publish = false
 
 version.workspace = true
@@ -11,4 +11,4 @@ repository.workspace = true
 exclude.workspace = true
 
 [dependencies]
-alloy-core = { workspace = true, features = ["sol-types", "json"] }
+base-core = { workspace = true, features = ["ylm-types", "json"] }

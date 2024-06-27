@@ -1,8 +1,8 @@
-#![cfg(feature = "sol-types")]
+#![cfg(feature = "ylm-types")]
 
-use alloy_core::sol;
+use base_core::ylm;
 
-sol! {
+ylm! {
     struct MyStruct {
         uint32 a;
         uint32 b;

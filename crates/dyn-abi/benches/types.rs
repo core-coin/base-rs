@@ -1,7 +1,7 @@
 #![allow(unknown_lints, clippy::incompatible_msrv)]
 
-use alloy_dyn_abi::{DynSolType, Specifier};
-use alloy_sol_type_parser::TypeSpecifier;
+use base_dyn_abi::{DynYlmType, Specifier};
+use base_ylm_type_parser::TypeSpecifier;
 use criterion::{
     criterion_group, criterion_main, measurement::WallTime, BenchmarkGroup, Criterion,
 };
@@ -67,20 +67,20 @@ fn format(c: &mut Criterion) {
 
     g.bench_function("keywords", |b| {
         let keyword_types =
-            KEYWORDS.iter().map(|s| DynSolType::parse(s).unwrap()).collect::<Vec<_>>();
+            KEYWORDS.iter().map(|s| DynYlmType::parse(s).unwrap()).collect::<Vec<_>>();
         let keyword_types = keyword_types.as_slice();
         b.iter(|| {
             let kw = unsafe { keyword_types.choose(rng).unwrap_unchecked() };
-            black_box(kw).sol_type_name()
+            black_box(kw).ylm_type_name()
         });
     });
     g.bench_function("complex", |b| {
         let complex_types =
-            COMPLEX.iter().map(|s| DynSolType::parse(s).unwrap()).collect::<Vec<_>>();
+            COMPLEX.iter().map(|s| DynYlmType::parse(s).unwrap()).collect::<Vec<_>>();
         let complex_types = complex_types.as_slice();
         b.iter(|| {
             let complex = unsafe { complex_types.choose(rng).unwrap_unchecked() };
-            black_box(complex).sol_type_name()
+            black_box(complex).ylm_type_name()
         });
     });
 

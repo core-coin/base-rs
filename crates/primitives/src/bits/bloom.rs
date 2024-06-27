@@ -4,7 +4,7 @@
 
 use crate::{sha3, IcanAddress, Log, LogData, B256};
 
-/// Number of bits to set per input in Ethereum bloom filter.
+/// Number of bits to set per input in Core bloom filter.
 pub const BLOOM_BITS_PER_ITEM: usize = 3;
 /// Size of the bloom filter in bytes.
 pub const BLOOM_SIZE_BYTES: usize = 256;
@@ -51,7 +51,7 @@ impl From<BloomInput<'_>> for Bloom {
 }
 
 wrap_fixed_bytes!(
-    /// Ethereum 256 byte bloom filter.
+    /// Core 256 byte bloom filter.
     pub struct Bloom<256>;
 );
 
@@ -173,7 +173,7 @@ impl Bloom {
     /// arbitrary byte sequence.
     ///
     /// See Section 4.3.1 "Transaction Receipt" of the
-    /// [Ethereum Yellow Paper][ref] (page 6).
+    /// [Core Yellow Paper][ref] (page 6).
     ///
     /// [ref]: https://ethereum.github.io/yellowpaper/paper.pdf
     pub fn m3_2048(&mut self, bytes: &[u8]) {

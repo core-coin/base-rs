@@ -13,10 +13,10 @@ fn serde(c: &mut Criterion) {
 }
 
 fn serde_(g: &mut BenchmarkGroup<'_, WallTime>, name: &str, s: &str) {
-    type A = alloy_json_abi::JsonAbi;
+    type A = base_json_abi::JsonAbi;
     type E = ethabi::Contract;
 
-    g.bench_function(format!("{name}/ser/alloy"), |b| {
+    g.bench_function(format!("{name}/ser/base"), |b| {
         let abi = serde_json::from_str::<A>(s).unwrap();
         b.iter(|| serde_json::to_string(black_box(&abi)).unwrap());
     });
@@ -25,7 +25,7 @@ fn serde_(g: &mut BenchmarkGroup<'_, WallTime>, name: &str, s: &str) {
         b.iter(|| serde_json::to_string(black_box(&abi)).unwrap());
     });
 
-    g.bench_function(format!("{name}/de/alloy"), |b| {
+    g.bench_function(format!("{name}/de/base"), |b| {
         b.iter(|| -> A { serde_json::from_str(black_box(s)).unwrap() });
     });
     g.bench_function(format!("{name}/de/ethabi"), |b| {
@@ -40,20 +40,20 @@ fn signature(c: &mut Criterion) {
 }
 
 fn signature_(g: &mut BenchmarkGroup<'_, WallTime>, name: &str, s: &str) {
-    let mut alloy = serde_json::from_str::<alloy_json_abi::Function>(s).unwrap();
+    let mut base = serde_json::from_str::<base_json_abi::Function>(s).unwrap();
     let mut ethabi = serde_json::from_str::<ethabi::Function>(s).unwrap();
 
-    assert_eq!(alloy.selector(), ethabi.short_signature());
+    assert_eq!(base.selector(), ethabi.short_signature());
 
     // clear outputs so ethabi doesn't format them
-    alloy.outputs.clear();
+    base.outputs.clear();
     ethabi.outputs.clear();
 
-    assert_eq!(alloy.selector(), ethabi.short_signature());
-    assert_eq!(alloy.signature(), ethabi.signature());
+    assert_eq!(base.selector(), ethabi.short_signature());
+    assert_eq!(base.signature(), ethabi.signature());
 
-    g.bench_function(format!("{name}/alloy"), |b| {
-        b.iter(|| black_box(&alloy).signature());
+    g.bench_function(format!("{name}/base"), |b| {
+        b.iter(|| black_box(&base).signature());
     });
     g.bench_function(format!("{name}/ethabi"), |b| {
         b.iter(|| black_box(&ethabi).signature());

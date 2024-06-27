@@ -1,9 +1,9 @@
 [package]
-name = "alloy-dyn-abi"
+name = "base-dyn-abi"
 description = "Run-time ABI and EIP-712 implementations"
-keywords = ["ethereum", "abi", "encoding", "evm", "solidity"]
+keywords = ["core", "abi", "encoding", "evm", "solidity"]
 categories = ["no-std", "encoding", "cryptography::cryptocurrencies"]
-homepage = "https://github.com/alloy-rs/core/tree/main/crates/dyn-abi"
+homepage = "https://github.com/core-coin/base-rs/tree/main/crates/dyn-abi"
 
 version.workspace = true
 edition.workspace = true
@@ -18,10 +18,10 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-alloy-json-abi.workspace = true
-alloy-sol-type-parser.workspace = true
-alloy-sol-types.workspace = true
-alloy-primitives.workspace = true
+base-json-abi.workspace = true
+base-ylm-type-parser.workspace = true
+base-ylm-types.workspace = true
+base-primitives.workspace = true
 
 hex.workspace = true
 itoa.workspace = true
@@ -46,25 +46,25 @@ serde_json = { workspace = true }
 [features]
 default = ["std"]
 std = [
-    "alloy-json-abi/std",
-    "alloy-sol-types/std",
-    "alloy-sol-type-parser/std",
-    "alloy-primitives/std",
+    "base-json-abi/std",
+    "base-ylm-types/std",
+    "base-ylm-type-parser/std",
+    "base-primitives/std",
     "hex/std",
     "serde?/std",
     "serde_json?/std",
 ]
-eip712 = ["alloy-sol-types/eip712-serde", "dep:derive_more", "dep:serde", "dep:serde_json"]
+eip712 = ["base-ylm-types/eip712-serde", "dep:derive_more", "dep:serde", "dep:serde_json"]
 arbitrary = [
     "std",
-    "alloy-sol-types/arbitrary",
+    "base-ylm-types/arbitrary",
     "dep:arbitrary",
     "dep:derive_arbitrary",
     "dep:proptest",
 ]
 
 # Debug winnow parsers; intentionally doesn't enable `winnow/debug`
-debug = ["std", "alloy-sol-type-parser/debug"]
+debug = ["std", "base-ylm-type-parser/debug"]
 
 [[bench]]
 name = "abi"
