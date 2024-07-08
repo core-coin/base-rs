@@ -1,7 +1,7 @@
-use crate::{dynamic::ty::as_tuple, DynSolType, DynSolValue, Result};
+use crate::{dynamic::ty::as_tuple, DynYlmType, DynYlmValue, Result};
 use alloc::vec::Vec;
-use alloy_primitives::{Function, IcanAddress, Sign, I256, U256};
-use alloy_sol_types::Word;
+use base_primitives::{Function, IcanAddress, Sign, I256, U256};
+use base_ylm_types::Word;
 use core::fmt;
 use hex::FromHexError;
 use parser::utils::{array_parser, char_parser, spanned};
@@ -17,63 +17,63 @@ use winnow::{
     PResult, Parser,
 };
 
-impl DynSolType {
-    /// Coerces a string into a [`DynSolValue`] via this type.
+impl DynYlmType {
+    /// Coerces a string into a [`DynYlmValue`] via this type.
     ///
     /// # Syntax
     ///
-    /// - [`Bool`](DynSolType::Bool): `true|false`
-    /// - [`Int`](DynSolType::Int): `[+-]?{Uint}`
-    /// - [`Uint`](DynSolType::Uint): `{literal}(\.[0-9]+)?(\s*{unit})?`
+    /// - [`Bool`](DynYlmType::Bool): `true|false`
+    /// - [`Int`](DynYlmType::Int): `[+-]?{Uint}`
+    /// - [`Uint`](DynYlmType::Uint): `{literal}(\.[0-9]+)?(\s*{unit})?`
     ///   - literal: base 2, 8, 10, or 16 integer literal. If not in base 10, must be prefixed with
     ///     `0b`, `0o`, or `0x` respectively.
-    ///   - unit: same as [Solidity ether units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#ether-units)
+    ///   - unit: same as [Ylem ether units](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#ether-units)
     ///   - decimals with more digits than the unit's exponent value are not allowed
-    /// - [`FixedBytes`](DynSolType::FixedBytes): `(0x)?[0-9A-Fa-f]{$0*2}`
-    /// - [`IcanAddress`](DynSolType::Address): `[0-9A-Fa-f]{44}`
-    /// - [`Function`](DynSolType::Function): `(0x)?[0-9A-Fa-f]{48}`
-    /// - [`Bytes`](DynSolType::Bytes): `(0x)?[0-9A-Fa-f]+`
-    /// - [`String`](DynSolType::String): `.*`
+    /// - [`FixedBytes`](DynYlmType::FixedBytes): `(0x)?[0-9A-Fa-f]{$0*2}`
+    /// - [`IcanAddress`](DynYlmType::Address): `[0-9A-Fa-f]{44}`
+    /// - [`Function`](DynYlmType::Function): `(0x)?[0-9A-Fa-f]{48}`
+    /// - [`Bytes`](DynYlmType::Bytes): `(0x)?[0-9A-Fa-f]+`
+    /// - [`String`](DynYlmType::String): `.*`
     ///   - can be surrounded by a pair of `"` or `'`
     ///   - trims whitespace if not surrounded
-    /// - [`Array`](DynSolType::Array): any number of the inner type delimited by commas (`,`) and
+    /// - [`Array`](DynYlmType::Array): any number of the inner type delimited by commas (`,`) and
     ///   surrounded by brackets (`[]`)
-    /// - [`FixedArray`](DynSolType::FixedArray): exactly the given number of the inner type
+    /// - [`FixedArray`](DynYlmType::FixedArray): exactly the given number of the inner type
     ///   delimited by commas (`,`) and surrounded by brackets (`[]`)
-    /// - [`Tuple`](DynSolType::Tuple): the inner types delimited by commas (`,`) and surrounded by
+    /// - [`Tuple`](DynYlmType::Tuple): the inner types delimited by commas (`,`) and surrounded by
     ///   parentheses (`()`)
     #[cfg_attr(
         feature = "eip712",
-        doc = "- [`CustomStruct`](DynSolType::CustomStruct): the same as `Tuple`"
+        doc = "- [`CustomStruct`](DynYlmType::CustomStruct): the same as `Tuple`"
     )]
     ///
     /// # Examples
     ///
     /// ```
-    /// use alloy_dyn_abi::{DynSolType, DynSolValue};
-    /// use alloy_primitives::U256;
+    /// use base_dyn_abi::{DynYlmType, DynYlmValue};
+    /// use base_primitives::U256;
     ///
-    /// let ty: DynSolType = "(uint256,string)[]".parse()?;
+    /// let ty: DynYlmType = "(uint256,string)[]".parse()?;
     /// let value = ty.coerce_str("[(0, \"hello\"), (42, \"world\")]")?;
     /// assert_eq!(
     ///     value,
-    ///     DynSolValue::Array(vec![
-    ///         DynSolValue::Tuple(vec![
-    ///             DynSolValue::Uint(U256::from(0), 256),
-    ///             DynSolValue::String(String::from("hello"))
+    ///     DynYlmValue::Array(vec![
+    ///         DynYlmValue::Tuple(vec![
+    ///             DynYlmValue::Uint(U256::from(0), 256),
+    ///             DynYlmValue::String(String::from("hello"))
     ///         ]),
-    ///         DynSolValue::Tuple(vec![
-    ///             DynSolValue::Uint(U256::from(42), 256),
-    ///             DynSolValue::String(String::from("world"))
+    ///         DynYlmValue::Tuple(vec![
+    ///             DynYlmValue::Uint(U256::from(42), 256),
+    ///             DynYlmValue::String(String::from("world"))
     ///         ]),
     ///     ])
     /// );
     /// assert!(value.matches(&ty));
     /// assert_eq!(value.as_type().unwrap(), ty);
-    /// # Ok::<_, alloy_dyn_abi::Error>(())
+    /// # Ok::<_, base_dyn_abi::Error>(())
     /// ```
     #[doc(alias = "tokenize")] // from ethabi
-    pub fn coerce_str(&self, s: &str) -> Result<DynSolValue> {
+    pub fn coerce_str(&self, s: &str) -> Result<DynYlmValue> {
         ValueParser::new(self)
             .parse(s)
             .map_err(|e| crate::Error::TypeParser(parser::Error::parser(e)))
@@ -81,41 +81,41 @@ impl DynSolType {
 }
 
 struct ValueParser<'a> {
-    ty: &'a DynSolType,
+    ty: &'a DynYlmType,
     list_end: Option<char>,
 }
 
-impl<'i> Parser<&'i str, DynSolValue, ContextError> for ValueParser<'_> {
-    fn parse_next(&mut self, input: &mut &'i str) -> PResult<DynSolValue, ContextError> {
+impl<'i> Parser<&'i str, DynYlmValue, ContextError> for ValueParser<'_> {
+    fn parse_next(&mut self, input: &mut &'i str) -> PResult<DynYlmValue, ContextError> {
         #[cfg(feature = "debug")]
-        let name = self.ty.sol_type_name();
+        let name = self.ty.ylm_type_name();
         #[cfg(not(feature = "debug"))]
         let name = "value_parser";
         trace(name, move |input: &mut &str| match self.ty {
-            DynSolType::Bool => bool(input).map(DynSolValue::Bool),
-            &DynSolType::Int(size) => {
-                int(size).parse_next(input).map(|int| DynSolValue::Int(int, size))
+            DynYlmType::Bool => bool(input).map(DynYlmValue::Bool),
+            &DynYlmType::Int(size) => {
+                int(size).parse_next(input).map(|int| DynYlmValue::Int(int, size))
             }
-            &DynSolType::Uint(size) => {
-                uint(size).parse_next(input).map(|uint| DynSolValue::Uint(uint, size))
+            &DynYlmType::Uint(size) => {
+                uint(size).parse_next(input).map(|uint| DynYlmValue::Uint(uint, size))
             }
-            &DynSolType::FixedBytes(size) => {
-                fixed_bytes(size).parse_next(input).map(|word| DynSolValue::FixedBytes(word, size))
+            &DynYlmType::FixedBytes(size) => {
+                fixed_bytes(size).parse_next(input).map(|word| DynYlmValue::FixedBytes(word, size))
             }
-            DynSolType::Address => address(input).map(DynSolValue::Address),
-            DynSolType::Function => function(input).map(DynSolValue::Function),
-            DynSolType::Bytes => bytes(input).map(DynSolValue::Bytes),
-            DynSolType::String => {
-                self.string().parse_next(input).map(|s| DynSolValue::String(s.into()))
+            DynYlmType::Address => address(input).map(DynYlmValue::Address),
+            DynYlmType::Function => function(input).map(DynYlmValue::Function),
+            DynYlmType::Bytes => bytes(input).map(DynYlmValue::Bytes),
+            DynYlmType::String => {
+                self.string().parse_next(input).map(|s| DynYlmValue::String(s.into()))
             }
-            DynSolType::Array(ty) => self.in_list(']', |this| {
-                this.with(ty).array().parse_next(input).map(DynSolValue::Array)
+            DynYlmType::Array(ty) => self.in_list(']', |this| {
+                this.with(ty).array().parse_next(input).map(DynYlmValue::Array)
             }),
-            DynSolType::FixedArray(ty, len) => self.in_list(']', |this| {
-                this.with(ty).fixed_array(*len).parse_next(input).map(DynSolValue::FixedArray)
+            DynYlmType::FixedArray(ty, len) => self.in_list(']', |this| {
+                this.with(ty).fixed_array(*len).parse_next(input).map(DynYlmValue::FixedArray)
             }),
-            as_tuple!(DynSolType tys) => {
-                self.in_list(')', |this| this.tuple(tys).parse_next(input).map(DynSolValue::Tuple))
+            as_tuple!(DynYlmType tys) => {
+                self.in_list(')', |this| this.tuple(tys).parse_next(input).map(DynYlmValue::Tuple))
             }
         })
         .parse_next(input)
@@ -124,7 +124,7 @@ impl<'i> Parser<&'i str, DynSolValue, ContextError> for ValueParser<'_> {
 
 impl<'a> ValueParser<'a> {
     #[inline]
-    const fn new(ty: &'a DynSolType) -> Self {
+    const fn new(ty: &'a DynYlmType) -> Self {
         Self { list_end: None, ty }
     }
 
@@ -137,7 +137,7 @@ impl<'a> ValueParser<'a> {
     }
 
     #[inline]
-    const fn with(&self, ty: &'a DynSolType) -> Self {
+    const fn with(&self, ty: &'a DynYlmType) -> Self {
         Self { list_end: self.list_end, ty }
     }
 
@@ -181,7 +181,7 @@ impl<'a> ValueParser<'a> {
     }
 
     #[inline]
-    fn array<'i: 'a>(self) -> impl Parser<&'i str, Vec<DynSolValue>, ContextError> + 'a {
+    fn array<'i: 'a>(self) -> impl Parser<&'i str, Vec<DynYlmValue>, ContextError> + 'a {
         #[cfg(feature = "debug")]
         let name = format!("{}[]", self.ty);
         #[cfg(not(feature = "debug"))]
@@ -193,14 +193,14 @@ impl<'a> ValueParser<'a> {
     fn fixed_array<'i: 'a>(
         self,
         len: usize,
-    ) -> impl Parser<&'i str, Vec<DynSolValue>, ContextError> + 'a {
+    ) -> impl Parser<&'i str, Vec<DynYlmValue>, ContextError> + 'a {
         #[cfg(feature = "debug")]
         let name = format!("{}[{len}]", self.ty);
         #[cfg(not(feature = "debug"))]
         let name = "fixed_array";
         trace(
             name,
-            array_parser(self).try_map(move |values: Vec<DynSolValue>| {
+            array_parser(self).try_map(move |values: Vec<DynYlmValue>| {
                 if values.len() == len {
                     Ok(values)
                 } else {
@@ -214,10 +214,10 @@ impl<'a> ValueParser<'a> {
     #[allow(clippy::ptr_arg)]
     fn tuple<'i: 's, 't: 's, 's>(
         &'s self,
-        tuple: &'t Vec<DynSolType>,
-    ) -> impl Parser<&'i str, Vec<DynSolValue>, ContextError> + 's {
+        tuple: &'t Vec<DynYlmType>,
+    ) -> impl Parser<&'i str, Vec<DynYlmValue>, ContextError> + 's {
         #[cfg(feature = "debug")]
-        let name = DynSolType::Tuple(tuple.clone()).to_string();
+        let name = DynYlmType::Tuple(tuple.clone()).to_string();
         #[cfg(not(feature = "debug"))]
         let name = "tuple";
         trace(name, move |input: &mut &'i str| {
@@ -502,7 +502,7 @@ mod tests {
         boxed::Box,
         string::{String, ToString},
     };
-    use alloy_primitives::{address, cAddress};
+    use base_primitives::{address, cAddress};
     use core::str::FromStr;
 
     #[track_caller]
@@ -515,302 +515,302 @@ mod tests {
 
     #[test]
     fn coerce_bool() {
-        assert_eq!(DynSolType::Bool.coerce_str("true").unwrap(), DynSolValue::Bool(true));
-        assert_eq!(DynSolType::Bool.coerce_str("false").unwrap(), DynSolValue::Bool(false));
+        assert_eq!(DynYlmType::Bool.coerce_str("true").unwrap(), DynYlmValue::Bool(true));
+        assert_eq!(DynYlmType::Bool.coerce_str("false").unwrap(), DynYlmValue::Bool(false));
 
-        assert!(DynSolType::Bool.coerce_str("").is_err());
-        assert!(DynSolType::Bool.coerce_str("0").is_err());
-        assert!(DynSolType::Bool.coerce_str("1").is_err());
-        assert!(DynSolType::Bool.coerce_str("tru").is_err());
+        assert!(DynYlmType::Bool.coerce_str("").is_err());
+        assert!(DynYlmType::Bool.coerce_str("0").is_err());
+        assert!(DynYlmType::Bool.coerce_str("1").is_err());
+        assert!(DynYlmType::Bool.coerce_str("tru").is_err());
     }
 
     #[test]
     fn coerce_int() {
         assert_eq!(
-            DynSolType::Int(256)
+            DynYlmType::Int(256)
                 .coerce_str("0x1111111111111111111111111111111111111111111111111111111111111111")
                 .unwrap(),
-            DynSolValue::Int(I256::from_be_bytes([0x11; 32]), 256)
+            DynYlmValue::Int(I256::from_be_bytes([0x11; 32]), 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256)
+            DynYlmType::Int(256)
                 .coerce_str("0x2222222222222222222222222222222222222222222222222222222222222222")
                 .unwrap(),
-            DynSolValue::Int(I256::from_be_bytes([0x22; 32]), 256)
+            DynYlmValue::Int(I256::from_be_bytes([0x22; 32]), 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256)
+            DynYlmType::Int(256)
                 .coerce_str("0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
                 .unwrap(),
-            DynSolValue::Int(I256::MAX, 256)
+            DynYlmValue::Int(I256::MAX, 256)
         );
-        assert!(DynSolType::Int(256)
+        assert!(DynYlmType::Int(256)
             .coerce_str("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
             .is_err());
 
         assert_eq!(
-            DynSolType::Int(256).coerce_str("0").unwrap(),
-            DynSolValue::Int(I256::ZERO, 256)
+            DynYlmType::Int(256).coerce_str("0").unwrap(),
+            DynYlmValue::Int(I256::ZERO, 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256).coerce_str("-0").unwrap(),
-            DynSolValue::Int(I256::ZERO, 256)
+            DynYlmType::Int(256).coerce_str("-0").unwrap(),
+            DynYlmValue::Int(I256::ZERO, 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256).coerce_str("+0").unwrap(),
-            DynSolValue::Int(I256::ZERO, 256)
+            DynYlmType::Int(256).coerce_str("+0").unwrap(),
+            DynYlmValue::Int(I256::ZERO, 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256).coerce_str("-1").unwrap(),
-            DynSolValue::Int(I256::MINUS_ONE, 256)
+            DynYlmType::Int(256).coerce_str("-1").unwrap(),
+            DynYlmValue::Int(I256::MINUS_ONE, 256)
         );
 
         assert_eq!(
-            DynSolType::Int(256)
+            DynYlmType::Int(256)
                 .coerce_str(
                     "57896044618658097711785492504343953926634992332820282019728792003956564819967"
                 )
                 .unwrap(),
-            DynSolValue::Int(I256::MAX, 256)
+            DynYlmValue::Int(I256::MAX, 256)
         );
         assert_eq!(
-            DynSolType::Int(256).coerce_str("-57896044618658097711785492504343953926634992332820282019728792003956564819968").unwrap(),
-            DynSolValue::Int(I256::MIN, 256)
+            DynYlmType::Int(256).coerce_str("-57896044618658097711785492504343953926634992332820282019728792003956564819968").unwrap(),
+            DynYlmValue::Int(I256::MIN, 256)
         );
     }
 
     #[test]
     fn coerce_int_overflow() {
         assert_eq!(
-            DynSolType::Int(8).coerce_str("126").unwrap(),
-            DynSolValue::Int(I256::try_from(126).unwrap(), 8),
+            DynYlmType::Int(8).coerce_str("126").unwrap(),
+            DynYlmValue::Int(I256::try_from(126).unwrap(), 8),
         );
         assert_eq!(
-            DynSolType::Int(8).coerce_str("127").unwrap(),
-            DynSolValue::Int(I256::try_from(127).unwrap(), 8),
+            DynYlmType::Int(8).coerce_str("127").unwrap(),
+            DynYlmValue::Int(I256::try_from(127).unwrap(), 8),
         );
-        assert!(DynSolType::Int(8).coerce_str("128").is_err());
-        assert!(DynSolType::Int(8).coerce_str("129").is_err());
+        assert!(DynYlmType::Int(8).coerce_str("128").is_err());
+        assert!(DynYlmType::Int(8).coerce_str("129").is_err());
         assert_eq!(
-            DynSolType::Int(16).coerce_str("128").unwrap(),
-            DynSolValue::Int(I256::try_from(128).unwrap(), 16),
+            DynYlmType::Int(16).coerce_str("128").unwrap(),
+            DynYlmValue::Int(I256::try_from(128).unwrap(), 16),
         );
         assert_eq!(
-            DynSolType::Int(16).coerce_str("129").unwrap(),
-            DynSolValue::Int(I256::try_from(129).unwrap(), 16),
+            DynYlmType::Int(16).coerce_str("129").unwrap(),
+            DynYlmValue::Int(I256::try_from(129).unwrap(), 16),
         );
 
         assert_eq!(
-            DynSolType::Int(8).coerce_str("-1").unwrap(),
-            DynSolValue::Int(I256::MINUS_ONE, 8),
+            DynYlmType::Int(8).coerce_str("-1").unwrap(),
+            DynYlmValue::Int(I256::MINUS_ONE, 8),
         );
         assert_eq!(
-            DynSolType::Int(16).coerce_str("-1").unwrap(),
-            DynSolValue::Int(I256::MINUS_ONE, 16),
+            DynYlmType::Int(16).coerce_str("-1").unwrap(),
+            DynYlmValue::Int(I256::MINUS_ONE, 16),
         );
     }
 
     #[test]
     fn coerce_uint() {
         assert_eq!(
-            DynSolType::Uint(256)
+            DynYlmType::Uint(256)
                 .coerce_str("0x1111111111111111111111111111111111111111111111111111111111111111")
                 .unwrap(),
-            DynSolValue::Uint(U256::from_be_bytes([0x11; 32]), 256)
+            DynYlmValue::Uint(U256::from_be_bytes([0x11; 32]), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256)
+            DynYlmType::Uint(256)
                 .coerce_str("0x2222222222222222222222222222222222222222222222222222222222222222")
                 .unwrap(),
-            DynSolValue::Uint(U256::from_be_bytes([0x22; 32]), 256)
+            DynYlmValue::Uint(U256::from_be_bytes([0x22; 32]), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256)
+            DynYlmType::Uint(256)
                 .coerce_str("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
                 .unwrap(),
-            DynSolValue::Uint(U256::from_be_bytes([0xff; 32]), 256)
+            DynYlmValue::Uint(U256::from_be_bytes([0xff; 32]), 256)
         );
 
         // 255 bits fails
-        assert!(DynSolType::Uint(255)
+        assert!(DynYlmType::Uint(255)
             .coerce_str("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
             .is_err());
 
         assert_eq!(
-            DynSolType::Uint(256)
+            DynYlmType::Uint(256)
                 .coerce_str("115792089237316195423570985008687907853269984665640564039457584007913129639935")
                 .unwrap(),
-            DynSolValue::Uint(U256::MAX, 256)
+            DynYlmValue::Uint(U256::MAX, 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0").unwrap(),
-            DynSolValue::Uint(U256::ZERO, 256)
+            DynYlmType::Uint(256).coerce_str("0").unwrap(),
+            DynYlmValue::Uint(U256::ZERO, 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1").unwrap(),
-            DynSolValue::Uint(U256::from(1), 256)
+            DynYlmType::Uint(256).coerce_str("1").unwrap(),
+            DynYlmValue::Uint(U256::from(1), 256)
         );
     }
 
     #[test]
     fn coerce_uint_overflow() {
         assert_eq!(
-            DynSolType::Uint(8).coerce_str("254").unwrap(),
-            DynSolValue::Uint(U256::from(254), 8),
+            DynYlmType::Uint(8).coerce_str("254").unwrap(),
+            DynYlmValue::Uint(U256::from(254), 8),
         );
         assert_eq!(
-            DynSolType::Uint(8).coerce_str("255").unwrap(),
-            DynSolValue::Uint(U256::from(255), 8),
+            DynYlmType::Uint(8).coerce_str("255").unwrap(),
+            DynYlmValue::Uint(U256::from(255), 8),
         );
-        assert!(DynSolType::Uint(8).coerce_str("256").is_err());
-        assert!(DynSolType::Uint(8).coerce_str("257").is_err());
+        assert!(DynYlmType::Uint(8).coerce_str("256").is_err());
+        assert!(DynYlmType::Uint(8).coerce_str("257").is_err());
         assert_eq!(
-            DynSolType::Uint(16).coerce_str("256").unwrap(),
-            DynSolValue::Uint(U256::from(256), 16),
+            DynYlmType::Uint(16).coerce_str("256").unwrap(),
+            DynYlmValue::Uint(U256::from(256), 16),
         );
         assert_eq!(
-            DynSolType::Uint(16).coerce_str("257").unwrap(),
-            DynSolValue::Uint(U256::from(257), 16),
+            DynYlmType::Uint(16).coerce_str("257").unwrap(),
+            DynYlmValue::Uint(U256::from(257), 16),
         );
     }
 
     #[test]
     fn coerce_uint_wei() {
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1wei").unwrap(),
-            DynSolValue::Uint(U256::from(1), 256)
+            DynYlmType::Uint(256).coerce_str("1wei").unwrap(),
+            DynYlmValue::Uint(U256::from(1), 256)
         );
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1 wei").unwrap(),
-            DynSolValue::Uint(U256::from(1), 256)
+            DynYlmType::Uint(256).coerce_str("1 wei").unwrap(),
+            DynYlmValue::Uint(U256::from(1), 256)
         );
 
-        assert!(DynSolType::Uint(256).coerce_str("1").is_ok());
-        assert!(DynSolType::Uint(256).coerce_str("1.").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1 .").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1 .0").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1.wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1. wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1.0wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1.0 wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1.00wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("1.00 wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1").is_ok());
+        assert!(DynYlmType::Uint(256).coerce_str("1.").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1 .").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1 .0").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1. wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.0wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.0 wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.00wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.00 wei").is_err());
     }
 
     #[test]
     fn coerce_uint_gwei() {
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1nano").unwrap(),
-            DynSolValue::Uint(U256::from_str("1000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("1nano").unwrap(),
+            DynYlmValue::Uint(U256::from_str("1000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1nanoether").unwrap(),
-            DynSolValue::Uint(U256::from_str("1000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("1nanoether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("1000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1gwei").unwrap(),
-            DynSolValue::Uint(U256::from_str("1000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("1gwei").unwrap(),
+            DynYlmValue::Uint(U256::from_str("1000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.1 gwei").unwrap(),
-            DynSolValue::Uint(U256::from_str("100000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.1 gwei").unwrap(),
+            DynYlmValue::Uint(U256::from_str("100000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.000000001gwei").unwrap(),
-            DynSolValue::Uint(U256::from(1), 256)
+            DynYlmType::Uint(256).coerce_str("0.000000001gwei").unwrap(),
+            DynYlmValue::Uint(U256::from(1), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.123456789gwei").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456789").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.123456789gwei").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456789").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("123456789123.123456789gwei").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456789123123456789").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("123456789123.123456789gwei").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456789123123456789").unwrap(), 256)
         );
     }
 
     #[test]
     fn coerce_uint_ether() {
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("10000000000ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("10000000000000000000000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("10000000000ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("10000000000000000000000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("1ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("1000000000000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("1ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("1000000000000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.01 ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("10000000000000000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.01 ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("10000000000000000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.000000000000000001ether").unwrap(),
-            DynSolValue::Uint(U256::from(1), 256)
+            DynYlmType::Uint(256).coerce_str("0.000000000000000001ether").unwrap(),
+            DynYlmValue::Uint(U256::from(1), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.000000000000000001ether"),
-            DynSolType::Uint(256).coerce_str("1wei"),
+            DynYlmType::Uint(256).coerce_str("0.000000000000000001ether"),
+            DynYlmType::Uint(256).coerce_str("1wei"),
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.123456789123456789ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456789123456789").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.123456789123456789ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456789123456789").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.123456789123456000ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456789123456000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.123456789123456000ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456789123456000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("0.1234567891234560ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456789123456000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("0.1234567891234560ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456789123456000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("123456.123456789123456789ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456123456789123456789").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("123456.123456789123456789ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456123456789123456789").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("123456.123456789123456000ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456123456789123456000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("123456.123456789123456000ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456123456789123456000").unwrap(), 256)
         );
 
         assert_eq!(
-            DynSolType::Uint(256).coerce_str("123456.1234567891234560ether").unwrap(),
-            DynSolValue::Uint(U256::from_str("123456123456789123456000").unwrap(), 256)
+            DynYlmType::Uint(256).coerce_str("123456.1234567891234560ether").unwrap(),
+            DynYlmValue::Uint(U256::from_str("123456123456789123456000").unwrap(), 256)
         );
     }
 
     #[test]
     fn coerce_uint_array_ether() {
         assert_eq!(
-            DynSolType::Array(Box::new(DynSolType::Uint(256)))
+            DynYlmType::Array(Box::new(DynYlmType::Uint(256)))
                 .coerce_str("[ 1   ether,  10 ether ]")
                 .unwrap(),
-            DynSolValue::Array(vec![
-                DynSolValue::Uint(U256::from_str("1000000000000000000").unwrap(), 256),
-                DynSolValue::Uint(U256::from_str("10000000000000000000").unwrap(), 256),
+            DynYlmValue::Array(vec![
+                DynYlmValue::Uint(U256::from_str("1000000000000000000").unwrap(), 256),
+                DynYlmValue::Uint(U256::from_str("10000000000000000000").unwrap(), 256),
             ])
         );
     }
@@ -818,34 +818,34 @@ mod tests {
     #[test]
     fn coerce_uint_invalid_units() {
         // 0.1 wei
-        assert!(DynSolType::Uint(256).coerce_str("0.1 wei").is_err());
-        assert!(DynSolType::Uint(256).coerce_str("0.0000000000000000001ether").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("0.1 wei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("0.0000000000000000001ether").is_err());
 
         // 1 ether + 0.1 wei
-        assert!(DynSolType::Uint(256).coerce_str("1.0000000000000000001ether").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1.0000000000000000001ether").is_err());
 
         // 1_000_000_000 ether + 0.1 wei
-        assert!(DynSolType::Uint(256).coerce_str("1000000000.0000000000000000001ether").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1000000000.0000000000000000001ether").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("0..1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("0..1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("..1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("..1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("1. gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1. gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str(".1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str(".1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("2.1.1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("2.1.1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str(".1.1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str(".1.1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("1abc").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1abc").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("1 gwei ").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1 gwei ").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("g 1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("g 1 gwei").is_err());
 
-        assert!(DynSolType::Uint(256).coerce_str("1gwei 1 gwei").is_err());
+        assert!(DynYlmType::Uint(256).coerce_str("1gwei 1 gwei").is_err());
     }
 
     #[test]
@@ -858,37 +858,37 @@ mod tests {
 
         // not actually valid, but we don't care here
         assert_eq!(
-            DynSolType::FixedBytes(0).coerce_str("0x").unwrap(),
-            DynSolValue::FixedBytes(mk_word(&[]), 0)
+            DynYlmType::FixedBytes(0).coerce_str("0x").unwrap(),
+            DynYlmValue::FixedBytes(mk_word(&[]), 0)
         );
 
         assert_eq!(
-            DynSolType::FixedBytes(1).coerce_str("0x00").unwrap(),
-            DynSolValue::FixedBytes(mk_word(&[0x00]), 1)
+            DynYlmType::FixedBytes(1).coerce_str("0x00").unwrap(),
+            DynYlmValue::FixedBytes(mk_word(&[0x00]), 1)
         );
         assert_eq!(
-            DynSolType::FixedBytes(1).coerce_str("0x00").unwrap(),
-            DynSolValue::FixedBytes(mk_word(&[0x00]), 1)
+            DynYlmType::FixedBytes(1).coerce_str("0x00").unwrap(),
+            DynYlmValue::FixedBytes(mk_word(&[0x00]), 1)
         );
         assert_eq!(
-            DynSolType::FixedBytes(2).coerce_str("0017").unwrap(),
-            DynSolValue::FixedBytes(mk_word(&[0x00, 0x17]), 2)
+            DynYlmType::FixedBytes(2).coerce_str("0017").unwrap(),
+            DynYlmValue::FixedBytes(mk_word(&[0x00, 0x17]), 2)
         );
         assert_eq!(
-            DynSolType::FixedBytes(3).coerce_str("123456").unwrap(),
-            DynSolValue::FixedBytes(mk_word(&[0x12, 0x34, 0x56]), 3)
+            DynYlmType::FixedBytes(3).coerce_str("123456").unwrap(),
+            DynYlmValue::FixedBytes(mk_word(&[0x12, 0x34, 0x56]), 3)
         );
 
-        let e = DynSolType::FixedBytes(1).coerce_str("").unwrap_err();
+        let e = DynYlmType::FixedBytes(1).coerce_str("").unwrap_err();
         assert_error_contains(&e, &Error::EmptyHexStringWithoutPrefix.to_string());
-        let e = DynSolType::FixedBytes(1).coerce_str("0").unwrap_err();
+        let e = DynYlmType::FixedBytes(1).coerce_str("0").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
-        let e = DynSolType::FixedBytes(1).coerce_str("0x").unwrap_err();
+        let e = DynYlmType::FixedBytes(1).coerce_str("0x").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::InvalidStringLength.to_string());
-        let e = DynSolType::FixedBytes(1).coerce_str("0x0").unwrap_err();
+        let e = DynYlmType::FixedBytes(1).coerce_str("0x0").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
 
-        let t = DynSolType::Array(Box::new(DynSolType::FixedBytes(1)));
+        let t = DynYlmType::Array(Box::new(DynYlmType::FixedBytes(1)));
         let e = t.coerce_str("[0]").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
         let e = t.coerce_str("[0x]").unwrap_err();
@@ -896,7 +896,7 @@ mod tests {
         let e = t.coerce_str("[0x0]").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
 
-        let t = DynSolType::Array(Box::new(DynSolType::Tuple(vec![DynSolType::FixedBytes(1)])));
+        let t = DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![DynYlmType::FixedBytes(1)])));
         let e = t.coerce_str("[(0)]").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
         let e = t.coerce_str("[(0x)]").unwrap_err();
@@ -908,84 +908,84 @@ mod tests {
     #[test]
     fn coerce_address() {
         // 38
-        assert!(DynSolType::Address.coerce_str("00000000000000000000000000000000000000").is_err());
+        assert!(DynYlmType::Address.coerce_str("00000000000000000000000000000000000000").is_err());
         // 39
-        assert!(DynSolType::Address.coerce_str("000000000000000000000000000000000000000").is_err());
+        assert!(DynYlmType::Address.coerce_str("000000000000000000000000000000000000000").is_err());
         // 40
         assert_eq!(
-            DynSolType::Address.coerce_str("00000000000000000000000000000000000000000000").unwrap(),
-            DynSolValue::Address(IcanAddress::ZERO)
+            DynYlmType::Address.coerce_str("00000000000000000000000000000000000000000000").unwrap(),
+            DynYlmValue::Address(IcanAddress::ZERO)
         );
         assert_eq!(
-            DynSolType::Address
+            DynYlmType::Address
                 .coerce_str("0x11111111111111111111111111111111111111111111")
                 .unwrap(),
-            DynSolValue::Address(IcanAddress::new([0x11; 22]))
+            DynYlmValue::Address(IcanAddress::new([0x11; 22]))
         );
         assert_eq!(
-            DynSolType::Address.coerce_str("22222222222222222222222222222222222222222222").unwrap(),
-            DynSolValue::Address(IcanAddress::new([0x22; 22]))
+            DynYlmType::Address.coerce_str("22222222222222222222222222222222222222222222").unwrap(),
+            DynYlmValue::Address(IcanAddress::new([0x22; 22]))
         );
     }
 
     #[test]
     fn coerce_function() {
         assert_eq!(
-            DynSolType::Function
+            DynYlmType::Function
                 .coerce_str("000000000000000000000000000000000000000000000000")
                 .unwrap(),
-            DynSolValue::Function(Function::ZERO)
+            DynYlmValue::Function(Function::ZERO)
         );
         assert_eq!(
-            DynSolType::Function
+            DynYlmType::Function
                 .coerce_str("0x111111111111111111111111111111111111111111111111")
                 .unwrap(),
-            DynSolValue::Function(Function::new([0x11; 24]))
+            DynYlmValue::Function(Function::new([0x11; 24]))
         );
         assert_eq!(
-            DynSolType::Function
+            DynYlmType::Function
                 .coerce_str("222222222222222222222222222222222222222222222222")
                 .unwrap(),
-            DynSolValue::Function(Function::new([0x22; 24]))
+            DynYlmValue::Function(Function::new([0x22; 24]))
         );
     }
 
     #[test]
     fn coerce_bytes() {
-        let e = DynSolType::Bytes.coerce_str("").unwrap_err();
+        let e = DynYlmType::Bytes.coerce_str("").unwrap_err();
         assert_error_contains(&e, &Error::EmptyHexStringWithoutPrefix.to_string());
 
-        assert_eq!(DynSolType::Bytes.coerce_str("0x").unwrap(), DynSolValue::Bytes(vec![]));
-        assert!(DynSolType::Bytes.coerce_str("0x0").is_err());
-        assert!(DynSolType::Bytes.coerce_str("0").is_err());
-        assert_eq!(DynSolType::Bytes.coerce_str("00").unwrap(), DynSolValue::Bytes(vec![0]));
-        assert_eq!(DynSolType::Bytes.coerce_str("0x00").unwrap(), DynSolValue::Bytes(vec![0]));
+        assert_eq!(DynYlmType::Bytes.coerce_str("0x").unwrap(), DynYlmValue::Bytes(vec![]));
+        assert!(DynYlmType::Bytes.coerce_str("0x0").is_err());
+        assert!(DynYlmType::Bytes.coerce_str("0").is_err());
+        assert_eq!(DynYlmType::Bytes.coerce_str("00").unwrap(), DynYlmValue::Bytes(vec![0]));
+        assert_eq!(DynYlmType::Bytes.coerce_str("0x00").unwrap(), DynYlmValue::Bytes(vec![0]));
 
         assert_eq!(
-            DynSolType::Bytes.coerce_str("123456").unwrap(),
-            DynSolValue::Bytes(vec![0x12, 0x34, 0x56])
+            DynYlmType::Bytes.coerce_str("123456").unwrap(),
+            DynYlmValue::Bytes(vec![0x12, 0x34, 0x56])
         );
         assert_eq!(
-            DynSolType::Bytes.coerce_str("0x0017").unwrap(),
-            DynSolValue::Bytes(vec![0x00, 0x17])
+            DynYlmType::Bytes.coerce_str("0x0017").unwrap(),
+            DynYlmValue::Bytes(vec![0x00, 0x17])
         );
 
-        let t = DynSolType::Tuple(vec![DynSolType::Bytes, DynSolType::Bytes]);
+        let t = DynYlmType::Tuple(vec![DynYlmType::Bytes, DynYlmType::Bytes]);
         let e = t.coerce_str("(0, 0x0)").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
 
         // TODO: cut_err in `array_parser` somehow
         /*
-        let t = DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-            DynSolType::Bytes,
-            DynSolType::Bytes,
+        let t = DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+            DynYlmType::Bytes,
+            DynYlmType::Bytes,
         ])));
         let e = t.coerce_str("[(0, 0x0)]").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
 
-        let t = DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-            DynSolType::Bytes,
-            DynSolType::Bytes,
+        let t = DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+            DynYlmType::Bytes,
+            DynYlmType::Bytes,
         ])));
         let e = t.coerce_str("[(0x00, 0x0)]").unwrap_err();
         assert_error_contains(&e, &hex::FromHexError::OddLength.to_string());
@@ -995,60 +995,60 @@ mod tests {
     #[test]
     fn coerce_string() {
         assert_eq!(
-            DynSolType::String.coerce_str("gavofyork").unwrap(),
-            DynSolValue::String("gavofyork".into())
+            DynYlmType::String.coerce_str("gavofyork").unwrap(),
+            DynYlmValue::String("gavofyork".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("gav of york").unwrap(),
-            DynSolValue::String("gav of york".into())
+            DynYlmType::String.coerce_str("gav of york").unwrap(),
+            DynYlmValue::String("gav of york".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("\"hello world\"").unwrap(),
-            DynSolValue::String("hello world".into())
+            DynYlmType::String.coerce_str("\"hello world\"").unwrap(),
+            DynYlmValue::String("hello world".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("'hello world'").unwrap(),
-            DynSolValue::String("hello world".into())
+            DynYlmType::String.coerce_str("'hello world'").unwrap(),
+            DynYlmValue::String("hello world".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("'\"hello world\"'").unwrap(),
-            DynSolValue::String("\"hello world\"".into())
+            DynYlmType::String.coerce_str("'\"hello world\"'").unwrap(),
+            DynYlmValue::String("\"hello world\"".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("'   hello world '").unwrap(),
-            DynSolValue::String("   hello world ".into())
+            DynYlmType::String.coerce_str("'   hello world '").unwrap(),
+            DynYlmValue::String("   hello world ".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("'\"hello world'").unwrap(),
-            DynSolValue::String("\"hello world".into())
+            DynYlmType::String.coerce_str("'\"hello world'").unwrap(),
+            DynYlmValue::String("\"hello world".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("a, b").unwrap(),
-            DynSolValue::String("a, b".into())
+            DynYlmType::String.coerce_str("a, b").unwrap(),
+            DynYlmValue::String("a, b".into())
         );
         assert_eq!(
-            DynSolType::String.coerce_str("hello (world)").unwrap(),
-            DynSolValue::String("hello (world)".into())
+            DynYlmType::String.coerce_str("hello (world)").unwrap(),
+            DynYlmValue::String("hello (world)".into())
         );
 
-        assert!(DynSolType::String.coerce_str("\"hello world").is_err());
-        assert!(DynSolType::String.coerce_str("\"hello world'").is_err());
-        assert!(DynSolType::String.coerce_str("'hello world").is_err());
-        assert!(DynSolType::String.coerce_str("'hello world\"").is_err());
+        assert!(DynYlmType::String.coerce_str("\"hello world").is_err());
+        assert!(DynYlmType::String.coerce_str("\"hello world'").is_err());
+        assert!(DynYlmType::String.coerce_str("'hello world").is_err());
+        assert!(DynYlmType::String.coerce_str("'hello world\"").is_err());
 
         assert_eq!(
-            DynSolType::String.coerce_str("Hello, world!").unwrap(),
-            DynSolValue::String("Hello, world!".into())
+            DynYlmType::String.coerce_str("Hello, world!").unwrap(),
+            DynYlmValue::String("Hello, world!".into())
         );
         let s = "$$g]a\"v/of;[()];2,yo\r)k_";
-        assert_eq!(DynSolType::String.coerce_str(s).unwrap(), DynSolValue::String(s.into()));
+        assert_eq!(DynYlmType::String.coerce_str(s).unwrap(), DynYlmValue::String(s.into()));
     }
 
     #[test]
     fn coerce_strings() {
-        let arr = DynSolType::Array(Box::new(DynSolType::String));
+        let arr = DynYlmType::Array(Box::new(DynYlmType::String));
         let mk_arr = |s: &[&str]| {
-            DynSolValue::Array(s.iter().map(|s| DynSolValue::String(s.to_string())).collect())
+            DynYlmValue::Array(s.iter().map(|s| DynYlmValue::String(s.to_string())).collect())
         };
 
         assert_eq!(arr.coerce_str("[]").unwrap(), mk_arr(&[]));
@@ -1075,75 +1075,75 @@ mod tests {
 
     #[test]
     fn coerce_array_of_bytes_and_strings() {
-        let ty = DynSolType::Array(Box::new(DynSolType::Bytes));
-        assert_eq!(ty.coerce_str("[]"), Ok(DynSolValue::Array(vec![])));
-        assert_eq!(ty.coerce_str("[0x]"), Ok(DynSolValue::Array(vec![DynSolValue::Bytes(vec![])])));
+        let ty = DynYlmType::Array(Box::new(DynYlmType::Bytes));
+        assert_eq!(ty.coerce_str("[]"), Ok(DynYlmValue::Array(vec![])));
+        assert_eq!(ty.coerce_str("[0x]"), Ok(DynYlmValue::Array(vec![DynYlmValue::Bytes(vec![])])));
 
-        let ty = DynSolType::Array(Box::new(DynSolType::String));
-        assert_eq!(ty.coerce_str("[]"), Ok(DynSolValue::Array(vec![])));
+        let ty = DynYlmType::Array(Box::new(DynYlmType::String));
+        assert_eq!(ty.coerce_str("[]"), Ok(DynYlmValue::Array(vec![])));
         assert_eq!(
             ty.coerce_str("[\"\"]"),
-            Ok(DynSolValue::Array(vec![DynSolValue::String(String::new())]))
+            Ok(DynYlmValue::Array(vec![DynYlmValue::String(String::new())]))
         );
         assert_eq!(
             ty.coerce_str("[0x]"),
-            Ok(DynSolValue::Array(vec![DynSolValue::String("0x".into())]))
+            Ok(DynYlmValue::Array(vec![DynYlmValue::String("0x".into())]))
         );
     }
 
     #[test]
     fn coerce_empty_array() {
         assert_eq!(
-            DynSolType::Array(Box::new(DynSolType::Bool)).coerce_str("[]").unwrap(),
-            DynSolValue::Array(vec![])
+            DynYlmType::Array(Box::new(DynYlmType::Bool)).coerce_str("[]").unwrap(),
+            DynYlmValue::Array(vec![])
         );
         assert_eq!(
-            DynSolType::FixedArray(Box::new(DynSolType::Bool), 0).coerce_str("[]").unwrap(),
-            DynSolValue::FixedArray(vec![]),
+            DynYlmType::FixedArray(Box::new(DynYlmType::Bool), 0).coerce_str("[]").unwrap(),
+            DynYlmValue::FixedArray(vec![]),
         );
-        assert!(DynSolType::FixedArray(Box::new(DynSolType::Bool), 1).coerce_str("[]").is_err());
+        assert!(DynYlmType::FixedArray(Box::new(DynYlmType::Bool), 1).coerce_str("[]").is_err());
     }
 
     #[test]
     fn coerce_bool_array() {
         assert_eq!(
-            DynSolType::coerce_str(&DynSolType::Array(Box::new(DynSolType::Bool)), "[true, false]")
+            DynYlmType::coerce_str(&DynYlmType::Array(Box::new(DynYlmType::Bool)), "[true, false]")
                 .unwrap(),
-            DynSolValue::Array(vec![DynSolValue::Bool(true), DynSolValue::Bool(false)])
+            DynYlmValue::Array(vec![DynYlmValue::Bool(true), DynYlmValue::Bool(false)])
         );
     }
 
     #[test]
     fn coerce_bool_array_of_arrays() {
         assert_eq!(
-            DynSolType::coerce_str(
-                &DynSolType::Array(Box::new(DynSolType::Array(Box::new(DynSolType::Bool)))),
+            DynYlmType::coerce_str(
+                &DynYlmType::Array(Box::new(DynYlmType::Array(Box::new(DynYlmType::Bool)))),
                 "[ [ true, true, false ], [ false]]"
             )
             .unwrap(),
-            DynSolValue::Array(vec![
-                DynSolValue::Array(vec![
-                    DynSolValue::Bool(true),
-                    DynSolValue::Bool(true),
-                    DynSolValue::Bool(false)
+            DynYlmValue::Array(vec![
+                DynYlmValue::Array(vec![
+                    DynYlmValue::Bool(true),
+                    DynYlmValue::Bool(true),
+                    DynYlmValue::Bool(false)
                 ]),
-                DynSolValue::Array(vec![DynSolValue::Bool(false)])
+                DynYlmValue::Array(vec![DynYlmValue::Bool(false)])
             ])
         );
     }
 
     #[test]
     fn coerce_bool_fixed_array() {
-        let ty = DynSolType::FixedArray(Box::new(DynSolType::Bool), 3);
+        let ty = DynYlmType::FixedArray(Box::new(DynYlmType::Bool), 3);
         assert!(ty.coerce_str("[]").is_err());
         assert!(ty.coerce_str("[true]").is_err());
         assert!(ty.coerce_str("[true, false]").is_err());
         assert_eq!(
             ty.coerce_str("[true, false, true]").unwrap(),
-            DynSolValue::FixedArray(vec![
-                DynSolValue::Bool(true),
-                DynSolValue::Bool(false),
-                DynSolValue::Bool(true),
+            DynYlmValue::FixedArray(vec![
+                DynYlmValue::Bool(true),
+                DynYlmValue::Bool(false),
+                DynYlmValue::Bool(true),
             ])
         );
         assert!(ty.coerce_str("[true, false, false, true]").is_err());
@@ -1151,28 +1151,28 @@ mod tests {
 
     #[test]
     fn single_quoted_in_array_must_error() {
-        assert!(DynSolType::Array(Box::new(DynSolType::Bool))
+        assert!(DynYlmType::Array(Box::new(DynYlmType::Bool))
             .coerce_str("[true,\"false,false]")
             .is_err());
-        assert!(DynSolType::Array(Box::new(DynSolType::Bool)).coerce_str("[false\"]").is_err());
-        assert!(DynSolType::Array(Box::new(DynSolType::Bool))
+        assert!(DynYlmType::Array(Box::new(DynYlmType::Bool)).coerce_str("[false\"]").is_err());
+        assert!(DynYlmType::Array(Box::new(DynYlmType::Bool))
             .coerce_str("[true,false\"]")
             .is_err());
-        assert!(DynSolType::Array(Box::new(DynSolType::Bool))
+        assert!(DynYlmType::Array(Box::new(DynYlmType::Bool))
             .coerce_str("[true,\"false\",false]")
             .is_err());
-        assert!(DynSolType::Array(Box::new(DynSolType::Bool)).coerce_str("[true,false]").is_ok());
+        assert!(DynYlmType::Array(Box::new(DynYlmType::Bool)).coerce_str("[true,false]").is_ok());
     }
 
     #[test]
     fn tuples() {
-        let ty = DynSolType::Tuple(vec![DynSolType::String, DynSolType::Bool, DynSolType::String]);
+        let ty = DynYlmType::Tuple(vec![DynYlmType::String, DynYlmType::Bool, DynYlmType::String]);
         assert_eq!(
             ty.coerce_str("(\"a,]) b\", true, true? ]and] false!)").unwrap(),
-            DynSolValue::Tuple(vec![
-                DynSolValue::String("a,]) b".into()),
-                DynSolValue::Bool(true),
-                DynSolValue::String("true? ]and] false!".into()),
+            DynYlmValue::Tuple(vec![
+                DynYlmValue::String("a,]) b".into()),
+                DynYlmValue::Bool(true),
+                DynYlmValue::String("true? ]and] false!".into()),
             ])
         );
         assert!(ty.coerce_str("(\"\", true, a, b)").is_err());
@@ -1182,39 +1182,39 @@ mod tests {
     #[test]
     fn tuples_arrays_mixed() {
         assert_eq!(
-            DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-                DynSolType::Array(Box::new(DynSolType::Tuple(vec![DynSolType::Bool]))),
-                DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-                    DynSolType::Bool,
-                    DynSolType::Bool
+            DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+                DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![DynYlmType::Bool]))),
+                DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+                    DynYlmType::Bool,
+                    DynYlmType::Bool
                 ]))),
             ])))
             .coerce_str("[([(true)],[(false,true)])]")
             .unwrap(),
-            DynSolValue::Array(vec![DynSolValue::Tuple(vec![
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![DynSolValue::Bool(true)])]),
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![
-                    DynSolValue::Bool(false),
-                    DynSolValue::Bool(true)
+            DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![
+                DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![DynYlmValue::Bool(true)])]),
+                DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![
+                    DynYlmValue::Bool(false),
+                    DynYlmValue::Bool(true)
                 ])]),
             ])])
         );
 
         assert_eq!(
-            DynSolType::Tuple(vec![
-                DynSolType::Array(Box::new(DynSolType::Tuple(vec![DynSolType::Bool]))),
-                DynSolType::Array(Box::new(DynSolType::Tuple(vec![
-                    DynSolType::Bool,
-                    DynSolType::Bool
+            DynYlmType::Tuple(vec![
+                DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![DynYlmType::Bool]))),
+                DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![
+                    DynYlmType::Bool,
+                    DynYlmType::Bool
                 ]))),
             ])
             .coerce_str("([(true)],[(false,true)])")
             .unwrap(),
-            DynSolValue::Tuple(vec![
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![DynSolValue::Bool(true)])]),
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![
-                    DynSolValue::Bool(false),
-                    DynSolValue::Bool(true)
+            DynYlmValue::Tuple(vec![
+                DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![DynYlmValue::Bool(true)])]),
+                DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![
+                    DynYlmValue::Bool(false),
+                    DynYlmValue::Bool(true)
                 ])]),
             ])
         );
@@ -1223,17 +1223,17 @@ mod tests {
     #[test]
     fn tuple_array_nested() {
         assert_eq!(
-            DynSolType::Tuple(vec![
-                DynSolType::Array(Box::new(DynSolType::Tuple(vec![DynSolType::Address]))),
-                DynSolType::Uint(256),
+            DynYlmType::Tuple(vec![
+                DynYlmType::Array(Box::new(DynYlmType::Tuple(vec![DynYlmType::Address]))),
+                DynYlmType::Uint(256),
             ])
             .coerce_str("([(00005c9d55b78febcc2061715ba4f57ecf8ea2711f2c)],2)")
             .unwrap(),
-            DynSolValue::Tuple(vec![
-                DynSolValue::Array(vec![DynSolValue::Tuple(vec![DynSolValue::Address(
+            DynYlmValue::Tuple(vec![
+                DynYlmValue::Array(vec![DynYlmValue::Tuple(vec![DynYlmValue::Address(
                     cAddress!("00005c9d55b78febcc2061715ba4f57ecf8ea2711f2c")
                 )])]),
-                DynSolValue::Uint(U256::from(2), 256),
+                DynYlmValue::Uint(U256::from(2), 256),
             ])
         );
     }
@@ -1243,9 +1243,9 @@ mod tests {
     fn lotsa_array_nesting() {
         let n = 10;
 
-        let mut ty = DynSolType::Bool;
+        let mut ty = DynYlmType::Bool;
         for _ in 0..n {
-            ty = DynSolType::Array(Box::new(ty));
+            ty = DynYlmType::Array(Box::new(ty));
         }
         let mut value_str = String::new();
         value_str.push_str(&"[".repeat(n));
@@ -1254,20 +1254,20 @@ mod tests {
 
         let mut value = ty.coerce_str(&value_str).unwrap();
         for _ in 0..n {
-            let DynSolValue::Array(arr) = value else { panic!("{value:?}") };
+            let DynYlmValue::Array(arr) = value else { panic!("{value:?}") };
             assert_eq!(arr.len(), 1);
             value = arr.into_iter().next().unwrap();
         }
-        assert_eq!(value, DynSolValue::Bool(true));
+        assert_eq!(value, DynYlmValue::Bool(true));
     }
 
     #[test]
     fn lotsa_tuple_nesting() {
         let n = 10;
 
-        let mut ty = DynSolType::Bool;
+        let mut ty = DynYlmType::Bool;
         for _ in 0..n {
-            ty = DynSolType::Tuple(vec![ty]);
+            ty = DynYlmType::Tuple(vec![ty]);
         }
         let mut value_str = String::new();
         value_str.push_str(&"(".repeat(n));
@@ -1276,10 +1276,10 @@ mod tests {
 
         let mut value = ty.coerce_str(&value_str).unwrap();
         for _ in 0..n {
-            let DynSolValue::Tuple(tuple) = value else { panic!("{value:?}") };
+            let DynYlmValue::Tuple(tuple) = value else { panic!("{value:?}") };
             assert_eq!(tuple.len(), 1);
             value = tuple.into_iter().next().unwrap();
         }
-        assert_eq!(value, DynSolValue::Bool(true));
+        assert_eq!(value, DynYlmValue::Bool(true));
     }
 }

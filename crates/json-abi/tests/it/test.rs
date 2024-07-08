@@ -1,4 +1,4 @@
-use alloy_json_abi::{Error, JsonAbi, Param};
+use base_json_abi::{Error, JsonAbi, Param};
 use std::{fs::File, io::BufReader};
 
 #[test]
@@ -19,7 +19,7 @@ fn complex_error() {
         decoded,
         Error {
             inputs: vec![Param {
-                internal_type: Some(alloy_json_abi::InternalType::Other {
+                internal_type: Some(base_json_abi::InternalType::Other {
                     contract: None,
                     ty: "string".into()
                 }),
@@ -36,10 +36,10 @@ fn complex_error() {
 fn big_function() {
     let s = include_str!("../abi/LargeFunction.json");
     let expected = "fulfillAvailableAdvancedOrders(((address,address,(uint8,address,uint256,uint256,uint256)[],(uint8,address,uint256,uint256,uint256,address)[],uint8,uint256,uint256,bytes32,uint256,bytes32,uint256),uint120,uint120,bytes,bytes)[],(uint256,uint8,uint256,uint256,bytes32[])[],(uint256,uint256)[][],(uint256,uint256)[][],bytes32,address,uint256)";
-    let f = serde_json::from_str::<alloy_json_abi::Function>(s).unwrap();
+    let f = serde_json::from_str::<base_json_abi::Function>(s).unwrap();
     assert_eq!(f.signature(), expected);
-    assert_eq!(f.selector(), alloy_primitives::sha3(expected)[..4]);
-    assert_eq!(f.selector(), alloy_primitives::hex!("89f025a5"));
+    assert_eq!(f.selector(), base_primitives::sha3(expected)[..4]);
+    assert_eq!(f.selector(), base_primitives::hex!("89f025a5"));
 
     let ethabi = serde_json::from_str::<ethabi::Function>(s).unwrap();
     assert_eq!(f.selector(), ethabi.short_signature());

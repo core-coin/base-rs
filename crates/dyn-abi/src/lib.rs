@@ -8,10 +8,6 @@
 // except according to those terms.
 
 #![doc = include_str!("../README.md")]
-#![doc(
-    html_logo_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/alloy.jpg",
-    html_favicon_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/favicon.ico"
-)]
 #![warn(
     missing_copy_implementations,
     missing_debug_implementations,
@@ -29,7 +25,7 @@
 #[macro_use]
 extern crate alloc;
 
-pub extern crate alloy_sol_type_parser as parser;
+pub extern crate base_ylm_type_parser as parser;
 
 #[cfg(feature = "arbitrary")]
 mod arbitrary;
@@ -38,7 +34,7 @@ mod coerce;
 
 mod dynamic;
 pub use dynamic::{
-    DecodedError, DecodedEvent, DynSolError, DynSolEvent, DynSolType, DynSolValue, DynToken,
+    DecodedError, DecodedEvent, DynToken, DynYlmError, DynYlmEvent, DynYlmType, DynYlmValue,
 };
 
 mod error;
@@ -56,7 +52,7 @@ pub mod eip712;
 pub use eip712::{parser as eip712_parser, Eip712Types, PropertyDef, Resolver, TypeDef, TypedData};
 
 #[doc(no_inline)]
-pub use alloy_sol_types::{
+pub use base_ylm_types::{
     abi::{self, Decoder, Encoder},
-    Eip712Domain, SolType, Word,
+    Eip712Domain, Word, YlmType,
 };

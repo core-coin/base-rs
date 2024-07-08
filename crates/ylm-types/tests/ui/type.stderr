@@ -1,0 +1,213 @@
+error: empty tuples are not allowed
+   --> tests/ui/type.rs:145:9
+    |
+145 |         () t;
+    |         ^^
+
+error: single element tuples must have a trailing comma
+   --> tests/ui/type.rs:151:14
+    |
+151 |         (bool) t;
+    |              ^
+
+error: invalid size: number would be zero for non-zero type
+   --> tests/ui/type.rs:157:9
+    |
+157 |         bytes0 a;
+    |         ^^^^^^
+
+error: fixed bytes range is 1-32
+   --> tests/ui/type.rs:163:9
+    |
+163 |         bytes33 a;
+    |         ^^^^^^^
+
+error: invalid size: number would be zero for non-zero type
+   --> tests/ui/type.rs:169:9
+    |
+169 |         uint0 a;
+    |         ^^^^^
+
+error: uintX must be a multiple of 8 up to 256
+   --> tests/ui/type.rs:175:9
+    |
+175 |         uint264 a;
+    |         ^^^^^^^
+
+error: uintX must be a multiple of 8 up to 256
+   --> tests/ui/type.rs:181:9
+    |
+181 |         uint7 a;
+    |         ^^^^^
+
+error: invalid size: number would be zero for non-zero type
+   --> tests/ui/type.rs:187:9
+    |
+187 |         int0 a;
+    |         ^^^^
+
+error: intX must be a multiple of 8 up to 256
+   --> tests/ui/type.rs:193:9
+    |
+193 |         int264 a;
+    |         ^^^^^^
+
+error: intX must be a multiple of 8 up to 256
+   --> tests/ui/type.rs:199:9
+    |
+199 |         int7 a;
+    |         ^^^^
+
+error: enum has too many variants
+   --> tests/ui/type.rs:476:10
+    |
+476 |     enum TooBigEnum {
+    |          ^^^^^^^^^^
+
+error: Mapping types are not supported here
+   --> tests/ui/type.rs:739:9
+    |
+739 |         mapping(mapping(a b => c d) e => mapping(f g => h i) j) map;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: Mapping types are not supported here
+   --> tests/ui/type.rs:748:13
+    |
+748 |     mapping(mapping(int => int) => int) public mapKeyOfMap;
+    |             ^^^^^^^^^^^^^^^^^^^
+
+error: Mapping types are not supported here
+   --> tests/ui/type.rs:752:23
+    |
+752 |     function mappings(mapping(uint256 a => bool b), mapping(bool => bool) x);
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: Mapping types are not supported here
+   --> tests/ui/type.rs:752:53
+    |
+752 |     function mappings(mapping(uint256 a => bool b), mapping(bool => bool) x);
+    |                                                     ^^^^^^^^^^^^^^^^^^^^^
+
+error[E0412]: cannot find type `bytes_` in this scope
+   --> tests/ui/type.rs:205:9
+    |
+205 |         bytes_ a;
+    |         ^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `bytes_32` in this scope
+   --> tests/ui/type.rs:206:9
+    |
+206 |         bytes_32 b;
+    |         ^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `uint_` in this scope
+   --> tests/ui/type.rs:207:9
+    |
+207 |         uint_ c;
+    |         ^^^^^ not found in this scope
+
+error[E0412]: cannot find type `uint_256` in this scope
+   --> tests/ui/type.rs:208:9
+    |
+208 |         uint_256 d;
+    |         ^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `int_` in this scope
+   --> tests/ui/type.rs:209:9
+    |
+209 |         int_ e;
+    |         ^^^^ not found in this scope
+
+error[E0412]: cannot find type `int_256` in this scope
+   --> tests/ui/type.rs:210:9
+    |
+210 |         int_256 f;
+    |         ^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `a` in this scope
+   --> tests/ui/type.rs:739:25
+    |
+739 |         mapping(mapping(a b => c d) e => mapping(f g => h i) j) map;
+    |                         ^ not found in this scope
+
+error[E0277]: the trait bound `(base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::String, Bool, base_ylm_types::ylm_data::Bytes, base_ylm_types::ylm_data::FixedBytes<1>, base_ylm_types::ylm_data::FixedBytes<2>, base_ylm_types::ylm_data::FixedBytes<3>, base_ylm_types::ylm_data::FixedBytes<4>, base_ylm_types::ylm_data::FixedBytes<5>, base_ylm_types::ylm_data::FixedBytes<6>, basetypes::ylm_data::FixedBytes<7>, basepes::ylm_data::FixedBytes<8>, base_ylm_types::ylm_data::FixedBytes<9>, base_ylm_types::ylm_data::FixedBytes<10>, base_ylm_types::ylm_data::FixedBytes<11>, base_ylm_types::ylm_data::FixedBytes<12>, base_ylm_types::ylm_data::FixedBytes<13>, base_ylm_types::ylm_data::FixedBytes<14>, base_ylm_types::ylm_data::FixedBytes<15>, base_ylm_types::ylm_data::FixedBytes<16>, base_ylm_types::ylm_data::FixedBytes<17>, base_ylm_types::ylm_data::FixedBytes<18>, base_ylm_types::ylm_data::FixedBytes<19>, base_ylm_types::ylm_data::FixedBytes<20>, base_ylm_types::ylm_data::FixedBytes<21>, base_ylm_types::ylm_data::FixedBytes<22>, base_ylm_types::ylm_data::FixedBytes<23>, base_ylm_types::ylm_data::FixedBytes<24>, base_ylm_types::ylm_data::FixedBytes<25>, base_ylm_types::ylm_data::FixedBytes<26>, base_ylm_types::ylm_data::FixedBytes<27>, base_ylm_types::ylm_data::FixedBytes<28>, base_ylm_types::ylm_data::FixedBytes<29>, base_ylm_types::ylm_data::FixedBytes<30>, base_ylm_types::ylm_data::FixedBytes<31>, base_ylm_types::ylm_data::FixedBytes<32>, Int<256>, Int<8>, Int<16>, Int<24>, Int<32>, Int<40>, Int<48>, Int<56>, Int<64>, Int<72>, Int<80>, Int<88>, Int<96>, Int<104>, Int<112>, Int<120>, Int<128>, Int<136>, Int<144>, Int<152>, Int<160>, Int<168>, Int<176>, Int<184>, Int<192>, Int<200>, Int<208>, Int<216>, Int<224>, Int<232>, Int<240>, Int<248>, Int<256>, base_ylm_types::ylm_data::Uint<256>, base_ylm_types::ylm_data::Uint<8>, base_ylm_types::ylm_data::Uint<16>, base_ylm_types::ylm_data::Uint<24>, base_ylm_types::ylm_data::Uint<32>, base_ylm_types::ylm_data::Uint<40>, base_ylm_types::ylm_data::Uint<48>, base_ylm_types::ylm_data::Uint<56>, base_ylm_types::ylm_data::Uint<64>, base_ylm_types::ylm_data::Uint<72>, base_ylm_types::ylm_data::Uint<80>, base_ylm_types::ylm_data::Uint<88>, base_ylm_types::ylm_data::Uint<96>, base_ylm_types::ylm_data::Uint<104>, base_ylm_types::ylm_data::Uint<112>, base_ylm_types::ylm_data::Uint<120>, base_ylm_types::ylm_data::Uint<128>, base_ylm_types::ylm_data::Uint<136>, base_ylm_types::ylm_data::Uint<144>, base_ylm_types::ylm_data::Uint<152>, base_ylm_types::ylm_data::Uint<160>, base_ylm_types::ylm_data::Uint<168>, base_ylm_types::ylm_data::Uint<176>, base_ylm_types::ylm_data::Uint<184>, base_ylm_types::ylm_data::Uint<192>, base_ylm_types::ylm_data::Uint<200>, base_ylm_types::ylm_data::Uint<208>, base_ylm_types::ylm_data::Uint<216>, base_ylm_types::ylm_data::Uint<224>, base_ylm_types::ylm_data::Uint<232>, base_ylm_types::ylm_data::Uint<240>, base_ylm_types::ylm_data::Uint<248>, base_ylm_types::ylm_data::Uint<256>): YlmType` is not satisfied
+   --> tests/ui/type.rs:3:1
+    |
+3   | / ylm! {
+4   | |     struct BuiltinTypes {
+5   | |         address a;
+6   | |         address payable ap;
+...   |
+111 | |     }
+112 | | }
+    | |_^ the trait `YlmType` is not implemented for `(Address, ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ...)`
+    |
+    = help: the following other types implement trait `YlmType`:
+              ()
+              (T1,)
+              (T1, T2)
+              (T1, T2, T3)
+              (T1, T2, T3, T4)
+              (T1, T2, T3, T4, T5)
+              (T1, T2, T3, T4, T5, T6)
+              (T1, T2, T3, T4, T5, T6, T7)
+            and $N others
+    = note: this error originates in the macro `sol` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `(base_ylm_types::private::Address, base_ylm_types::private::Address, std::string::String, bool, base_ylm_types::private::Bytes, base_ylm_types::private::FixedBytes<1>, base_ylm_types::private::FixedBytes<2>, base_ylm_types::private::FixedBytes<3>, base_ylm_types::private::FixedBytes<4>, base_ylm_types::private::FixedBytes<5>, base_ylm_types::private::FixedBytes<6>, base_ylm_types::private::FixedBytes<7>, base_ylm_types::private::FixedBytes<8>, base_ylm_types::private::FixedBytes<9>, base_ylm_types::private::FixedBytes<10>, base_ylm_types::private::FixedBytes<11>, base_ylm_types::private::FixedBytes<12>, base_ylm_types::private::FixedBytes<13>, base_ylm_types::private::FixedBytes<14>, base_ylm_types::private::FixedBytes<15>, base_ylm_types::private::FixedBytes<16>, base_ylm_types::private::FixedBytes<17>, base_ylm_types::private::FixedBytes<18>, base_ylm_types::private::FixedBytes<19>, base_ylm_types::private::FixedBytes<20>, base_ylm_types::private::FixedBytes<21>, base_ylm_types::private::FixedBytes<22>, base_ylm_types::private::FixedBytes<23>, base_ylm_types::private::FixedBytes<24>, base_ylm_types::private::FixedBytes<25>, base_ylm_types::private::FixedBytes<26>, base_ylm_types::private::FixedBytes<27>, base_ylm_types::private::FixedBytes<28>, base_ylm_types::private::FixedBytes<29>, base_ylm_types::private::FixedBytes<30>, base_ylm_types::private::FixedBytes<31>, base_ylm_types::private::FixedBytes<32>, Signed<256, 4>, i8, i16, i32, i32, i64, i64, i64, i64, i128, i128, i128, i128, i128, i128, i128, i128, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, base_ylm_types::private::Uint<256, 4>, u8, u16, u32, u32, u64, u64, u64, u64, u128, u128, u128, u128, u128, u128, u128, u128, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>): YlmTypeValue<(base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::String, Bool, base_ylm_types::ylm_data::Bytes, base_ylm_types::ylm_data::FixedBytes<1>, base_ylm_types::ylm_data::FixedBytes<2>, base_ylm_types::ylm_data::FixedBytes<3>, base_ylm_types::ylm_data::FixedBytes<4>, base_ylm_types::ylm_data::FixedBytes<5>, base_ylm_types::ylm_data::FixedBytes<6>, base_ylm_types::ylm_data::FixedBytes<7>, base_ylm_types::ylm_data::FixedBytes<8>, base_ylm_types::ylm_data::FixedBytes<9>, base_ylm_types::ylm_data::FixedBytes<10>, base_ylm_types::ylm_data::FixedBytes<11>, base_ylm_types::ylm_data::FixedBytes<12>, base_ylm_types::ylm_data::FixedBytes<13>, base_ylm_types::ylm_data::FixedBytes<14>, base_ylm_types::ylm_data::FixedBytes<15>, base_ylm_types::ylm_data::FixedBytes<16>, base_ylm_types::ylm_data::FixedBytes<17>, base_ylm_types::ylm_data::FixedBytes<18>, base_ylm_types::ylm_data::FixedBytes<19>, base_ylm_types::ylm_data::FixedBytes<20>, base_ylm_types::ylm_data::FixedBytes<21>, base_ylm_types::ylm_data::FixedBytes<22>, base_ylm_types::ylm_data::FixedBytes<23>, base_ylm_types::ylm_data::FixedBytes<24>, base_ylm_types::ylm_data::FixedBytes<25>, base_ylm_types::ylm_data::FixedBytes<26>, base_ylm_types::ylm_data::FixedBytes<27>, base_ylm_types::ylm_data::FixedBytes<28>, base_ylm_types::ylm_data::FixedBytes<29>, base_ylm_types::ylm_data::FixedBytes<30>, base_ylm_types::ylm_data::FixedBytes<31>, base_ylm_types::ylm_data::FixedBytes<32>, Int<256>, Int<8>, Int<16>, Int<24>, Int<32>, Int<40>, Int<48>, Int<56>, Int<64>, Int<72>, Int<80>, Int<88>, Int<96>, Int<104>, Int<112>, Int<120>, Int<128>, Int<136>, Int<144>, Int<152>, Int<160>, Int<168>, Int<176>, Int<184>, Int<192>, Int<200>, Int<208>, Int<216>, Int<224>, Int<232>, Int<240>, Int<248>, Int<256>, base_ylm_types::ylm_data::Uint<256>, base_ylm_types::ylm_data::Uint<8>, base_ylm_types::ylm_data::Uint<16>, base_ylm_types::ylm_data::Uint<24>, base_ylm_types::ylm_data::Uint<32>, base_ylm_types::ylm_data::Uint<40>, base_ylm_types::ylm_data::Uint<48>, base_ylm_types::ylm_data::Uint<56>, base_ylm_types::ylm_data::Uint<64>, base_ylm_types::ylm_data::Uint<72>, base_ylm_types::ylm_data::Uint<80>, base_ylm_types::ylm_data::Uint<88>, base_ylm_types::ylm_data::Uint<96>, base_ylm_types::ylm_data::Uint<104>, base_ylm_types::ylm_data::Uint<112>, base_ylm_types::ylm_data::Uint<120>, base_ylm_types::ylm_data::Uint<128>, base_ylm_types::ylm_data::Uint<136>, base_ylm_types::ylm_data::Uint<144>, base_ylm_types::ylm_data::Uint<152>, base_ylm_types::ylm_data::Uint<160>, base_ylm_types::ylm_data::Uint<168>, base_ylm_types::ylm_data::Uint<176>, base_ylm_types::ylm_data::Uint<184>, base_ylm_types::ylm_data::Uint<192>, base_ylm_types::ylm_data::Uint<200>, base_ylm_types::ylm_data::Uint<208>, base_ylm_types::ylm_data::Uint<216>, base_ylm_types::ylm_data::Uint<224>, base_ylm_types::ylm_data::Uint<232>, base_ylm_types::ylm_data::Uint<240>, base_ylm_types::ylm_data::Uint<248>, base_ylm_types::ylm_data::Uint<256>)>` is not satisfied
+   --> tests/ui/type.rs:3:1
+    |
+3   | / ylm! {
+4   | |     struct BuiltinTypes {
+5   | |         address a;
+6   | |         address payable ap;
+...   |
+111 | |     }
+112 | | }
+    | |_^ the trait `YlmTypeValue<(base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::String, Bool, base_ylm_types::ylm_data::Bytes, base_ylm_types::ylm_data::FixedBytes<1>, base_ylm_types::ylm_data::FixedBytes<2>, base_ylm_types::ylm_data::FixedBytes<3>, base_ylm_types::ylm_data::FixedBytes<4>, base_ylm_types::ylm_data::FixedBytes<5>, base_ylm_types::ylm_data::FixedBytes<6>, base_ylm_types::ylm_data::FixedBytes<7>, base_ylm_types::ylm_data::FixedBytes<8>, base_ylm_types::ylm_data::FixedBytes<9>, base_ylm_types::ylm_data::FixedBytes<10>, base_ylm_types::ylm_data::FixedBytes<11>, base_ylm_types::ylm_data::FixedBytes<12>, base_ylm_types::ylm_data::FixedBytes<13>, base_ylm_types::ylm_data::FixedBytes<14>, base_ylm_types::ylm_data::FixedBytes<15>, base_ylm_types::ylm_data::FixedBytes<16>, base_ylm_types::ylm_data::FixedBytes<17>, base_ylm_types::ylm_data::FixedBytes<18>, base_ylm_types::ylm_data::FixedBytes<19>, base_ylm_types::ylm_data::FixedBytes<20>, base_ylm_types::ylm_data::FixedBytes<21>, base_ylm_types::ylm_data::FixedBytes<22>, base_ylm_types::ylm_data::FixedBytes<23>, base_ylm_types::ylm_data::FixedBytes<24>, base_ylm_types::ylm_data::FixedBytes<25>, base_ylm_types::ylm_data::FixedBytes<26>, base_ylm_types::ylm_data::FixedBytes<27>, base_ylm_types::ylm_data::FixedBytes<28>, base_ylm_types::ylm_data::FixedBytes<29>, base_ylm_types::ylm_data::FixedBytes<30>, base_ylm_types::ylm_data::FixedBytes<31>, base_ylm_types::ylm_data::FixedBytes<32>, Int<256>, Int<8>, Int<16>, Int<24>, Int<32>, Int<40>, Int<48>, Int<56>, Int<64>, Int<72>, Int<80>, Int<88>, Int<96>, Int<104>, Int<112>, Int<120>, Int<128>, Int<136>, Int<144>, Int<152>, Int<160>, Int<168>, Int<176>, Int<184>, Int<192>, Int<200>, Int<208>, Int<216>, Int<224>, Int<232>, Int<240>, Int<248>, Int<256>, base_ylm_types::ylm_data::Uint<256>, base_ylm_types::ylm_data::Uint<8>, base_ylm_types::ylm_data::Uint<16>, base_ylm_types::ylm_data::Uint<24>, base_ylm_types::ylm_data::Uint<32>, base_ylm_types::ylm_data::Uint<40>, base_ylm_types::ylm_data::Uint<48>, base_ylm_types::ylm_data::Uint<56>, base_ylm_types::ylm_data::Uint<64>, base_ylm_types::ylm_data::Uint<72>, base_ylm_types::ylm_data::Uint<80>, base_ylm_types::ylm_data::Uint<88>, base_ylm_types::ylm_data::Uint<96>, base_ylm_types::ylm_data::Uint<104>, base_ylm_types::ylm_data::Uint<112>, base_ylm_types::ylm_data::Uint<120>, base_ylm_types::ylm_data::Uint<128>, base_ylm_types::ylm_data::Uint<136>, base_ylm_types::ylm_data::Uint<144>, base_ylm_types::ylm_data::Uint<152>, base_ylm_types::ylm_data::Uint<160>, base_ylm_types::ylm_data::Uint<168>, base_ylm_types::ylm_data::Uint<176>, base_ylm_types::ylm_data::Uint<184>, base_ylm_types::ylm_data::Uint<192>, base_ylm_types::ylm_data::Uint<200>, base_ylm_types::ylm_data::Uint<208>, base_ylm_types::ylm_data::Uint<216>, base_ylm_types::ylm_data::Uint<224>, base_ylm_types::ylm_data::Uint<232>, base_ylm_types::ylm_data::Uint<240>, base_ylm_types::ylm_data::Uint<248>, base_ylm_types::ylm_data::Uint<256>)>` is not implemented for `(Address, ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ...)`
+    |
+    = help: the following other types implement trait `YlmTypeValue<T>`:
+              <() as YlmTypeValue<()>>
+              <(T1,) as YlmTypeValue<(U1,)>>
+              <(T1, T2) as YlmTypeValue<(U1, U2)>>
+              <(T1, T2, T3) as YlmTypeValue<(U1, U2, U3)>>
+              <(T1, T2, T3, T4) as YlmTypeValue<(U1, U2, U3, U4)>>
+              <(T1, T2, T3, T4, T5) as YlmTypeValue<(U1, U2, U3, U4, U5)>>
+              <(T1, T2, T3, T4, T5, T6) as YlmTypeValue<(U1, U2, U3, U4, U5, U6)>>
+              <(T1, T2, T3, T4, T5, T6, T7) as YlmTypeValue<(U1, U2, U3, U4, U5, U6, U7)>>
+            and $N others
+note: required by a bound in `base_ylm_types::YlmType::abi_encoded_size`
+   --> src/types/ty.rs
+    |
+    |     fn abi_encoded_size<E: ?Sized + YlmTypeValue<Self>>(rust: &E) -> usize {
+    |                                     ^^^^^^^^^^^^^^^^^^ required by this bound in `YlmType::abi_encoded_size`
+    = note: this error originates in the macro `sol` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `(base_ylm_types::private::Address, base_ylm_types::private::Address, std::string::String, bool, base_ylm_types::private::Bytes, base_ylm_types::private::FixedBytes<1>, base_ylm_types::private::FixedBytes<2>, base_ylm_types::private::FixedBytes<3>, base_ylm_types::private::FixedBytes<4>, base_ylm_types::private::FixedBytes<5>, base_ylm_types::private::FixedBytes<6>, base_ylm_types::private::FixedBytes<7>, base_ylm_types::private::FixedBytes<8>, base_ylm_types::private::FixedBytes<9>, base_ylm_types::private::FixedBytes<10>, base_ylm_types::private::FixedBytes<11>, base_ylm_types::private::FixedBytes<12>, base_ylm_types::private::FixedBytes<13>, base_ylm_types::private::FixedBytes<14>, base_ylm_types::private::FixedBytes<15>, base_ylm_types::private::FixedBytes<16>, base_ylm_types::private::FixedBytes<17>, base_ylm_types::private::FixedBytes<18>, base_ylm_types::private::FixedBytes<19>, base_ylm_types::private::FixedBytes<20>, base_ylm_types::private::FixedBytes<21>, base_ylm_types::private::FixedBytes<22>, base_ylm_types::private::FixedBytes<23>, base_ylm_types::private::FixedBytes<24>, base_ylm_types::private::FixedBytes<25>, base_ylm_types::private::FixedBytes<26>, base_ylm_types::private::FixedBytes<27>, base_ylm_types::private::FixedBytes<28>, base_ylm_types::private::FixedBytes<29>, base_ylm_types::private::FixedBytes<30>, base_ylm_types::private::FixedBytes<31>, base_ylm_types::private::FixedBytes<32>, Signed<256, 4>, i8, i16, i32, i32, i64, i64, i64, i64, i128, i128, i128, i128, i128, i128, i128, i128, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, Signed<256, 4>, base_ylm_types::private::Uint<256, 4>, u8, u16, u32, u32, u64, u64, u64, u64, u128, u128, u128, u128, u128, u128, u128, u128, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>, base_ylm_types::private::Uint<256, 4>): YlmTypeValue<(base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::String, Bool, base_ylm_types::ylm_data::Bytes, base_ylm_types::ylm_data::FixedBytes<1>, base_ylm_types::ylm_data::FixedBytes<2>, base_ylm_types::ylm_data::FixedBytes<3>, base_ylm_types::ylm_data::FixedBytes<4>, base_ylm_types::ylm_data::FixedBytes<5>, base_ylm_types::ylm_data::FixedBytes<6>, base_ylm_types::ylm_data::FixedBytes<7>, base_ylm_types::ylm_data::FixedBytes<8>, base_ylm_types::ylm_data::FixedBytes<9>, base_ylm_types::ylm_data::FixedBytes<10>, base_ylm_types::ylm_data::FixedBytes<11>, base_ylm_types::ylm_data::FixedBytes<12>, base_ylm_types::ylm_data::FixedBytes<13>, base_ylm_types::ylm_data::FixedBytes<14>, base_ylm_types::ylm_data::FixedBytes<15>, base_ylm_types::ylm_data::FixedBytes<16>, base_ylm_types::ylm_data::FixedBytes<17>, base_ylm_types::ylm_data::FixedBytes<18>, base_ylm_types::ylm_data::FixedBytes<19>, base_ylm_types::ylm_data::FixedBytes<20>, base_ylm_types::ylm_data::FixedBytes<21>, base_ylm_types::ylm_data::FixedBytes<22>, base_ylm_types::ylm_data::FixedBytes<23>, base_ylm_types::ylm_data::FixedBytes<24>, base_ylm_types::ylm_data::FixedBytes<25>, base_ylm_types::ylm_data::FixedBytes<26>, base_ylm_types::ylm_data::FixedBytes<27>, base_ylm_types::ylm_data::FixedBytes<28>, base_ylm_types::ylm_data::FixedBytes<29>, base_ylm_types::ylm_data::FixedBytes<30>, base_ylm_types::ylm_data::FixedBytes<31>, base_ylm_types::ylm_data::FixedBytes<32>, Int<256>, Int<8>, Int<16>, Int<24>, Int<32>, Int<40>, Int<48>, Int<56>, Int<64>, Int<72>, Int<80>, Int<88>, Int<96>, Int<104>, Int<112>, Int<120>, Int<128>, Int<136>, Int<144>, Int<152>, Int<160>, Int<168>, Int<176>, Int<184>, Int<192>, Int<200>, Int<208>, Int<216>, Int<224>, Int<232>, Int<240>, Int<248>, Int<256>, base_ylm_types::ylm_data::Uint<256>, base_ylm_types::ylm_data::Uint<8>, base_ylm_types::ylm_data::Uint<16>, base_ylm_types::ylm_data::Uint<24>, base_ylm_types::ylm_data::Uint<32>, base_ylm_types::ylm_data::Uint<40>, base_ylm_types::ylm_data::Uint<48>, base_ylm_types::ylm_data::Uint<56>, base_ylm_types::ylm_data::Uint<64>, base_ylm_types::ylm_data::Uint<72>, base_ylm_types::ylm_data::Uint<80>, base_ylm_types::ylm_data::Uint<88>, base_ylm_types::ylm_data::Uint<96>, base_ylm_types::ylm_data::Uint<104>, base_ylm_types::ylm_data::Uint<112>, base_ylm_types::ylm_data::Uint<120>, base_ylm_types::ylm_data::Uint<128>, base_ylm_types::ylm_data::Uint<136>, base_ylm_types::ylm_data::Uint<144>, base_ylm_types::ylm_data::Uint<152>, base_ylm_types::ylm_data::Uint<160>, base_ylm_types::ylm_data::Uint<168>, base_ylm_types::ylm_data::Uint<176>, base_ylm_types::ylm_data::Uint<184>, base_ylm_types::ylm_data::Uint<192>, base_ylm_types::ylm_data::Uint<200>, base_ylm_types::ylm_data::Uint<208>, base_ylm_types::ylm_data::Uint<216>, base_ylm_types::ylm_data::Uint<224>, base_ylm_types::ylm_data::Uint<232>, base_ylm_types::ylm_data::Uint<240>, base_ylm_types::ylm_data::Uint<248>, base_ylm_types::ylm_data::Uint<256>)>` is not satisfied
+   --> tests/ui/type.rs:3:1
+    |
+3   | / ylm! {
+4   | |     struct BuiltinTypes {
+5   | |         address a;
+6   | |         address payable ap;
+...   |
+111 | |     }
+112 | | }
+    | |_^ the trait `YlmTypeValue<(base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::Address, base_ylm_types::ylm_data::String, Bool, base_ylm_types::ylm_data::Bytes, base_ylm_types::ylm_data::FixedBytes<1>, base_ylm_types::ylm_data::FixedBytes<2>, base_ylm_types::ylm_data::FixedBytes<3>, base_ylm_types::ylm_data::FixedBytes<4>, base_ylm_types::ylm_data::FixedBytes<5>, base_ylm_types::ylm_data::FixedBytes<6>, base_ylm_types::ylm_data::FixedBytes<7>, base_ylm_types::ylm_data::FixedBytes<8>, base_ylm_types::ylm_data::FixedBytes<9>, base_ylm_types::ylm_data::FixedBytes<10>, base_ylm_types::ylm_data::FixedBytes<11>, base_ylm_types::ylm_data::FixedBytes<12>, base_ylm_types::ylm_data::FixedBytes<13>, base_ylm_types::ylm_data::FixedBytes<14>, base_ylm_types::ylm_data::FixedBytes<15>, base_ylm_types::ylm_data::FixedBytes<16>, base_ylm_types::ylm_data::FixedBytes<17>, base_ylm_types::ylm_data::FixedBytes<18>, base_ylm_types::ylm_data::FixedBytes<19>, base_ylm_types::ylm_data::FixedBytes<20>, base_ylm_types::ylm_data::FixedBytes<21>, base_ylm_types::ylm_data::FixedBytes<22>, base_ylm_types::ylm_data::FixedBytes<23>, base_ylm_types::ylm_data::FixedBytes<24>, base_ylm_types::ylm_data::FixedBytes<25>, base_ylm_types::ylm_data::FixedBytes<26>, base_ylm_types::ylm_data::FixedBytes<27>, base_ylm_types::ylm_data::FixedBytes<28>, base_ylm_types::ylm_data::FixedBytes<29>, base_ylm_types::ylm_data::FixedBytes<30>, base_ylm_types::ylm_data::FixedBytes<31>, base_ylm_types::ylm_data::FixedBytes<32>, Int<256>, Int<8>, Int<16>, Int<24>, Int<32>, Int<40>, Int<48>, Int<56>, Int<64>, Int<72>, Int<80>, Int<88>, Int<96>, Int<104>, Int<112>, Int<120>, Int<128>, Int<136>, Int<144>, Int<152>, Int<160>, Int<168>, Int<176>, Int<184>, Int<192>, Int<200>, Int<208>, Int<216>, Int<224>, Int<232>, Int<240>, Int<248>, Int<256>, base_ylm_types::ylm_data::Uint<256>, base_ylm_types::ylm_data::Uint<8>, base_ylm_types::ylm_data::Uint<16>, base_ylm_types::ylm_data::Uint<24>, base_ylm_types::ylm_data::Uint<32>, base_ylm_types::ylm_data::Uint<40>, base_ylm_types::ylm_data::Uint<48>, base_ylm_types::ylm_data::Uint<56>, base_ylm_types::ylm_data::Uint<64>, base_ylm_types::ylm_data::Uint<72>, base_ylm_types::ylm_data::Uint<80>, base_ylm_types::ylm_data::Uint<88>, base_ylm_types::ylm_data::Uint<96>, base_ylm_types::ylm_data::Uint<104>, base_ylm_types::ylm_data::Uint<112>, base_ylm_types::ylm_data::Uint<120>, base_ylm_types::ylm_data::Uint<128>, base_ylm_types::ylm_data::Uint<136>, base_ylm_types::ylm_data::Uint<144>, base_ylm_types::ylm_data::Uint<152>, base_ylm_types::ylm_data::Uint<160>, base_ylm_types::ylm_data::Uint<168>, base_ylm_types::ylm_data::Uint<176>, base_ylm_types::ylm_data::Uint<184>, base_ylm_types::ylm_data::Uint<192>, base_ylm_types::ylm_data::Uint<200>, base_ylm_types::ylm_data::Uint<208>, base_ylm_types::ylm_data::Uint<216>, base_ylm_types::ylm_data::Uint<224>, base_ylm_types::ylm_data::Uint<232>, base_ylm_types::ylm_data::Uint<240>, base_ylm_types::ylm_data::Uint<248>, base_ylm_types::ylm_data::Uint<256>)>` is not implemented for `(Address, ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ..., ...)`
+    |
+    = help: the following other types implement trait `YlmTypeValue<T>`:
+              <() as YlmTypeValue<()>>
+              <(T1,) as YlmTypeValue<(U1,)>>
+              <(T1, T2) as YlmTypeValue<(U1, U2)>>
+              <(T1, T2, T3) as YlmTypeValue<(U1, U2, U3)>>
+              <(T1, T2, T3, T4) as YlmTypeValue<(U1, U2, U3, U4)>>
+              <(T1, T2, T3, T4, T5) as YlmTypeValue<(U1, U2, U3, U4, U5)>>
+              <(T1, T2, T3, T4, T5, T6) as YlmTypeValue<(U1, U2, U3, U4, U5, U6)>>
+              <(T1, T2, T3, T4, T5, T6, T7) as YlmTypeValue<(U1, U2, U3, U4, U5, U6, U7)>>
+            and $N others
+note: required by a bound in `base_ylm_types::YlmType::abi_encode_packed_to`
+   --> src/types/ty.rs
+    |
+    |     fn abi_encode_packed_to<E: ?Sized + YlmTypeValue<Self>>(rust: &E, out: &mut Vec<u8>) {
+    |                                         ^^^^^^^^^^^^^^^^^^ required by this bound in `YlmType::abi_encode_packed_to`
+    = note: this error originates in the macro `sol` (in Nightly builds, run with -Z macro-backtrace for more info)

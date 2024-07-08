@@ -1,5 +1,5 @@
 use crate::{
-    eip712::typed_data::Eip712Types, eip712_parser::EncodeType, DynSolType, DynSolValue, Error,
+    eip712::typed_data::Eip712Types, eip712_parser::EncodeType, DynYlmType, DynYlmValue, Error,
     Result, Specifier,
 };
 use alloc::{
@@ -8,8 +8,8 @@ use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use alloy_primitives::{sha3, B256};
-use alloy_sol_types::SolStruct;
+use base_primitives::{sha3, B256};
+use base_ylm_types::YlmStruct;
 use core::{cmp::Ordering, fmt};
 use parser::{RootType, TypeSpecifier, TypeStem};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -202,7 +202,7 @@ struct DfsContext<'a> {
 }
 
 /// A dependency graph built from the `Eip712Types` object. This is used to
-/// safely resolve JSON into a [`crate::DynSolType`] by detecting cycles in the
+/// safely resolve JSON into a [`crate::DynYlmType`] by detecting cycles in the
 /// type graph and traversing the dep graph.
 #[derive(Clone, Debug, Default)]
 pub struct Resolver {
@@ -254,10 +254,10 @@ impl From<&Resolver> for Eip712Types {
 }
 
 impl Resolver {
-    /// Instantiate a new resolver from a `SolStruct` type.
-    pub fn from_struct<S: SolStruct>() -> Self {
+    /// Instantiate a new resolver from a `YlmStruct` type.
+    pub fn from_struct<S: YlmStruct>() -> Self {
         let mut resolver = Self::default();
-        resolver.ingest_sol_struct::<S>();
+        resolver.ingest_ylm_struct::<S>();
         resolver
     }
 
@@ -303,7 +303,7 @@ impl Resolver {
     }
 
     /// Ingest a sol struct typedef.
-    pub fn ingest_sol_struct<S: SolStruct>(&mut self) {
+    pub fn ingest_ylm_struct<S: YlmStruct>(&mut self) {
         self.ingest_string(S::eip712_encode_type()).unwrap();
     }
 
@@ -372,17 +372,17 @@ impl Resolver {
         Ok(resolution)
     }
 
-    /// Resolve a typename into a [`crate::DynSolType`] or return an error if
+    /// Resolve a typename into a [`crate::DynYlmType`] or return an error if
     /// the type is missing, or contains a circular dependency.
-    pub fn resolve(&self, type_name: &str) -> Result<DynSolType> {
+    pub fn resolve(&self, type_name: &str) -> Result<DynYlmType> {
         if self.detect_cycle(type_name, &mut Default::default()) {
             return Err(Error::circular_dependency(type_name));
         }
         self.unchecked_resolve(&type_name.try_into()?)
     }
 
-    /// Resolve a type into a [`crate::DynSolType`] without checking for cycles.
-    fn unchecked_resolve(&self, type_spec: &TypeSpecifier<'_>) -> Result<DynSolType> {
+    /// Resolve a type into a [`crate::DynYlmType`] without checking for cycles.
+    fn unchecked_resolve(&self, type_spec: &TypeSpecifier<'_>) -> Result<DynYlmType> {
         let ty = match &type_spec.stem {
             TypeStem::Root(root) => self.resolve_root_type(*root),
             TypeStem::Tuple(tuple) => tuple
@@ -390,14 +390,14 @@ impl Resolver {
                 .iter()
                 .map(|ty| self.unchecked_resolve(ty))
                 .collect::<Result<_, _>>()
-                .map(DynSolType::Tuple),
+                .map(DynYlmType::Tuple),
         }?;
         Ok(ty.array_wrap_from_iter(type_spec.sizes.iter().copied()))
     }
 
-    /// Resolves a root Solidity type into either a basic type or a custom
+    /// Resolves a root Ylem type into either a basic type or a custom
     /// struct.
-    fn resolve_root_type(&self, root_type: RootType<'_>) -> Result<DynSolType> {
+    fn resolve_root_type(&self, root_type: RootType<'_>) -> Result<DynYlmType> {
         if let Ok(ty) = root_type.resolve() {
             return Ok(ty);
         }
@@ -413,7 +413,7 @@ impl Resolver {
             .map(|ty| self.unchecked_resolve(&ty.try_into()?))
             .collect::<Result<_, _>>()?;
 
-        Ok(DynSolType::CustomStruct { name: ty.type_name.clone(), prop_names, tuple })
+        Ok(DynYlmType::CustomStruct { name: ty.type_name.clone(), prop_names, tuple })
     }
 
     /// Encode the type into an EIP-712 `encodeType` string
@@ -440,19 +440,19 @@ impl Resolver {
     }
 
     /// Encode the data according to EIP-712 `encodeData` rules.
-    pub fn encode_data(&self, value: &DynSolValue) -> Result<Option<Vec<u8>>> {
+    pub fn encode_data(&self, value: &DynYlmValue) -> Result<Option<Vec<u8>>> {
         Ok(match value {
-            DynSolValue::CustomStruct { tuple: inner, .. }
-            | DynSolValue::Array(inner)
-            | DynSolValue::FixedArray(inner) => {
+            DynYlmValue::CustomStruct { tuple: inner, .. }
+            | DynYlmValue::Array(inner)
+            | DynYlmValue::FixedArray(inner) => {
                 let mut bytes = Vec::with_capacity(inner.len() * 32);
                 for v in inner {
                     bytes.extend(self.eip712_data_word(v)?.as_slice());
                 }
                 Some(bytes)
             }
-            DynSolValue::Bytes(buf) => Some(buf.to_vec()),
-            DynSolValue::String(s) => Some(s.as_bytes().to_vec()),
+            DynYlmValue::Bytes(buf) => Some(buf.to_vec()),
+            DynYlmValue::String(s) => Some(s.as_bytes().to_vec()),
             _ => None,
         })
     }
@@ -460,29 +460,29 @@ impl Resolver {
     /// Encode the data as a struct property according to EIP-712 `encodeData`
     /// rules. Atomic types are encoded as-is, while non-atomic types are
     /// encoded as their `encodeData` hash.
-    pub fn eip712_data_word(&self, value: &DynSolValue) -> Result<B256> {
+    pub fn eip712_data_word(&self, value: &DynYlmValue) -> Result<B256> {
         if let Some(word) = value.as_word() {
             return Ok(word);
         }
 
         let mut bytes;
         let to_hash = match value {
-            DynSolValue::CustomStruct { name, tuple, .. } => {
+            DynYlmValue::CustomStruct { name, tuple, .. } => {
                 bytes = self.type_hash(name)?.to_vec();
                 for v in tuple {
                     bytes.extend(self.eip712_data_word(v)?.as_slice());
                 }
                 &bytes[..]
             }
-            DynSolValue::Array(inner) | DynSolValue::FixedArray(inner) => {
+            DynYlmValue::Array(inner) | DynYlmValue::FixedArray(inner) => {
                 bytes = Vec::with_capacity(inner.len() * 32);
                 for v in inner {
                     bytes.extend(self.eip712_data_word(v)?);
                 }
                 &bytes[..]
             }
-            DynSolValue::Bytes(buf) => buf,
-            DynSolValue::String(s) => s.as_bytes(),
+            DynYlmValue::Bytes(buf) => buf,
+            DynYlmValue::String(s) => s.as_bytes(),
             _ => unreachable!("all types are words or covered in the match"),
         };
         Ok(sha3(to_hash))
@@ -502,7 +502,7 @@ impl Resolver {
 mod tests {
     use super::*;
     use alloc::boxed::Box;
-    use alloy_sol_types::sol;
+    use base_ylm_types::ylm;
 
     #[test]
     fn it_detects_cycles() {
@@ -567,17 +567,17 @@ mod tests {
             vec![PropertyDef::new_unchecked("uint256", "myUint")],
         ));
 
-        let c = DynSolType::CustomStruct {
+        let c = DynYlmType::CustomStruct {
             name: "C".to_string(),
             prop_names: vec!["myUint".to_string()],
-            tuple: vec![DynSolType::Uint(256)],
+            tuple: vec![DynYlmType::Uint(256)],
         };
-        let b = DynSolType::CustomStruct {
+        let b = DynYlmType::CustomStruct {
             name: "B".to_string(),
             prop_names: vec!["myC".to_string()],
             tuple: vec![c.clone()],
         };
-        let a = DynSolType::CustomStruct {
+        let a = DynYlmType::CustomStruct {
             name: "A".to_string(),
             prop_names: vec!["myB".to_string()],
             tuple: vec![b.clone()],
@@ -603,17 +603,17 @@ mod tests {
             vec![PropertyDef::new_unchecked("uint256", "myUint")],
         ));
 
-        let c = DynSolType::CustomStruct {
+        let c = DynYlmType::CustomStruct {
             name: "C".to_string(),
             prop_names: vec!["myUint".to_string()],
-            tuple: vec![DynSolType::Uint(256)],
+            tuple: vec![DynYlmType::Uint(256)],
         };
-        let b = DynSolType::CustomStruct {
+        let b = DynYlmType::CustomStruct {
             name: "B".to_string(),
             prop_names: vec!["myC".to_string()],
-            tuple: vec![DynSolType::Array(Box::new(c.clone()))],
+            tuple: vec![DynYlmType::Array(Box::new(c.clone()))],
         };
-        let a = DynSolType::CustomStruct {
+        let a = DynYlmType::CustomStruct {
             name: "A".to_string(),
             prop_names: vec!["myB".to_string()],
             tuple: vec![b.clone()],
@@ -637,15 +637,15 @@ mod tests {
     }
 
     #[test]
-    fn it_ingests_sol_structs() {
-        sol!(
+    fn it_ingests_ylm_structs() {
+        ylm!(
             struct MyStruct {
                 uint256 a;
             }
         );
 
         let mut graph = Resolver::default();
-        graph.ingest_sol_struct::<MyStruct>();
+        graph.ingest_ylm_struct::<MyStruct>();
         assert_eq!(graph.encode_type("MyStruct").unwrap(), MyStruct::eip712_encode_type());
     }
 }

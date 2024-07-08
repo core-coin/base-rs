@@ -1,0 +1,30 @@
+[package]
+name = "base-ylm-macro-input"
+description = "Input types for ylm!-like macros"
+keywords = ["core", "abi", "encoding", "evm", "solidity"]
+categories = ["encoding", "cryptography::cryptocurrencies"]
+homepage = "https://github.com/core-coin/base-rs/tree/main/crates/ylm-macro-input"
+
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude.workspace = true
+
+[dependencies]
+dunce = "1.0.4"
+heck = "0.5.0"
+hex.workspace = true
+proc-macro2.workspace = true
+syn.workspace = true
+syn-ylem.workspace = true
+quote.workspace = true
+
+# json
+base-json-abi = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[features]
+json = ["dep:base-json-abi", "dep:serde_json"]

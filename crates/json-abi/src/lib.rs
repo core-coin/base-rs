@@ -8,10 +8,6 @@
 // except according to those terms.
 
 #![doc = include_str!("../README.md")]
-#![doc(
-    html_logo_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/alloy.jpg",
-    html_favicon_url = "https://raw.githubusercontent.com/alloy-rs/core/main/assets/favicon.ico"
-)]
 #![warn(
     missing_copy_implementations,
     missing_debug_implementations,
@@ -30,7 +26,7 @@
 #[allow(unused_imports)]
 extern crate alloc;
 
-pub extern crate alloy_sol_type_parser as parser;
+pub extern crate base_ylm_type_parser as parser;
 
 use serde::{Deserialize, Serialize};
 
@@ -46,8 +42,8 @@ pub use param::{EventParam, Param};
 mod internal_type;
 pub use internal_type::InternalType;
 
-mod to_sol;
-pub use to_sol::ToSolConfig;
+mod to_ylm;
+pub use to_ylm::ToYlmConfig;
 
 pub(crate) mod utils;
 
@@ -65,7 +61,7 @@ pub enum StateMutability {
     ///
     /// This is the solidity default: <https://docs.soliditylang.org/en/latest/abi-spec.html#json>
     ///
-    /// The state mutability nonpayable is reflected in Solidity by not specifying a state
+    /// The state mutability nonpayable is reflected in Ylem by not specifying a state
     /// mutability modifier at all.
     #[default]
     NonPayable,

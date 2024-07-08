@@ -39,13 +39,13 @@ impl fmt::Display for IcanAddress {
 }
 
 impl IcanAddress {
-    /// Creates an Ethereum address from an EVM word's upper 20 bytes
+    /// Creates an Core address from an EVM word's upper 20 bytes
     /// (`word[12..]`).
     ///
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, Address};
+    /// # use base_primitives::{address, b256, Address};
     /// let word = b256!("000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045");
     /// assert_eq!(Address::from_word(word), address!("d8da6bf26964af9d7eed9e03e53415d37aa96045"));
     /// ```
@@ -60,7 +60,7 @@ impl IcanAddress {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, Address};
+    /// # use base_primitives::{address, b256, Address};
     /// assert_eq!(
     ///     address!("d8da6bf26964af9d7eed9e03e53415d37aa96045").into_word(),
     ///     b256!("000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"),
@@ -102,7 +102,7 @@ impl IcanAddress {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{cAddress, IcanAddress};
+    /// # use base_primitives::{cAddress, IcanAddress};
     /// let sender = cAddress!("cb00b20a608c624Ca5003905aA834De7156C68b2E1d0");
     ///
     /// let expected = cAddress!("cb13e6ff992542059347e59e8e393af8adefa71fd4e6");
@@ -156,7 +156,7 @@ impl IcanAddress {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, bytes, Address};
+    /// # use base_primitives::{address, b256, bytes, Address};
     /// let address = address!("8ba1f109551bD432803012645Ac136ddd64DBA72");
     /// let salt = b256!("7c5ea36004851c764c44143b1dcb59679b11c9a68e5f41497f6cf3d480715331");
     /// let init_code = bytes!("6394198df16000526103ff60206004601c335afa6040516060f3");
@@ -187,7 +187,7 @@ impl IcanAddress {
     /// # Examples
     ///
     /// ```
-    /// # use alloy_primitives::{address, b256, Address};
+    /// # use base_primitives::{address, b256, Address};
     /// let address = address!("5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f").to_ican(1);
     /// let salt = b256!("2b2f5776e38002e0c013d0d89828fdb06fee595ea2d5ed4b194e3883e823e350");
     /// let init_code_hash = b256!("96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f");

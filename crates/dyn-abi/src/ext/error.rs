@@ -1,16 +1,16 @@
-use crate::{DynSolError, Specifier};
+use crate::{DynYlmError, Specifier};
 use alloc::vec::Vec;
-use alloy_json_abi::Error;
-use alloy_primitives::{sha3, Selector};
+use base_json_abi::Error;
+use base_primitives::{sha3, Selector};
 
 mod sealed {
     pub trait Sealed {}
-    impl Sealed for alloy_json_abi::Error {}
+    impl Sealed for base_json_abi::Error {}
 }
 use sealed::Sealed;
 
-impl Specifier<DynSolError> for Error {
-    fn resolve(&self) -> crate::Result<DynSolError> {
+impl Specifier<DynYlmError> for Error {
+    fn resolve(&self) -> crate::Result<DynYlmError> {
         let signature = self.signature();
         let selector = Selector::from_slice(&sha3(signature)[0..4]);
 
@@ -19,7 +19,7 @@ impl Specifier<DynSolError> for Error {
             body.push(param.resolve()?);
         }
 
-        Ok(DynSolError::new_unchecked(selector, crate::DynSolType::Tuple(body)))
+        Ok(DynYlmError::new_unchecked(selector, crate::DynYlmType::Tuple(body)))
     }
 }
 
@@ -29,7 +29,7 @@ pub trait ErrorExt: Sealed {
     fn decode_error(&self, data: &[u8]) -> crate::Result<crate::DecodedError>;
 }
 
-impl ErrorExt for alloy_json_abi::Error {
+impl ErrorExt for base_json_abi::Error {
     fn decode_error(&self, data: &[u8]) -> crate::Result<crate::DecodedError> {
         self.resolve()?.decode_error(data)
     }

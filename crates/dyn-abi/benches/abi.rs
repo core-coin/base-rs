@@ -1,8 +1,8 @@
 #![allow(unknown_lints, clippy::incompatible_msrv)]
 
-use alloy_dyn_abi::{DynSolType, DynSolValue};
-use alloy_primitives::{hex, U256};
-use alloy_sol_types::{sol, sol_data, SolType, SolValue};
+use base_dyn_abi::{DynYlmType, DynYlmValue};
+use base_primitives::{hex, U256};
+use base_ylm_types::{ylm, ylm_data, YlmType, YlmValue};
 use criterion::{
     criterion_group, criterion_main, measurement::WallTime, BenchmarkGroup, Criterion,
 };
@@ -55,14 +55,14 @@ fn dyn_abi_encode(c: &mut Criterion) {
     g.bench_function("single", |b| {
         let input = encode_single_input();
         b.iter(|| {
-            let value = DynSolValue::String(input.clone());
+            let value = DynYlmValue::String(input.clone());
             black_box(value).abi_encode()
         });
     });
 
     g.bench_function("struct", |b| {
-        let input = encode_struct_sol_values();
-        let input = DynSolValue::Tuple(input.to_vec());
+        let input = encode_struct_ylm_values();
+        let input = DynYlmValue::Tuple(input.to_vec());
         b.iter(|| black_box(&input).abi_encode_sequence());
     });
 
@@ -73,13 +73,13 @@ fn dyn_abi_decode(c: &mut Criterion) {
     let mut g = group(c, "dyn-abi/decode");
 
     g.bench_function("word", |b| {
-        let ty = DynSolType::Uint(256);
+        let ty = DynYlmType::Uint(256);
         let input = decode_word_input();
         b.iter(|| ty.abi_decode(black_box(&input)).unwrap());
     });
 
     g.bench_function("dynamic", |b| {
-        let ty = DynSolType::String;
+        let ty = DynYlmType::String;
         let input = decode_dynamic_input();
         b.iter(|| ty.abi_decode(black_box(&input)).unwrap());
     });
@@ -87,8 +87,8 @@ fn dyn_abi_decode(c: &mut Criterion) {
     g.finish();
 }
 
-fn sol_types_encode(c: &mut Criterion) {
-    let mut g = group(c, "sol-types/encode");
+fn ylm_types_encode(c: &mut Criterion) {
+    let mut g = group(c, "ylm-types/encode");
 
     g.bench_function("single", |b| {
         let input = encode_single_input();
@@ -103,23 +103,23 @@ fn sol_types_encode(c: &mut Criterion) {
     g.finish();
 }
 
-fn sol_types_decode(c: &mut Criterion) {
-    let mut g = group(c, "sol-types/decode");
+fn ylm_types_decode(c: &mut Criterion) {
+    let mut g = group(c, "ylm-types/decode");
 
     g.bench_function("word", |b| {
         let input = decode_word_input();
-        b.iter(|| sol_data::Uint::<256>::abi_decode(black_box(&input), false).unwrap());
+        b.iter(|| ylm_data::Uint::<256>::abi_decode(black_box(&input), false).unwrap());
     });
 
     g.bench_function("dynamic", |b| {
         let input = decode_dynamic_input();
-        b.iter(|| sol_data::String::abi_decode(black_box(&input), false).unwrap());
+        b.iter(|| ylm_data::String::abi_decode(black_box(&input), false).unwrap());
     });
 
     g.finish();
 }
 
-sol! {
+ylm! {
     /// UniswapV3's `SwapRouter::ExactInputSingleParams`:
     /// <https://github.com/Uniswap/v3-periphery/blob/6cce88e63e176af1ddb6cc56e029110289622317/contracts/interfaces/ISwapRouter.sol#L10C10-L19>
     struct Input {
@@ -169,7 +169,7 @@ fn encode_struct_input_tokens() -> [ethabi::Token; 8] {
     ]
 }
 
-fn encode_struct_sol_values() -> [DynSolValue; 8] {
+fn encode_struct_ylm_values() -> [DynYlmValue; 8] {
     let input = encode_struct_input();
     [
         input.tokenIn.into(),
@@ -211,7 +211,7 @@ criterion_group!(
     ethabi_decode,
     dyn_abi_encode,
     dyn_abi_decode,
-    sol_types_encode,
-    sol_types_decode,
+    ylm_types_encode,
+    ylm_types_decode,
 );
 criterion_main!(benches);

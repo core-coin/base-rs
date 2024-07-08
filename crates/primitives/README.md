@@ -1,11 +1,11 @@
-# alloy-primitives
+# base-primitives
 
-Primitive types shared by [alloy], [foundry], [revm], and [reth].
+Primitive types shared by [atoms-rs], [foxar], [cvm], and [core].
 
-[alloy]: https://github.com/alloy-rs
-[foundry]: https://github.com/foundry-rs/foundry
-[revm]: https://github.com/bluealloy/revm
-[reth]: https://github.com/paradigmxyz/reth
+[atoms-rs]: https://github.com/core-coin/atoms-rs
+[foxar]: https://github.com/bchainhub/foxar
+[cvm]: https://github.com/core-coin/cvm
+[core]: https://github.com/core-coin/core
 
 ## Types
 
@@ -23,10 +23,10 @@ Primitive types shared by [alloy], [foundry], [revm], and [reth].
 This library has straightforward, basic, types. Usage is correspondingly simple.
 Please consult [the documentation][docs] for more information.
 
-[docs]: https://docs.rs/alloy-primitives/latest/alloy_primitives/
+[docs]: https://docs.rs/base-primitives/latest/base_primitives/
 
 ```rust
-use alloy_primitives::{address, fixed_bytes, Address, FixedBytes, I256, U256};
+use base_primitives::{address, fixed_bytes, Address, FixedBytes, I256, U256};
 
 // FixedBytes
 let n: FixedBytes<6> = fixed_bytes!("1234567890ab");

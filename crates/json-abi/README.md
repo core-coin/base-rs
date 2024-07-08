@@ -1,13 +1,13 @@
-# alloy-json-abi
+# base-json-abi
 
-Full Ethereum [JSON-ABI] implementation.
+Full Core [JSON-ABI] implementation.
 
 This crate is a re-implementation of a part of [ethabi]'s API, with a few main
 differences:
 - the `Contract` struct is now called `JsonAbi` and also contains the `fallback`
   and `receive` functions
 - the `Param` and `EventParam` structs only partially parse the type string
-  instead of fully resolving it into a Solidity type
+  instead of fully resolving it into a Ylem type
 
 [JSON-ABI]: https://docs.soliditylang.org/en/latest/abi-spec.html#json
 [ethabi]: https://crates.io/crates/ethabi
@@ -17,7 +17,7 @@ differences:
 Parse a JSON ABI file into a `JsonAbi` struct:
 
 ```rust
-use alloy_json_abi::JsonAbi;
+use base_json_abi::JsonAbi;
 
 # stringify!(
 let path = "path/to/abi.json";
@@ -30,7 +30,7 @@ for item in abi.items() {
 }
 ```
 
-Resolve a `Function`'s input type with [`alloy-dyn-abi`](../dyn-abi):
+Resolve a `Function`'s input type with [`base-dyn-abi`](../dyn-abi):
 
 ```rust,ignore
 todo!()
