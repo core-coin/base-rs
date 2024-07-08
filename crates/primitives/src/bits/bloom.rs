@@ -2,7 +2,7 @@
 //!
 //! Adapted from <https://github.com/paritytech/parity-common/blob/2fb72eea96b6de4a085144ce239feb49da0cd39e/ethbloom/src/lib.rs>
 
-use crate::{sha3, Address, Log, LogData, B256};
+use crate::{sha3, IcanAddress, Log, LogData, B256};
 
 /// Number of bits to set per input in Core bloom filter.
 pub const BLOOM_BITS_PER_ITEM: usize = 3;
@@ -55,16 +55,16 @@ wrap_fixed_bytes!(
     pub struct Bloom<256>;
 );
 
-impl<'a> FromIterator<&'a (Address, LogData)> for Bloom {
-    fn from_iter<T: IntoIterator<Item = &'a (Address, LogData)>>(iter: T) -> Self {
+impl<'a> FromIterator<&'a (IcanAddress, LogData)> for Bloom {
+    fn from_iter<T: IntoIterator<Item = &'a (IcanAddress, LogData)>>(iter: T) -> Self {
         let mut bloom = Self::ZERO;
         bloom.extend(iter);
         bloom
     }
 }
 
-impl<'a> Extend<&'a (Address, LogData)> for Bloom {
-    fn extend<T: IntoIterator<Item = &'a (Address, LogData)>>(&mut self, iter: T) {
+impl<'a> Extend<&'a (IcanAddress, LogData)> for Bloom {
+    fn extend<T: IntoIterator<Item = &'a (IcanAddress, LogData)>>(&mut self, iter: T) {
         for (address, log_data) in iter {
             self.accrue_raw_log(*address, log_data.topics())
         }
@@ -189,7 +189,7 @@ impl Bloom {
     }
 
     /// Ingests a raw log into the bloom filter.
-    pub fn accrue_raw_log(&mut self, address: Address, topics: &[B256]) {
+    pub fn accrue_raw_log(&mut self, address: IcanAddress, topics: &[B256]) {
         self.m3_2048(address.as_slice());
         for topic in topics.iter() {
             self.m3_2048(topic.as_slice());
@@ -205,7 +205,7 @@ impl Bloom {
     ///
     /// Note: This method may return false positives. This is inherent to the
     /// bloom filter data structure.
-    pub fn contains_raw_log(&self, address: Address, topics: &[B256]) -> bool {
+    pub fn contains_raw_log(&self, address: IcanAddress, topics: &[B256]) -> bool {
         let mut bloom = Self::default();
         bloom.accrue_raw_log(address, topics);
         self.contains(&bloom)

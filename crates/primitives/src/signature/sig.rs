@@ -1,13 +1,34 @@
-use crate::{hex, signature::SignatureError, B1368};
+use crate::{hex, signature::SignatureError, IcanAddress, B1368};
 use alloc::vec::Vec;
-use core::str::FromStr;
+use core::{net, str::FromStr};
+use libgoldilocks::{
+    errors::LibgoldilockErrors,
+    goldilocks::{ed448_sign, ed448_verify_with_error},
+    PrehashSigner, SigningKey, VerifyingKey,
+};
+
+#[cfg(feature = "arbitrary")]
+use arbitrary::Arbitrary;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// An Core ECDSA signature.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Signature {
     sig: B1368,
+}
+
+impl PrehashSigner<Signature> for SigningKey {
+    fn sign_prehash(&self, prehash: &[u8]) -> Result<Signature, LibgoldilockErrors> {
+        let sig = ed448_sign(&self.to_bytes(), prehash);
+        let mut sig_with_private_key: [u8; 171] = [0; 171];
+        sig_with_private_key[0..114].copy_from_slice(&sig);
+        sig_with_private_key[114..171].copy_from_slice(&self.verifying_key().as_bytes());
+
+        Ok(Signature { sig: sig_with_private_key.into() })
+    }
 }
 
 impl<'a> TryFrom<&'a [u8]> for Signature {
@@ -107,6 +128,58 @@ impl Signature {
     pub fn write_rlp(&self, out: &mut dyn alloy_rlp::BufMut) {
         alloy_rlp::Encodable::encode(&self.sig, out);
     }
+
+    /// Recovers an [`Address`] from this signature and the given message by first prefixing and
+    /// hashing the message according to [EIP-191](crate::eip191_hash_message).
+    ///
+    /// [`IcanAddress`]: IcanAddress
+    #[inline]
+    pub fn recover_address_from_msg<T: AsRef<[u8]>>(
+        &self,
+        msg: T,
+        network_id: u64,
+    ) -> Result<IcanAddress, SignatureError> {
+        self.recover_from_msg(msg).map(|vk| IcanAddress::from_public_key(&vk, network_id))
+    }
+
+    /// Recovers an [`Address`] from this signature and the given prehashed message.
+    ///
+    /// [`IcanAddress`]: IcanAddress
+    #[inline]
+    pub fn recover_address_from_prehash(
+        &self,
+        prehash: &crate::B256,
+        network_id: u64,
+    ) -> Result<IcanAddress, SignatureError> {
+        self.recover_from_prehash(prehash).map(|vk| IcanAddress::from_public_key(&vk, network_id))
+    }
+
+    /// Recovers a [`VerifyingKey`] from this signature and the given message by first prefixing and
+    /// hashing the message according to [EIP-191](crate::eip191_hash_message).
+    ///
+    /// [`VerifyingKey`]: VerifyingKey
+    #[inline]
+    pub fn recover_from_msg<T: AsRef<[u8]>>(&self, msg: T) -> Result<VerifyingKey, SignatureError> {
+        self.recover_from_prehash(&crate::eip191_hash_message(msg))
+    }
+
+    /// Recovers a [`VerifyingKey`] from this signature and the given prehashed message.
+    ///
+    /// [`VerifyingKey`]: VerifyingKey
+    #[inline]
+    pub fn recover_from_prehash(
+        &self,
+        prehash: &crate::B256,
+    ) -> Result<VerifyingKey, SignatureError> {
+        ed448_verify_with_error(
+            &self.as_bytes()[114..],
+            &self.as_bytes()[..114],
+            prehash.as_slice(),
+        )
+        .map_err(|err| SignatureError::Libgoldilocks(err))?;
+
+        Ok(VerifyingKey::from_bytes(&self.as_bytes()[114..]))
+    }
 }
 
 #[cfg(feature = "rlp")]
@@ -140,9 +213,11 @@ impl alloy_rlp::Decodable for crate::Signature {
 #[cfg(test)]
 #[allow(unused_imports)]
 mod tests {
+    use ruint::aliases::U176;
+
     use super::*;
     use crate::B1368;
-    use core::str::FromStr;
+    use core::{fmt::Debug, str::FromStr};
 
     #[test]
     fn test_from_str() {
@@ -161,6 +236,72 @@ mod tests {
         let inner: B1368 = B1368::from_str("ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580").unwrap();
         assert_eq!(sig.unwrap().sig().0, inner.0);
     }
+
+    #[test]
+    fn recover_address_from_prehash() {
+        let sig = crate::Signature::from_str(
+            "ea535a535ff0dbfda0b2c1394bad87311789c1c6eafe6eef48fd509c2e7ba0e67c4774fab8c45abf1c7e22532bb816115bf1da8438fdb81e00e13ca01494adc201c9c35bc32cdd7c1922a0b1121f1d8ed72b37786dfd6e5583b06ad172bdb4f1d2afd41b4444abd2b5901c851fcb3d641200fadc64a37e95ad1bcbaf19625bf95826e6a8cbab42b57fc91b72da98d26bae8bda2d1fc52c508a03724aded17b8cef8253f2116307bbbf7580",
+        ).unwrap();
+        let addr = sig
+            .recover_address_from_prehash(
+                &b256!("ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008"),
+                1,
+            )
+            .unwrap();
+        assert_eq!(
+            addr,
+            IcanAddress::from_str("cb72355e4fdb2edb55c4a747c899505d393aa6628590").unwrap()
+        );
+    }
+
+    #[test]
+    fn recover_address_from_msg() {
+        let sig = crate::Signature::from_str(
+            "0x1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080",
+        ).unwrap();
+        let addr = sig.recover_address_from_msg("Hello, world!", 1).unwrap();
+        assert_eq!(
+            addr,
+            IcanAddress::from_str("cb43bfd3937bfb2cd1b2b36253b43f60a1487ea4af3c").unwrap()
+        );
+    }
+
+    #[test]
+    fn sign_prehash() {
+        let prehash = crate::eip191_hash_message("Hello, world!");
+
+        let key = SigningKey::from_str("ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008ce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe706");
+        let sig: Signature = key.sign_prehash(&prehash.0).unwrap();
+
+        assert_eq!(sig.sig.to_string(), "0x1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080");
+        assert_eq!(
+            prehash.to_string(),
+            "0x5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc"
+        );
+    }
+
+    #[test]
+    fn recover_from_prehash() {
+        let sig = crate::Signature::from_str(
+            "1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080",
+        ).unwrap();
+        let key = sig
+            .recover_from_prehash(&b256!(
+                "5a715dc3d0332f9d07824171d604d0cec9475f4299605e8c588d071a0c6c15cc"
+            ))
+            .unwrap();
+        assert_eq!(key, VerifyingKey::from_str("4c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080"));
+    }
+
+    #[test]
+    fn recover_from_msg() {
+        let sig = crate::Signature::from_str(
+            "1e9e2b20b92cc21257764ffccc5e0ad7f9a350d4e6ece497f5856abb1fb244eaf527035814e28ac4d1eb905fd7ee3bc5b8aab5a79a8243f6804ef8b60e89c248473fde7150d43eb03b27623f354cc8965b8cdfe5029ea8a033d3143fe69a1d86c331b41588c336a050e5e6395508ec7e22004c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080",
+        ).unwrap();
+        let addr = sig.recover_from_msg("Hello, world!").unwrap();
+        assert_eq!(addr, VerifyingKey::from_str("4c4a20a489260a4f5829c04101e75ac20947d60eb01fbd29a96d48c02639384d2806c4263340153194e7a3638ec2cca39938c1b74be200f080"));
+    }
+
     //
     // #[cfg(feature = "rlp")]
     // use alloy_rlp::{Decodable, Encodable};

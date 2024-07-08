@@ -3,6 +3,9 @@ use core::{borrow::Borrow, fmt, panic, str};
 use libgoldilocks::{SigningKey, VerifyingKey};
 use ruint::aliases::U176;
 
+#[cfg(feature = "serde")]
+use serde::{Serialize, Serializer};
+
 wrap_fixed_bytes!(
     extra_derives: [],
     pub struct IcanAddress<22>;
@@ -22,18 +25,16 @@ impl From<IcanAddress> for U176 {
     }
 }
 impl fmt::Display for IcanAddress {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
-        // let checksum = checksum.as_str();
-        // if f.alternate() {
-        //     // If the alternate flag is set, use middle-out compression
-        //     // "0x" + first 4 bytes + "…" + last 4 bytes
-        //     f.write_str(&checksum[..6])?;
-        //     f.write_str("…")?;
-        //     f.write_str(&checksum[38..])
-        // } else {
-        //     f.write_str(checksum)
-        // }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if f.alternate() {
+            // If the alternate flag is set, use middle-out compression
+            // "0x" + first 4 bytes + "…" + last 4 bytes
+            f.write_str(hex::encode(&self[..3]).as_str())?;
+            f.write_str("…")?;
+            f.write_str(hex::encode(&self[20..]).as_str())
+        } else {
+            f.write_str(hex::encode(self).as_str())
+        }
     }
 }
 
@@ -253,6 +254,8 @@ impl IcanAddress {
 }
 #[cfg(test)]
 mod tests {
+    use hex::FromHex;
+
     use super::*;
     use crate::Address;
 
@@ -370,6 +373,32 @@ mod tests {
         let wrong_expected =
             "cb82a5fd22b9bee8b8ab877c86e0a2c21765e1d5bfc4".parse::<IcanAddress>().unwrap();
         assert_ne!(IcanAddress::from_private_key(&private_key, 1), wrong_expected);
+    }
+
+    #[test]
+    fn fmt() {
+        assert_eq!(
+            IcanAddress::from_hex("cb122222222222222222222222222222222222222222")
+                .unwrap()
+                .to_string(),
+            "cb122222222222222222222222222222222222222222"
+        );
+
+        assert_eq!(
+            format!(
+                "{:#}",
+                IcanAddress::from_hex("cb122222222222222222222222222222222222222222").unwrap()
+            ),
+            "cb1222…2222"
+        );
+
+        assert_eq!(
+            format!(
+                "{:}",
+                IcanAddress::from_hex("cb122222222222222222222222222222222222222222").unwrap()
+            ),
+            "cb122222222222222222222222222222222222222222"
+        );
     }
 
     //
