@@ -15,13 +15,6 @@ pub enum Parity {
     Parity(bool),
 }
 
-#[cfg(feature = "k256")]
-impl From<k256::ecdsa::RecoveryId> for Parity {
-    fn from(value: k256::ecdsa::RecoveryId) -> Self {
-        Self::Parity(value.is_y_odd())
-    }
-}
-
 impl TryFrom<U64> for Parity {
     type Error = <Self as TryFrom<u64>>::Error;
     fn try_from(value: U64) -> Result<Self, Self::Error> {
@@ -129,21 +122,6 @@ impl Parity {
         };
 
         Self::Eip155(to_eip155_v(parity as u8, chain_id))
-    }
-
-    /// Determines the recovery ID.
-    #[cfg(feature = "k256")]
-    pub const fn recid(&self) -> k256::ecdsa::RecoveryId {
-        let recid_opt = match self {
-            Self::Eip155(v) => Some(crate::signature::utils::normalize_v(*v)),
-            Self::NonEip155(b) | Self::Parity(b) => k256::ecdsa::RecoveryId::from_byte(*b as u8),
-        };
-
-        // manual unwrap for const fn
-        match recid_opt {
-            Some(recid) => recid,
-            None => unreachable!(),
-        }
     }
 
     /// Convert to a parity bool, dropping any V information.

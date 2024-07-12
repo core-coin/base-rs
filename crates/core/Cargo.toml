@@ -49,5 +49,4 @@ arbitrary = [
     "base-ylm-types?/arbitrary",
     "base-dyn-abi?/arbitrary",
 ]
-k256 = ["base-primitives/k256"]
 eip712 = ["base-ylm-types?/eip712-serde", "base-dyn-abi?/eip712"]
