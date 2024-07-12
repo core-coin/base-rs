@@ -349,7 +349,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, contract: &ItemContract) -> Result<TokenS
         });
 
         let base_contract = &cx.crates.contract;
-        let generics_t_p_n = quote!(<T: base_contract::private::Transport + ::core::clone::Clone, P: basecontract::private::Provider<T, N>, N: base_contract::private::Network>);
+        let generics_t_p_n = quote!(<T: base_contract::private::Transport + ::core::clone::Clone, P: base_contract::private::Provider<T, N>, N: base_contract::private::Network>);
 
         quote! {
             use #base_contract as base_contract;
