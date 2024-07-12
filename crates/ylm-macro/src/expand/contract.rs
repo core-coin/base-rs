@@ -367,7 +367,7 @@ pub(super) fn expand(cx: &ExpCtxt<'_>, contract: &ItemContract) -> Result<TokenS
 
             #[doc = #struct_doc]
             #[derive(Clone)]
-            pub struct #name<T, P, N = base_contract::private::Core> {
+            pub struct #name<T, P, N = base_contract::private::Ethereum> {
                 address: base_ylm_types::private::Address,
                 provider: P,
                 _network_transport: ::core::marker::PhantomData<(N, T)>,
