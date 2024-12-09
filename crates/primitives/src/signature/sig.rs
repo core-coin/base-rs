@@ -92,6 +92,10 @@ impl crate::Signature {
 }
 
 impl Signature {
+    pub fn new(sig: B1368) -> Self {
+        Self { sig }
+    }
+
     /// Returns the `r` component of this signature.
     #[inline]
     pub const fn sig(&self) -> B1368 {
