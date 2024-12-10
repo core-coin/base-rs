@@ -19,7 +19,7 @@ pub const WEI_IN_ETHER: crate::U256 = Unit::ETHER.wei_const();
 pub type Units = Unit;
 
 /// The prefix used for hashing messages according to EIP-191.
-pub const EIP191_PREFIX: &str = "\x19CoreSigned Message:\n";
+pub const EIP191_PREFIX: &str = "\x19Core Signed Message:\n";
 
 /// Tries to create a `Vec` of `n` elements, each initialized to `elem`.
 #[macro_export]
